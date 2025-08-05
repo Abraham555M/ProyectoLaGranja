@@ -51,6 +51,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:clipToPadding="false"
         android:padding="16dp"
-        tools:listitem="@layout/item_comentario_usuario" />
+        tools:listitem="@layout/item_articulo_catalogo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
