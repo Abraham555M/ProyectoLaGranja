@@ -6,9 +6,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.Catalogo.CatalogoFragment">
 
-    <!-- CardView para el Spinner de Estado -->
+    <!-- CardView para el Spinner de categorías -->
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardview_estado"
+        android:id="@+id/cardview_categorias"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="8dp"
@@ -19,38 +19,68 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <Spinner
-            android:id="@+id/spinner_estado"
+            android:id="@+id/sp_categorias"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:entries="@array/listaro_categorias"
+            android:entries="@array/listado_categorias"
             android:padding="16dp" />
     </androidx.cardview.widget.CardView>
 
-    <!-- CardView para Filtro por Fecha -->
+    <!-- CardView para el Spinner de productos -->
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardview_fechas"
+        android:id="@+id/cardview_productos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
         android:layout_margin="8dp"
-        app:layout_constraintTop_toBottomOf="@id/cardview_estado"
+        app:layout_constraintTop_toBottomOf="@id/cardview_categorias"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
+
+        <Spinner
+            android:id="@+id/sp_productos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:entries="@array/listado_categorias"
+            android:padding="16dp" />
     </androidx.cardview.widget.CardView>
 
-    <!-- RecyclerView para mostrar los comentarios -->
+    <!-- CardView para el EditText de búsqueda -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardview_busqueda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        android:layout_margin="8dp"
+        app:layout_constraintTop_toBottomOf="@id/cardview_productos"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <EditText
+            android:id="@+id/et_busqueda"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:hint="Nombre del articulo"
+            android:inputType="text"
+            android:padding="12dp" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- RecyclerView para mostrar los articulos -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewComentarios"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/cardview_fechas"
+        android:clipToPadding="false"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/cardview_productos"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:clipToPadding="false"
-        android:padding="16dp"
         tools:listitem="@layout/item_articulo_catalogo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
