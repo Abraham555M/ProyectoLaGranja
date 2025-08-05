@@ -10,4 +10,15 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="listaro_categorias">
+        <item>Todas</item>
+        <item>Aves</item>
+        <item>Carnes</item>
+        <item>Otros</item>
+        <item>Preparados</item>
+        <item>Embutidos</item>
+    </string-array>
 </resources>
