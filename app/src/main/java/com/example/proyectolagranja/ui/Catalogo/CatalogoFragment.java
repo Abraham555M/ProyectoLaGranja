@@ -12,8 +12,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectolagranja.R;
+import com.example.proyectolagranja.ui.Catalogo.Adapter.ArticuloAdapter;
+import com.example.proyectolagranja.ui.Clases.Articulo;
 import com.example.proyectolagranja.ui.Clases.Categoria;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.loopj.android.http.AsyncHttpClient;
@@ -31,6 +35,9 @@ import cz.msebera.android.httpclient.Header;
 
 public class CatalogoFragment extends Fragment {
     private Spinner spCategorias, spProductos;
+    private RecyclerView recyclerView;
+    private ArticuloAdapter adapter;
+    private List<Articulo> listaArticulos = new ArrayList<>();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -42,7 +49,49 @@ public class CatalogoFragment extends Fragment {
         cargarCategorias();
         cargarProductos();
 
+        recyclerView = rootView.findViewById(R.id.recyclerViewComentarios);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new ArticuloAdapter(getContext(), listaArticulos);
+        recyclerView.setAdapter(adapter);
+
+        cargarArticulos(); // Método para traer artículos desde el servidor
+
         return rootView;
+    }
+
+    private void cargarArticulos() {
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_catalogo.php";
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONArray jsonArray = new JSONArray(new String(responseBody));
+                    listaArticulos.clear();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        String id = obj.getString("id_articulo");
+                        String nombre = obj.getString("nom_articulo");
+                        String precio = obj.getString("prec_vent3_articulo");
+                        String imagen = obj.getString("foto_articulo");
+
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                    }
+
+                    adapter.notifyDataSetChanged();
+
+                } catch (JSONException e) {
+                    Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void cargarCategorias() {
