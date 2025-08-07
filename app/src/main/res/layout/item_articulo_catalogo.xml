@@ -62,19 +62,24 @@
             android:gravity="center">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAgregar"
-                android:layout_width="41dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="16dp"
-                android:backgroundTint="#90FBC1"
-                android:gravity="center"
-                android:padding="0dp"
+                android:id="@+id/btnAgregarCantidad"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/color_principal"
+                android:elevation="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:insetLeft="0dp"
+                android:insetRight="0dp"
                 android:text=""
-                app:cornerRadius="8dp"
-                app:icon="@drawable/ic_add"
+                app:cornerRadius="24dp"
+                app:icon="@drawable/ic_carrito_compras_add"
+                app:iconTint="@android:color/white"
                 app:iconPadding="0dp"
-                app:iconTint="@android:color/black" />
+                app:strokeWidth="0dp"
+                style="@style/Widget.MaterialComponents.Button.Icon" />
+
 
         </LinearLayout>
     </LinearLayout>

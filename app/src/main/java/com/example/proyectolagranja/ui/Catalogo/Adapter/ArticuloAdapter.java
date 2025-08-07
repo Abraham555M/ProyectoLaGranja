@@ -20,6 +20,7 @@ import java.util.List;
 public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.ArticuloViewHolder>{
     private Context context;
     private List<Articulo> listaArticulos;
+    private OnAgregarCantidadClickListener listener;
 
     public ArticuloAdapter(Context context, List<Articulo> listaArticulos) {
         this.context = context;
@@ -52,6 +53,11 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         return listaArticulos.size();
 
     }
+
+    public interface OnAgregarCantidadClickListener {
+        void onAgregarClick(Articulo articulo);
+    }
+
 
     public static class ArticuloViewHolder extends RecyclerView.ViewHolder {
         ImageView imagen;

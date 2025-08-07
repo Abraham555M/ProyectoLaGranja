@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,11 +34,12 @@ import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
 
-public class CatalogoFragment extends Fragment {
+public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private Spinner spCategorias, spProductos;
     private RecyclerView recyclerView;
     private ArticuloAdapter adapter;
     private List<Articulo> listaArticulos = new ArrayList<>();
+    private Button btnAgregarCantidad;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -131,6 +133,7 @@ public class CatalogoFragment extends Fragment {
             }
         });
     }
+
     private void cargarProductos() {
         String url = ServidorConfig.URL_SERVIDOR + "producto/producto_listar.php";
         AsyncHttpClient client = new AsyncHttpClient();
@@ -167,5 +170,12 @@ public class CatalogoFragment extends Fragment {
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v == btnAgregarCantidad) {
+
+        }
     }
 }
