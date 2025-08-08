@@ -23,6 +23,7 @@ import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Catalogo.Adapter.ArticuloAdapter;
 import com.example.proyectolagranja.ui.Clases.Articulo;
 import com.example.proyectolagranja.ui.Clases.Categoria;
+import com.example.proyectolagranja.ui.Clases.Producto;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -48,6 +49,7 @@ public class CatalogoFragment extends Fragment {
     private EditText et_busqueda;
     private List<Articulo> listaArticulos = new ArrayList<>();
     private List<Categoria> listaCategorias = new ArrayList<>();
+    private List<Producto> listaProductos = new ArrayList<>();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -66,8 +68,9 @@ public class CatalogoFragment extends Fragment {
         cargarProductos(); // Cargar Productos en el spinner
         cargarArticulos(); // Cargar Articulos
 
-        configurarSpinnerCategorias(); // Configuracion
-        configurarBusquedaPorNombre(); // Configuracion
+        configurarSpinnerCategorias(); // Configuracion categorias
+        configurarSpinnerProductos(); // Configuracion productos
+        configurarBusquedaPorNombre(); // Configuracion nombre
 
         return rootView;
     }
@@ -81,6 +84,24 @@ public class CatalogoFragment extends Fragment {
                     filtrarArticulosPorCategoria(seleccionada.getId_categoria());
                 } else {
                     cargarArticulos(); // Mostrar todo si no se selecciona ninguna categoría válida
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private void configurarSpinnerProductos() {
+        spProductos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0 && position < listaProductos.size()) {
+                    Producto seleccionado = listaProductos.get(position);
+                    filtrarArticulosPorProducto(seleccionado.getId_producto());
+                } else {
+                    cargarArticulos();
                 }
             }
 
@@ -116,6 +137,40 @@ public class CatalogoFragment extends Fragment {
                         });
                     }
                 }, DELAY);
+            }
+        });
+    }
+
+    private void filtrarArticulosPorProducto(int idProducto) {
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_producto.php?id_producto=" + idProducto;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                listaArticulos.clear();
+
+                try {
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject obj = response.getJSONObject(i);
+                        String id = obj.getString("id_articulo");
+                        String nombre = obj.getString("nom_articulo");
+                        String precio = obj.getString("prec_vent3_articulo");
+                        String imagen = obj.getString("foto_articulo");
+
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                    }
+
+                    adapter.notifyDataSetChanged();
+
+                } catch (JSONException e) {
+                    Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Toast.makeText(getContext(), "Error al filtrar artículos por producto", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -278,9 +333,15 @@ public class CatalogoFragment extends Fragment {
                     List<String> nombresProductos = new ArrayList<>();
                     nombresProductos.add("Productos");
 
+                    listaProductos.clear();
+                    listaProductos.add(null);
+
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject categoria = jsonArray.getJSONObject(i);
-                        String nombre = categoria.getString("nom_producto");
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        int id = obj.getInt("id_producto");
+                        String nombre = obj.getString("nom_producto");
+
+                        listaProductos.add(new Producto(id, nombre));
                         nombresProductos.add(nombre);
                     }
 
@@ -292,7 +353,6 @@ public class CatalogoFragment extends Fragment {
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spProductos.setAdapter(adapter);
                 } catch (JSONException e) {
-                    e.printStackTrace();
                     Toast.makeText(getContext(), "Error al procesar los datos", Toast.LENGTH_SHORT).show();
                 }
             }
