@@ -53,10 +53,13 @@ public class MainActivity extends AppCompatActivity {
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.nav_crear_cuenta || destination.getId() == R.id.nav_inicio_sesion) {
                 binding.appBarMain.toolbar.setVisibility(View.GONE);
+                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // 🔒 Desactiva swipe
             } else {
                 binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
+                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED); // ✅ Reactiva swipe
             }
         });
+
     }
 
     @Override
