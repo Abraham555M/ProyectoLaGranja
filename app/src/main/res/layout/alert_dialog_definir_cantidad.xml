@@ -6,25 +6,53 @@
     android:orientation="vertical"
     android:padding="24dp"
     android:background="@drawable/bg_dialog_rounded"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:layout_marginHorizontal="16dp">
 
-    <!-- Campo Cantidad -->
+    <!-- Nombre del Artículo -->
+    <TextView
+        android:id="@+id/tvNombreArticulo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nombre del artículo"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="4dp" />
+
+    <!-- Precio del Artículo -->
+    <TextView
+        android:id="@+id/tvPrecioArticulo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="S/ 0.00"
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Campo Cantidad - Diseño alternativo -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         app:boxBackgroundMode="filled"
-        app:boxCornerRadiusTopStart="24dp"
-        app:boxCornerRadiusTopEnd="24dp"
-        app:boxCornerRadiusBottomStart="24dp"
-        app:boxCornerRadiusBottomEnd="24dp"
-        app:boxBackgroundColor="#F5F5F5">
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxBackgroundColor="@android:color/white"
+        app:hintEnabled="false"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeColor="@android:color/transparent"
+        android:elevation="2dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etCantidad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Cantidad"
+            android:padding="12dp"
+            android:backgroundTint="@android:color/transparent"
             android:textColor="@android:color/black"
             android:textColorHint="@android:color/darker_gray"
             android:inputType="number" />
@@ -34,12 +62,17 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         app:boxBackgroundMode="filled"
-        app:boxCornerRadiusTopStart="24dp"
-        app:boxCornerRadiusTopEnd="24dp"
-        app:boxCornerRadiusBottomStart="24dp"
-        app:boxCornerRadiusBottomEnd="24dp"
-        app:boxBackgroundColor="#F5F5F5">
+        app:boxCornerRadiusTopStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxBackgroundColor="@android:color/white"
+        app:hintEnabled="false"
+        app:boxStrokeWidth="0dp"
+        app:boxStrokeColor="@android:color/transparent"
+        android:elevation="2dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etDetalle"
@@ -59,10 +92,9 @@
         android:layout_height="wrap_content"
         android:text="(*) La cantidad puede variar de acuerdo al peso"
         android:textSize="12sp"
-        android:textStyle="bold"
+        android:textStyle="italic"
         android:textColor="@android:color/black"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="20dp" />
 
     <!-- Botón Agregar -->
     <com.google.android.material.button.MaterialButton
@@ -72,8 +104,10 @@
         android:layout_height="wrap_content"
         android:text="Agregar"
         android:textColor="@android:color/white"
-        android:backgroundTint="#4CD28A"
+        android:backgroundTint="@color/color_principal"
         app:cornerRadius="50dp"
         android:paddingLeft="32dp"
-        android:paddingRight="32dp"/>
+        android:paddingRight="32dp"
+        android:layout_gravity="center_horizontal" />
+
 </LinearLayout>

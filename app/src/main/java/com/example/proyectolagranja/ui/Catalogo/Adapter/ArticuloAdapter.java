@@ -20,11 +20,15 @@ import java.util.List;
 public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.ArticuloViewHolder>{
     private Context context;
     private List<Articulo> listaArticulos;
-    private OnAgregarCantidadClickListener listener;
+    private OnAgregarClickListener listener;
 
-    public ArticuloAdapter(Context context, List<Articulo> listaArticulos) {
+    public ArticuloAdapter(Context context, List<Articulo> listaArticulos, OnAgregarClickListener listener) {
         this.context = context;
         this.listaArticulos = listaArticulos;
+        this.listener = listener;
+    }
+    public interface OnAgregarClickListener {
+        void onAgregarClick(Articulo articulo);
     }
 
     @NonNull
@@ -40,12 +44,17 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         holder.nombre.setText(articulo.getNombre());
         holder.precio.setText("S/ " + articulo.getPrecio());
 
-        // Carga de imagen con Glide
-        String urlImagen = articulo.getImagen();
+        // Cargar imagen
         Glide.with(context)
-                .load(urlImagen)
+                .load(articulo.getImagen())
                 .into(holder.imagen);
-        Glide.with(context).load(urlImagen).into(holder.imagen);
+
+        // Listener del botón Agregar
+        holder.btnAgregar.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onAgregarClick(articulo);
+            }
+        });
     }
 
     @Override
@@ -69,7 +78,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
             imagen = itemView.findViewById(R.id.imgArticulo);
             nombre = itemView.findViewById(R.id.nombreArticulo);
             precio = itemView.findViewById(R.id.precioArticulo);
-            btnAgregar = itemView.findViewById(R.id.btnAgregar);
+            btnAgregar = itemView.findViewById(R.id.btnAgregarCantidad); // ← ¡Este es el correcto!
         }
     }
 }
