@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_catalogo">
+    app:startDestination="@id/nav_inicio_sesion">
 
     <fragment
         android:id="@+id/nav_catalogo"
@@ -27,13 +27,21 @@
         android:label="Perfil"
         tools:layout="@layout/fragment_perfil" />
     <fragment
-        android:id="@+id/crearCuenta"
+        android:id="@+id/nav_crear_cuenta"
         android:name="com.example.proyectolagranja.ui.Autenticacion.CrearCuenta"
         android:label="fragment_crear_cuenta"
-        tools:layout="@layout/fragment_crear_cuenta" />
+        tools:layout="@layout/fragment_crear_cuenta" >
+        <action
+            android:id="@+id/action_nav_crear_cuenta_to_nav_catalogo"
+            app:destination="@id/nav_catalogo" />
+    </fragment>
     <fragment
-        android:id="@+id/inicioSesion"
+        android:id="@+id/nav_inicio_sesion"
         android:name="com.example.proyectolagranja.ui.Autenticacion.InicioSesion"
         android:label="fragment_inicio_sesion"
-        tools:layout="@layout/fragment_inicio_sesion" />
+        tools:layout="@layout/fragment_inicio_sesion" >
+        <action
+            android:id="@+id/action_nav_inicio_sesion_to_nav_catalogo"
+            app:destination="@id/nav_catalogo" />
+    </fragment>
 </navigation>

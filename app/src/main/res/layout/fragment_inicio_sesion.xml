@@ -1,14 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.Autenticacion.InicioSesion">
+    android:fillViewport="true"
+    android:background="#0A4D8C">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="match_parent">
 
-</FrameLayout>
+        <LinearLayout
+            android:id="@+id/contenedor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:layout_margin="32dp"
+            android:padding="24dp"
+            android:background="@drawable/bg_dialog_rounded"
+            android:elevation="4dp"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp">
+
+            <!-- Sección Bienvenida -->
+            <LinearLayout
+                android:id="@+id/layout_bienvenida"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bienvenido a La Granja"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Queremos verificar su número telefónico\nIngrese su número"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/etTelefono"
+                    android:layout_width="260dp"
+                    android:layout_height="48dp"
+                    android:background="#E9E9E9"
+                    android:hint="Número de teléfono"
+                    android:inputType="phone"
+                    android:paddingHorizontal="16dp" />
+
+                <Button
+                    android:id="@+id/btnEnviarTelefono"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enviar teléfono"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="#FF5B5B"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp" />
+            </LinearLayout>
+
+            <!-- Sección Código -->
+            <LinearLayout
+                android:id="@+id/layout_codigo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Le enviamos un código al número ingresado,\ndigítelo para comprobarlo"
+                    android:textSize="14sp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Recuadros de código -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <EditText
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:maxLength="1"
+                        android:textSize="18sp"
+                        android:layout_margin="4dp" />
+
+                    <EditText
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:maxLength="1"
+                        android:textSize="18sp"
+                        android:layout_margin="4dp" />
+
+                    <EditText
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:maxLength="1"
+                        android:textSize="18sp"
+                        android:layout_margin="4dp" />
+
+                    <EditText
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:maxLength="1"
+                        android:textSize="18sp"
+                        android:layout_margin="4dp" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnValidarCodigo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Validar código"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="#FF5B5B"
+                    android:layout_gravity="center" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </FrameLayout>
+</ScrollView>

@@ -48,6 +48,15 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        // Para que no sea visible el encabezado
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.nav_crear_cuenta || destination.getId() == R.id.nav_inicio_sesion) {
+                binding.appBarMain.toolbar.setVisibility(View.GONE);
+            } else {
+                binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     @Override
