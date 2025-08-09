@@ -17,6 +17,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.proyectolagranja.R;
+import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 public class InicioSesion extends Fragment implements View.OnClickListener {
     private LinearLayout layoutBienvenida, layoutCodigo;
@@ -38,11 +45,10 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
         btnValidarCodigo.setOnClickListener(this);
         btnEnviarTelefono.setOnClickListener(this);
-        etEnlaceReenviar.setOnClickListener(this);
 
         return rootView;
     }
-    private void mostrarDialogoConfirmarNumero(String telefono) {
+    private void mostrarDialogoConfirmarNumero() {
         View dialogView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.alert_dialog_confirmar_numero, null);
 
@@ -65,6 +71,44 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         dialog.show();
     }
 
+    private void validarTelefono(String telefono) {
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_comprobar_telefono.php?tel_cliente=" + telefono;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String response = new String(responseBody);
+                    JSONObject json = new JSONObject(response);
+                    boolean existe = json.getBoolean("existe");
+
+                    NavController navController = Navigation.findNavController(
+                            requireActivity(),
+                            R.id.nav_host_fragment_content_main
+                    );
+
+                    if (existe) {
+                        // Si existe → ir al catálogo
+                        navController.navigate(R.id.action_nav_inicio_sesion_to_nav_catalogo);
+                    } else {
+                        // Si no existe → ir al registro y pasar teléfono
+                        Bundle bundle = new Bundle();
+                        bundle.putString("telefono", telefono);
+                        navController.navigate(R.id.action_nav_inicio_sesion_to_nav_crear_cuenta, bundle);
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(requireContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
         if (v == btnEnviarTelefono) {
@@ -78,9 +122,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                 Toast.makeText(requireContext(), "El número debe tener al menos 9 dígitos", Toast.LENGTH_SHORT).show();
                 return;
             }
-            mostrarDialogoConfirmarNumero(telefono);
+            mostrarDialogoConfirmarNumero();
         }
-
 
         if (v == btnValidarCodigo) {
             // Referencias a los EditText de código
@@ -100,10 +143,10 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     et6.getText().toString().trim().isEmpty()) {
 
                 Toast.makeText(requireContext(), "Por favor, complete todos los dígitos del código", Toast.LENGTH_SHORT).show();
-                return; // Salir sin navegar
+                return;
             }
 
-            // Si todos están llenos, concatenar el código (opcional)
+            // Si todos están llenos, concatenar el código
             String codigo = et1.getText().toString() +
                     et2.getText().toString() +
                     et3.getText().toString() +
@@ -111,11 +154,12 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     et5.getText().toString() +
                     et6.getText().toString();
 
-            NavController navController = Navigation.findNavController(
-                    requireActivity(),
-                    R.id.nav_host_fragment_content_main
-            );
-            navController.navigate(R.id.action_nav_inicio_sesion_to_nav_catalogo);
+            String telefono = etTelefono.getText().toString().trim();
+            if (!telefono.isEmpty() && telefono.length() >= 9) {
+                validarTelefono(telefono);
+            } else {
+                Toast.makeText(requireContext(), "Número de teléfono inválido", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

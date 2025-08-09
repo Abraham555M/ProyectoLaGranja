@@ -31,6 +31,9 @@
         android:name="com.example.proyectolagranja.ui.Autenticacion.CrearCuenta"
         android:label="fragment_crear_cuenta"
         tools:layout="@layout/fragment_crear_cuenta" >
+        <argument
+            android:name="telefono"
+            app:argType="string" />
         <action
             android:id="@+id/action_nav_crear_cuenta_to_nav_catalogo"
             app:destination="@id/nav_catalogo" />

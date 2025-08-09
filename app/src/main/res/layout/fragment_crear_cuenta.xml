@@ -60,7 +60,7 @@
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="@color/color_verde"
+                    app:boxStrokeColor="@color/color_principal"
                     android:layout_marginTop="16dp">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -82,7 +82,7 @@
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="@color/color_verde"
+                    app:boxStrokeColor="@color/color_principal"
                     android:layout_marginTop="16dp">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -93,41 +93,19 @@
                         android:textColor="@color/black" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Campo EditText para Teléfono -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilTelefono"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Teléfono"
-                    app:boxBackgroundColor="@color/white"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="@color/color_verde"
-                    android:layout_marginTop="16dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etTelefono"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/black" />
-                </com.google.android.material.textfield.TextInputLayout>
-
                 <!-- Campo EditText para Direccion -->
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilApellidos"
+                    android:id="@+id/tilDireccion"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Apellidos"
+                    android:hint="Dirección"
                     app:boxBackgroundColor="@color/white"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="@color/color_verde"
+                    app:boxStrokeColor="@color/color_principal"
                     android:layout_marginTop="16dp">
 
                     <com.google.android.material.textfield.TextInputEditText
