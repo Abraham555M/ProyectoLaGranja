@@ -23,7 +23,6 @@
             android:layout_marginTop="40dp"
             android:layout_marginBottom="40dp">
 
-            <!-- Sección Bienvenida -->
             <LinearLayout
                 android:id="@+id/layout_bienvenida"
                 android:layout_width="match_parent"
@@ -34,32 +33,44 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bienvenido a La Granja"
-                    android:textSize="20sp"
+                    android:text="¡Bienvenido a La Granja!"
+                    android:textSize="22sp"
                     android:textStyle="bold"
-                    android:layout_marginBottom="16dp" />
+                    android:textColor="@android:color/black"
+                    android:layout_marginBottom="12dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Queremos verificar su número telefónico\nIngrese su número"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="8dp" />
+                    android:text="Para continuar, necesitamos verificar tu número de teléfono.\nPor favor ingrésalo a continuación."
+                    android:textSize="15sp"
+                    android:textAlignment="center"
+                    android:layout_marginBottom="10dp" />
 
                 <EditText
                     android:id="@+id/etTelefono"
                     android:layout_width="260dp"
                     android:layout_height="48dp"
                     android:background="#E9E9E9"
-                    android:hint="Número de teléfono"
+                    android:hint="Ej. +51 999 888 777"
                     android:inputType="phone"
-                    android:paddingHorizontal="16dp" />
+                    android:paddingHorizontal="16dp"
+                    android:maxLength="9"
+                    android:textAlignment="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Te enviaremos un código de verificación por SMS."
+                    android:textSize="13sp"
+                    android:textColor="#666"
+                    android:layout_marginTop="6dp" />
 
                 <Button
                     android:id="@+id/btnEnviarTelefono"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Enviar teléfono"
+                    android:text="Enviar código"
                     android:textColor="@android:color/white"
                     android:backgroundTint="#FF5B5B"
                     android:layout_gravity="center"
@@ -72,13 +83,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="gone"
+                android:gravity="center_horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Le enviamos un código al número ingresado,\ndigítelo para comprobarlo"
-                    android:textSize="14sp"
+                    android:text="Hemos enviado un código de 6 dígitos a tu teléfono.\nPor favor ingrésalo para confirmar tu identidad."
+                    android:textSize="15sp"
+                    android:textAlignment="center"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="16dp" />
 
@@ -91,45 +104,82 @@
                     android:layout_marginBottom="16dp">
 
                     <EditText
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:id="@+id/etCodigo1"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
                         android:background="@drawable/bg_input"
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textSize="18sp"
-                        android:layout_margin="4dp" />
+                        android:textSize="15sp"
+                        android:layout_margin="2dp" />
 
                     <EditText
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:id="@+id/etCodigo2"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
                         android:background="@drawable/bg_input"
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textSize="18sp"
-                        android:layout_margin="4dp" />
+                        android:textSize="15sp"
+                        android:layout_margin="2dp" />
 
                     <EditText
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:id="@+id/etCodigo3"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
                         android:background="@drawable/bg_input"
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textSize="18sp"
-                        android:layout_margin="4dp" />
+                        android:textSize="15sp"
+                        android:layout_margin="2dp" />
 
                     <EditText
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:id="@+id/etCodigo4"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
                         android:background="@drawable/bg_input"
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textSize="18sp"
-                        android:layout_margin="4dp" />
+                        android:textSize="15sp"
+                        android:layout_margin="2dp" />
+
+                    <EditText
+                        android:id="@+id/etCodigo5"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:background="@drawable/bg_input"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:maxLength="1"
+                        android:textSize="15sp"
+                        android:layout_margin="2dp" />
+
+                    <EditText
+                        android:id="@+id/etCodigo6"
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:background="@drawable/bg_input"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:maxLength="1"
+                        android:textSize="15sp"
+                        android:layout_margin="2dp" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/etEnlaceReenviar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="¿No recibiste el código? Reenviar"
+                    android:textSize="13sp"
+                    android:textColor="#0A4D8C"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginBottom="12dp" />
 
                 <Button
                     android:id="@+id/btnValidarCodigo"
@@ -140,7 +190,6 @@
                     android:backgroundTint="#FF5B5B"
                     android:layout_gravity="center" />
             </LinearLayout>
-
         </LinearLayout>
     </FrameLayout>
 </ScrollView>

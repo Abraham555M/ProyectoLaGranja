@@ -43,5 +43,8 @@
         <action
             android:id="@+id/action_nav_inicio_sesion_to_nav_catalogo"
             app:destination="@id/nav_catalogo" />
+        <action
+            android:id="@+id/action_nav_inicio_sesion_to_nav_crear_cuenta"
+            app:destination="@id/nav_crear_cuenta" />
     </fragment>
 </navigation>

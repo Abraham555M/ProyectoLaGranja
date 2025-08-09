@@ -13,7 +13,7 @@
         tools:context=".ui.Inicio.CrearCuenta"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#D9DBDB"
+        android:background="#0A4D8C"
         android:padding="16dp">
 
         <!-- Card para Crear Cuenta centrado -->
