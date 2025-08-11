@@ -3,7 +3,13 @@ package com.example.proyectolagranja;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.example.proyectolagranja.ui.Clases.Producto;
+import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -15,11 +21,24 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.proyectolagranja.databinding.ActivityMainBinding;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
-
+    private List<Producto> listaMedioPago = new ArrayList<>();
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
+    private Spinner spMedioPago;
+    private Button btnCerrar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +53,17 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // Inflar el layout de tu alert_dialog_carrito
                 View dialogView = getLayoutInflater().inflate(R.layout.alert_dialog_carrito, null);
+                spMedioPago = dialogView.findViewById(R.id.spMedioPago);
+                btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+
                 // Crear el AlertDialog
                 androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
                         .setView(dialogView)
-                        .setCancelable(true) // Si quieres permitir cerrar tocando fuera
                         .create();
+                btnCerrar.setOnClickListener(v -> dialog.dismiss());
+
+
+                cargarMedioPago();
 
                 dialog.show();
             }
@@ -70,7 +95,86 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+    private void cargarMedioPago() {
+        String url = ServidorConfig.URL_SERVIDOR + "medio_pago/medio_pago_listar.php";
+        AsyncHttpClient client = new AsyncHttpClient();
 
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONArray jsonArray = new JSONArray(new String(responseBody));
+                    List<String> nombresProductos = new ArrayList<>();
+
+                    // Primera opción por defecto
+                    listaMedioPago.clear();
+                    listaMedioPago.add(new Producto(0, "Seleccione un medio de pago"));
+                    nombresProductos.add("Seleccione un medio de pago");
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        int id = obj.getInt("id_pago_medio");
+                        String nombre = obj.getString("nom_pago_medio");
+
+                        listaMedioPago.add(new Producto(id, nombre));
+                        nombresProductos.add(nombre);
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            MainActivity.this,
+                            android.R.layout.simple_spinner_item,
+                            nombresProductos
+                    );
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spMedioPago.setAdapter(adapter);
+
+                } catch (JSONException e) {
+                    Toast.makeText(MainActivity.this, "Error al procesar los datos", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(MainActivity.this, "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /*
+    private void cargarEstadosDesdeBackend(Spinner spinner) {
+        String url = ServidorConfig.URL_SERVIDOR + "medio_pago/medio_pago_listar.php";
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String response = new String(responseBody);
+                    JSONArray jsonArray = new JSONArray(response);
+
+                    ArrayList<String> listaEstados = new ArrayList<>();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        listaEstados.add(obj.getString("nom_pago_medio")); // "nombre" viene del PHP
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this,
+                            android.R.layout.simple_spinner_item, listaEstados);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinner.setAdapter(adapter);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                error.printStackTrace();
+            }
+        });
+    }
+*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

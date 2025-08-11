@@ -77,7 +77,7 @@
             app:cardElevation="2dp">
 
             <Spinner
-                android:id="@+id/sp_medio_pago"
+                android:id="@+id/spMedioPago"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
