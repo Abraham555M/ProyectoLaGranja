@@ -27,7 +27,7 @@
             android:padding="16dp" />
     </androidx.cardview.widget.CardView>
 
-    <!-- CardView para Filtro por Fecha -->
+    <!-- CardView para los Filtros de Fechas -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardview_fechas"
         android:layout_width="match_parent"
@@ -38,27 +38,32 @@
         app:layout_constraintTop_toBottomOf="@id/cardview_estado"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:padding="16dp">
-
             <EditText
-                android:id="@+id/et_fecha"
-                android:layout_width="match_parent"
+                android:id="@+id/et_fecha_ini"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Fecha"
+                android:layout_weight="1"
+                android:hint="Fecha Inicio"
                 android:focusable="false"
                 android:clickable="true"
-                android:padding="12dp" />
+                android:layout_marginEnd="8dp"/>
+            <EditText
+                android:id="@+id/et_fecha_fin"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Fecha Fin"
+                android:focusable="false"
+                android:clickable="true"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <!-- RecyclerView para mostrar los pedidos -->
-
-    <!-- Botón debajo del RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewPedidos"
         android:layout_width="0dp"
@@ -71,7 +76,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardview_fechas"
         tools:listitem="@layout/item_pedido" />
-
+    <!-- Botón debajo del RecyclerView -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnNuevoPedido"
         android:layout_width="0dp"
@@ -79,12 +84,9 @@
         android:text="Nuevo Pedido"
         android:layout_margin="16dp"
         app:cornerRadius="12dp"
-        app:backgroundTint="@color/color_verde"
+        app:backgroundTint="@color/color_principal"
         app:layout_constraintTop_toBottomOf="@id/recyclerViewPedidos"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

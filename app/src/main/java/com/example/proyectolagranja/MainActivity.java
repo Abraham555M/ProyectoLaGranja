@@ -32,11 +32,18 @@ public class MainActivity extends AppCompatActivity {
         binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null)
-                        .setAnchorView(R.id.fab).show();
+                // Inflar el layout de tu alert_dialog_carrito
+                View dialogView = getLayoutInflater().inflate(R.layout.alert_dialog_carrito, null);
+                // Crear el AlertDialog
+                androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
+                        .setView(dialogView)
+                        .setCancelable(true) // Si quieres permitir cerrar tocando fuera
+                        .create();
+
+                dialog.show();
             }
         });
+
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each

@@ -92,11 +92,13 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
                     if (existe) {
                         // Si existe → ir al catálogo
+                        limpiarEspacios();
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_catalogo);
                     } else {
                         // Si no existe → ir al registro y pasar teléfono
                         Bundle bundle = new Bundle();
                         bundle.putString("telefono", telefono);
+                        limpiarEspacios();
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_crear_cuenta, bundle);
                     }
                 } catch (Exception e) {
@@ -111,7 +113,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         });
     }
 
-    private void configurarAutoFocusCodigo(View rootView) {
+    private void configurarAutoFocusCodigo(View rootView) { // Para los digitos del codigo
         EditText[] edits = {
                 rootView.findViewById(R.id.etCodigo1),
                 rootView.findViewById(R.id.etCodigo2),
@@ -151,7 +153,29 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         }
     }
 
+    public void limpiarEspacios(){
+        etTelefono.setText("");
 
+        // Limpiar campos de código
+        if (getView() != null) {
+            EditText et1 = getView().findViewById(R.id.etCodigo1);
+            EditText et2 = getView().findViewById(R.id.etCodigo2);
+            EditText et3 = getView().findViewById(R.id.etCodigo3);
+            EditText et4 = getView().findViewById(R.id.etCodigo4);
+            EditText et5 = getView().findViewById(R.id.etCodigo5);
+            EditText et6 = getView().findViewById(R.id.etCodigo6);
+
+            et1.setText("");
+            et2.setText("");
+            et3.setText("");
+            et4.setText("");
+            et5.setText("");
+            et6.setText("");
+
+            // Dejar el foco en el primer campo del código
+            et1.requestFocus();
+        }
+    }
 
     @Override
     public void onClick(View v) {
@@ -164,6 +188,10 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
             }
             if (telefono.length() < 9) {
                 Toast.makeText(requireContext(), "El número debe tener al menos 9 dígitos", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!telefono.startsWith("9")) {
+                Toast.makeText(requireContext(), "El número debe comenzar con 9", Toast.LENGTH_SHORT).show();
                 return;
             }
             mostrarDialogoConfirmarNumero();
