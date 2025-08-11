@@ -33,7 +33,10 @@
 
     <string-array name="listado_estado">
         <item>Todos</item>
-        <item>No revisado</item>
-        <item>Revisado</item>
+        <item>Anulado</item>
+        <item>Pendiente</item>
+        <item>Despachado</item>
+        <item>Entregado</item>
+        <item>Pagado</item>
     </string-array>
 </resources>

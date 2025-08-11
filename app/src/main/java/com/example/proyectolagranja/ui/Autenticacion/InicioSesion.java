@@ -46,6 +46,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         btnValidarCodigo.setOnClickListener(this);
         btnEnviarTelefono.setOnClickListener(this);
 
+        configurarAutoFocusCodigo(rootView);
+
         return rootView;
     }
     private void mostrarDialogoConfirmarNumero() {
@@ -108,6 +110,48 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
             }
         });
     }
+
+    private void configurarAutoFocusCodigo(View rootView) {
+        EditText[] edits = {
+                rootView.findViewById(R.id.etCodigo1),
+                rootView.findViewById(R.id.etCodigo2),
+                rootView.findViewById(R.id.etCodigo3),
+                rootView.findViewById(R.id.etCodigo4),
+                rootView.findViewById(R.id.etCodigo5),
+                rootView.findViewById(R.id.etCodigo6)
+        };
+
+        for (int i = 0; i < edits.length; i++) {
+            final int index = i;
+
+            // Avanzar si hay un dígito
+            edits[i].addTextChangedListener(new android.text.TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() >= 1 && index < edits.length - 1) {
+                        edits[index + 1].requestFocus();
+                    }
+                }
+                @Override public void afterTextChanged(android.text.Editable s) {}
+            });
+
+            // Retroceder si está vacío
+            edits[i].setOnKeyListener((v, keyCode, event) -> {
+                if (keyCode == android.view.KeyEvent.KEYCODE_DEL &&
+                        event.getAction() == android.view.KeyEvent.ACTION_DOWN) {
+
+                    if (edits[index].getText().toString().isEmpty() && index > 0) {
+                        edits[index - 1].requestFocus();
+                        edits[index - 1].setSelection(edits[index - 1].getText().length());
+                    }
+                }
+                return false;
+            });
+        }
+    }
+
+
 
     @Override
     public void onClick(View v) {
