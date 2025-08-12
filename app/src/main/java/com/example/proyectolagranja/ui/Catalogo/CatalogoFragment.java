@@ -120,8 +120,12 @@ public class CatalogoFragment extends Fragment {
             private Timer timer = new Timer();
             private static final long DELAY = 500;
 
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
                 timer.cancel();
                 timer = new Timer();
             }
@@ -369,7 +373,8 @@ public class CatalogoFragment extends Fragment {
     }
 
     private void mostrarDialogoAgregar(Articulo articulo) {
-        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_definir_cantidad, null);
+        View dialogView = LayoutInflater.from(getContext())
+                .inflate(R.layout.alert_dialog_definir_cantidad, null);
 
         TextView nombreArticulo = dialogView.findViewById(R.id.tvNombreArticulo);
         TextView precioArticulo = dialogView.findViewById(R.id.tvPrecioArticulo);
@@ -379,6 +384,25 @@ public class CatalogoFragment extends Fragment {
 
         nombreArticulo.setText(articulo.getNombre());
         precioArticulo.setText("S/ " + articulo.getPrecio());
+
+        // --- Buscar si el artículo ya está en el carrito ---
+        final ItemCarrito[] itemExistente = {null};
+        final int[] indexExistente = {-1};
+
+        for (int i = 0; i < MainActivity.carrito.size(); i++) {
+            if (MainActivity.carrito.get(i).getArticulo().getId().equals(articulo.getId())) {
+                itemExistente[0] = MainActivity.carrito.get(i);
+                indexExistente[0] = i;
+                break;
+            }
+        }
+
+        // --- Si ya existe, precargar datos ---
+        if (itemExistente[0] != null) {
+            etCantidad.setText(String.valueOf(itemExistente[0].getCantidad()));
+            etDetalle.setText(itemExistente[0].getDetalle());
+            btnAgregar.setText("Actualizar");
+        }
 
         AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setView(dialogView)
@@ -394,16 +418,23 @@ public class CatalogoFragment extends Fragment {
             }
             int cantidad = Integer.parseInt(cantidadStr);
 
-            // Guardar en carrito global
-            MainActivity.carrito.add(new ItemCarrito(articulo, cantidad, detalle));
-            ((MainActivity) requireActivity()).actualizarBadge(); // Se actualiza los registros en el carrito
-            Toast.makeText(getContext(),
-                    "Artículo agregado al carrito",
-                    Toast.LENGTH_SHORT).show();
+            if (itemExistente[0] == null) {
+                // No existía → agregar
+                MainActivity.carrito.add(new ItemCarrito(articulo, cantidad, detalle));
+                Toast.makeText(getContext(), "Artículo agregado al carrito", Toast.LENGTH_SHORT).show();
+            } else {
+                // Ya existía → actualizar
+                itemExistente[0].setCantidad(cantidad);
+                itemExistente[0].setDetalle(detalle);
+                MainActivity.carrito.set(indexExistente[0], itemExistente[0]);
+                Toast.makeText(getContext(), "Artículo actualizado en el carrito", Toast.LENGTH_SHORT).show();
+            }
+
+            ((MainActivity) requireActivity()).actualizarBadge();
             dialog.dismiss();
         });
 
         dialog.show();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); // Para el borde redondeado
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 }

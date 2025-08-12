@@ -14,4 +14,16 @@ public class ItemCarrito {
     public Articulo getArticulo() { return articulo; }
     public int getCantidad() { return cantidad; }
     public String getDetalle() { return detalle; }
+
+    public void setArticulo(Articulo articulo) {
+        this.articulo = articulo;
+    }
+
+    public void setDetalle(String detalle) {
+        this.detalle = detalle;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
 }

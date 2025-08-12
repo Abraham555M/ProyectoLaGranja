@@ -20,10 +20,12 @@ import java.util.List;
 public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHolder> {
     private Context context;
     private List<ItemCarrito> lista;
+    private OnCarritoChangeListener listener; // Para los constantes cambios en el carrito
 
-    public CarritoAdapter(Context context, List<ItemCarrito> lista) {
+    public CarritoAdapter(Context context, List<ItemCarrito> lista, OnCarritoChangeListener listener) {
         this.context = context;
         this.lista = lista;
+        this.listener = listener;
     }
 
     @NonNull
@@ -56,7 +58,15 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
             MainActivity.carrito.remove(position);
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, lista.size());
+
+            if (listener != null) {
+                listener.onCarritoChange(); // Notifica a la actividad
+            }
         });
+    }
+
+    public interface OnCarritoChangeListener {
+        void onCarritoChange();
     }
 
     @Override

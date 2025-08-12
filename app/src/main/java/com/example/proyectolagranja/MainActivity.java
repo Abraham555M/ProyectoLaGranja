@@ -103,7 +103,12 @@ public class MainActivity extends AppCompatActivity {
         // RecyclerView para mostrar el carrito ---
         RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-        recyclerView.setAdapter(new CarritoAdapter(MainActivity.this, carrito));
+
+        recyclerView.setAdapter(new CarritoAdapter(
+                MainActivity.this,
+                carrito,
+                () -> actualizarBadge() //  listener
+        ));
 
         // Crear el AlertDialog
         androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
