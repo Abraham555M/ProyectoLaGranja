@@ -18,7 +18,6 @@ import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import java.util.List;
 
 public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHolder> {
-
     private Context context;
     private List<ItemCarrito> lista;
 
@@ -46,14 +45,14 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         double subtotal = precio * item.getCantidad();
         holder.subTotalArticulo.setText("Subtotal: $" + subtotal);
 
-        // Si tienes URL de imagen
+        // URL de imagen
         Glide.with(context)
                 .load(item.getArticulo().getImagen())
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(holder.imgArticulo);
 
         // Botón para eliminar artículo del carrito
-        holder.btnEliminar.setOnClickListener(v -> {
+        holder.btnEliminarArticulo.setOnClickListener(v -> {
             MainActivity.carrito.remove(position);
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, lista.size());
@@ -68,7 +67,7 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgArticulo;
         TextView nombreArticulo, precioArticulo, cantidadArticulo, subTotalArticulo;
-        View btnEliminar;
+        View btnEliminarArticulo;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -77,7 +76,7 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
             precioArticulo = itemView.findViewById(R.id.precioArticulo);
             cantidadArticulo = itemView.findViewById(R.id.cantidadArticulo);
             subTotalArticulo = itemView.findViewById(R.id.subTotalArticulo);
-            btnEliminar = itemView.findViewById(R.id.btnAgregarCantidad); // tu botón delete
+            btnEliminarArticulo = itemView.findViewById(R.id.btnEliminarArticulo);
         }
     }
 }

@@ -63,18 +63,16 @@ public class MainActivity extends AppCompatActivity {
                 spMedioPago = dialogView.findViewById(R.id.spMedioPago);
                 btnCerrar = dialogView.findViewById(R.id.btnCerrar);
 
-                // --- RecyclerView para mostrar el carrito ---
+                // RecyclerView para mostrar el carrito ---
                 RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerView);
                 recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                 recyclerView.setAdapter(new CarritoAdapter(MainActivity.this, carrito));
-                // --------------------------------------------
 
                 // Crear el AlertDialog
                 androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
                         .setView(dialogView)
                         .create();
                 btnCerrar.setOnClickListener(v -> dialog.dismiss());
-
 
                 cargarMedioPago();
 
@@ -107,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
                 binding.appBarMain.fab.setVisibility(View.VISIBLE);
             }
         });
-
     }
     private void cargarMedioPago() {
         String url = ServidorConfig.URL_SERVIDOR + "medio_pago/medio_pago_listar.php";

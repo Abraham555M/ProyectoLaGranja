@@ -392,20 +392,17 @@ public class CatalogoFragment extends Fragment {
                 etCantidad.setError("Ingrese una cantidad");
                 return;
             }
-
             int cantidad = Integer.parseInt(cantidadStr);
 
-            // ✅ Guardar en carrito global
+            // Guardar en carrito global
             MainActivity.carrito.add(new ItemCarrito(articulo, cantidad, detalle));
-
             Toast.makeText(getContext(),
                     "Artículo agregado al carrito",
                     Toast.LENGTH_SHORT).show();
-
             dialog.dismiss();
         });
 
         dialog.show();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); // Para el borde redondeado
     }
 }

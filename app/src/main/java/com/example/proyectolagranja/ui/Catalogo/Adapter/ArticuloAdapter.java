@@ -63,11 +63,6 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
 
     }
 
-    public interface OnAgregarCantidadClickListener {
-        void onAgregarClick(Articulo articulo);
-    }
-
-
     public static class ArticuloViewHolder extends RecyclerView.ViewHolder {
         ImageView imagen;
         TextView nombre, precio;
@@ -78,7 +73,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
             imagen = itemView.findViewById(R.id.imgArticulo);
             nombre = itemView.findViewById(R.id.nombreArticulo);
             precio = itemView.findViewById(R.id.precioArticulo);
-            btnAgregar = itemView.findViewById(R.id.btnAgregarCantidad); // ← ¡Este es el correcto!
+            btnAgregar = itemView.findViewById(R.id.btnAgregarCantidad);
         }
     }
 }
