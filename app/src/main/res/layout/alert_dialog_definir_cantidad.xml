@@ -30,7 +30,7 @@
         android:textColor="@android:color/darker_gray"
         android:layout_marginBottom="16dp" />
 
-    <!-- Campo Cantidad - Diseño alternativo -->
+    <!-- Campo Cantidad -->
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,22 +41,21 @@
         app:boxCornerRadiusBottomStart="12dp"
         app:boxCornerRadiusBottomEnd="12dp"
         app:boxBackgroundColor="@android:color/white"
-        app:hintEnabled="false"
-        app:boxStrokeWidth="0dp"
-        app:boxStrokeColor="@android:color/transparent"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeColor="@color/color_principal"
+        app:hintTextColor="@android:color/darker_gray"
         android:elevation="2dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etCantidad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Cantidad"
-            android:padding="12dp"
-            android:backgroundTint="@android:color/transparent"
+            android:inputType="number"
             android:textColor="@android:color/black"
             android:textColorHint="@android:color/darker_gray"
-            android:inputType="number" />
+            android:hint="Cantidad(*)" />
     </com.google.android.material.textfield.TextInputLayout>
+
 
     <!-- Campo Detalle -->
     <com.google.android.material.textfield.TextInputLayout
@@ -69,22 +68,21 @@
         app:boxCornerRadiusBottomStart="12dp"
         app:boxCornerRadiusBottomEnd="12dp"
         app:boxBackgroundColor="@android:color/white"
-        app:hintEnabled="false"
-        app:boxStrokeWidth="0dp"
-        app:boxStrokeColor="@android:color/transparent"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeColor="@color/color_principal"
+        app:hintTextColor="@android:color/darker_gray"
         android:elevation="2dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etDetalle"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:hint="Detalle"
+            android:layout_height="wrap_content"
+            android:inputType="number"
             android:textColor="@android:color/black"
             android:textColorHint="@android:color/darker_gray"
-            android:gravity="top"
-            android:inputType="textMultiLine"
-            android:maxLines="4" />
+            android:hint="Detalle" />
     </com.google.android.material.textfield.TextInputLayout>
+
 
     <!-- Nota -->
     <TextView

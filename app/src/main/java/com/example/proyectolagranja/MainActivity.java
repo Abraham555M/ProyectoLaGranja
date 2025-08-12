@@ -1,5 +1,7 @@
 package com.example.proyectolagranja;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 cargarMedioPago();
 
                 dialog.show();
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             }
         });
 
@@ -140,41 +143,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /*
-    private void cargarEstadosDesdeBackend(Spinner spinner) {
-        String url = ServidorConfig.URL_SERVIDOR + "medio_pago/medio_pago_listar.php";
-        AsyncHttpClient client = new AsyncHttpClient();
-
-        client.get(url, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    String response = new String(responseBody);
-                    JSONArray jsonArray = new JSONArray(response);
-
-                    ArrayList<String> listaEstados = new ArrayList<>();
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        listaEstados.add(obj.getString("nom_pago_medio")); // "nombre" viene del PHP
-                    }
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this,
-                            android.R.layout.simple_spinner_item, listaEstados);
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinner.setAdapter(adapter);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                error.printStackTrace();
-            }
-        });
-    }
-*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
