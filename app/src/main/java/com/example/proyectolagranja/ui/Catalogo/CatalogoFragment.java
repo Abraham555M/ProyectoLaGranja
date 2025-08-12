@@ -21,10 +21,12 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.proyectolagranja.MainActivity;
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Catalogo.Adapter.ArticuloAdapter;
 import com.example.proyectolagranja.ui.Clases.Articulo;
 import com.example.proyectolagranja.ui.Clases.Categoria;
+import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.Producto;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.button.MaterialButton;
@@ -383,20 +385,22 @@ public class CatalogoFragment extends Fragment {
                 .create();
 
         btnAgregar.setOnClickListener(v -> {
-            String cantidad = etCantidad.getText().toString().trim();
+            String cantidadStr = etCantidad.getText().toString().trim();
             String detalle = etDetalle.getText().toString().trim();
 
-            if (cantidad.isEmpty()) {
+            if (cantidadStr.isEmpty()) {
                 etCantidad.setError("Ingrese una cantidad");
                 return;
             }
 
+            int cantidad = Integer.parseInt(cantidadStr);
+
+            // ✅ Guardar en carrito global
+            MainActivity.carrito.add(new ItemCarrito(articulo, cantidad, detalle));
+
             Toast.makeText(getContext(),
-                    "Artículo agregado:\n" +
-                            "Nombre: " + articulo.getNombre() + "\n" +
-                            "Cantidad: " + cantidad + "\n" +
-                            "Detalle: " + detalle,
-                    Toast.LENGTH_LONG).show();
+                    "Artículo agregado al carrito",
+                    Toast.LENGTH_SHORT).show();
 
             dialog.dismiss();
         });

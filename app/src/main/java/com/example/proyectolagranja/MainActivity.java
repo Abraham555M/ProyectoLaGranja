@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.proyectolagranja.ui.Catalogo.Adapter.CarritoAdapter;
+import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.Producto;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.snackbar.Snackbar;
@@ -21,6 +23,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectolagranja.databinding.ActivityMainBinding;
 import com.loopj.android.http.AsyncHttpClient;
@@ -41,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private Spinner spMedioPago;
     private Button btnCerrar;
+    public static List<ItemCarrito> carrito = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,12 @@ public class MainActivity extends AppCompatActivity {
                 View dialogView = getLayoutInflater().inflate(R.layout.alert_dialog_carrito, null);
                 spMedioPago = dialogView.findViewById(R.id.spMedioPago);
                 btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+
+                // --- RecyclerView para mostrar el carrito ---
+                RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerView);
+                recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                recyclerView.setAdapter(new CarritoAdapter(MainActivity.this, carrito));
+                // --------------------------------------------
 
                 // Crear el AlertDialog
                 androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
