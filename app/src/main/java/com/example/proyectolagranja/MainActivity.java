@@ -1,5 +1,6 @@
 package com.example.proyectolagranja;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -8,12 +9,15 @@ import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.proyectolagranja.ui.Catalogo.Adapter.CarritoAdapter;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.Producto;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.badge.BadgeUtils;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -38,6 +42,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
+import com.google.android.material.badge.ExperimentalBadgeUtils;
+import com.google.android.material.badge.BadgeUtils;
+import androidx.annotation.OptIn;
 
 public class MainActivity extends AppCompatActivity {
     private List<Producto> listaMedioPago = new ArrayList<>();
@@ -45,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private Spinner spMedioPago;
     private Button btnCerrar;
+    private TextView tvBadge;
     public static List<ItemCarrito> carrito = new ArrayList<>();
 
     @Override
@@ -53,33 +61,12 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         setSupportActionBar(binding.appBarMain.toolbar);
-        binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Inflar el layout de tu alert_dialog_carrito
-                View dialogView = getLayoutInflater().inflate(R.layout.alert_dialog_carrito, null);
-                spMedioPago = dialogView.findViewById(R.id.spMedioPago);
-                btnCerrar = dialogView.findViewById(R.id.btnCerrar);
 
-                // RecyclerView para mostrar el carrito ---
-                RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerView);
-                recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-                recyclerView.setAdapter(new CarritoAdapter(MainActivity.this, carrito));
+        tvBadge = findViewById(R.id.tvBadge);
+        binding.appBarMain.fab.setOnClickListener(v -> mostrarCarrito());
 
-                // Crear el AlertDialog
-                androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
-                        .setView(dialogView)
-                        .create();
-                btnCerrar.setOnClickListener(v -> dialog.dismiss());
-
-                cargarMedioPago();
-
-                dialog.show();
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            }
-        });
+        actualizarBadge();
 
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
@@ -106,6 +93,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void mostrarCarrito() {
+        // Inflar el layout de tu alert_dialog_carrito
+        View dialogView = getLayoutInflater().inflate(R.layout.alert_dialog_carrito, null);
+        spMedioPago = dialogView.findViewById(R.id.spMedioPago);
+        btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+
+        // RecyclerView para mostrar el carrito ---
+        RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+        recyclerView.setAdapter(new CarritoAdapter(MainActivity.this, carrito));
+
+        // Crear el AlertDialog
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
+                .setView(dialogView)
+                .create();
+        btnCerrar.setOnClickListener(v -> dialog.dismiss());
+
+        cargarMedioPago();
+
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    public void actualizarBadge() {
+        int cantidad = carrito.size();
+        if (cantidad > 0) {
+            tvBadge.setVisibility(View.VISIBLE);
+            tvBadge.setText(String.valueOf(cantidad));
+        } else {
+            tvBadge.setVisibility(View.GONE);
+        }
+    }
+
     private void cargarMedioPago() {
         String url = ServidorConfig.URL_SERVIDOR + "medio_pago/medio_pago_listar.php";
         AsyncHttpClient client = new AsyncHttpClient();

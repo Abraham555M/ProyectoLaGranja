@@ -396,6 +396,7 @@ public class CatalogoFragment extends Fragment {
 
             // Guardar en carrito global
             MainActivity.carrito.add(new ItemCarrito(articulo, cantidad, detalle));
+            ((MainActivity) requireActivity()).actualizarBadge(); // Se actualiza los registros en el carrito
             Toast.makeText(getContext(),
                     "Artículo agregado al carrito",
                     Toast.LENGTH_SHORT).show();
