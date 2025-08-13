@@ -98,14 +98,16 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
             Toast.makeText(getActivity(), "Ingrese su documento", Toast.LENGTH_SHORT).show();
             return false;
         }
+        if (etDocumento.length() != 8) {
+            Toast.makeText(getActivity(), "El documento debe tener 8 dígitos", Toast.LENGTH_SHORT).show();
+            return false;
+        }
         if (etDireccion.getText().toString().trim().isEmpty()) {
             Toast.makeText(getActivity(), "Ingrese su dirección", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
     }
-
-
 
     @Override
     public void onClick(View v) {
@@ -114,7 +116,6 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
                 crearCliente();
             }
         }
-
     }
 
 

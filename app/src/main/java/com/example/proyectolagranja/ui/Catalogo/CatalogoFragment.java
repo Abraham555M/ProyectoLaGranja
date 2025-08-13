@@ -382,10 +382,12 @@ public class CatalogoFragment extends Fragment {
         TextInputEditText etDetalle = dialogView.findViewById(R.id.etDetalle);
         MaterialButton btnAgregar = dialogView.findViewById(R.id.btnAgregar);
 
+        // Imprimir el encabezado del articulo
         nombreArticulo.setText(articulo.getNombre());
         precioArticulo.setText("S/ " + articulo.getPrecio());
 
         // --- Buscar si el artículo ya está en el carrito ---
+        // Se guarda la referencia y posición
         final ItemCarrito[] itemExistente = {null};
         final int[] indexExistente = {-1};
 
