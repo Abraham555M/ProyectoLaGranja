@@ -10,4 +10,33 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="listado_categorias">
+        <item>Todas</item>
+        <item>Aves</item>
+        <item>Carnes</item>
+        <item>Otros</item>
+        <item>Preparados</item>
+        <item>Embutidos</item>
+    </string-array>
+
+    <string-array name="listado_productos">
+        <item>Todas</item>
+        <item>Aves</item>
+        <item>Carnes</item>
+        <item>Otros</item>
+        <item>Preparados</item>
+        <item>Embutidos</item>
+    </string-array>
+
+    <string-array name="listado_estado">
+        <item>Todos</item>
+        <item>Anulado</item>
+        <item>Pendiente</item>
+        <item>Despachado</item>
+        <item>Entregado</item>
+        <item>Pagado</item>
+    </string-array>
 </resources>

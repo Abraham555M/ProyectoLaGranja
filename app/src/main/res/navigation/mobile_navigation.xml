@@ -3,23 +3,51 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@id/nav_inicio_sesion">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="com.example.proyectolagranja.ui.home.HomeFragment"
-        android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/nav_catalogo"
+        android:name="com.example.proyectolagranja.ui.Catalogo.CatalogoFragment"
+        android:label="Catalogo"
+        tools:layout="@layout/fragment_catalogo" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.example.proyectolagranja.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:id="@+id/nav_pedidos"
+        android:name="com.example.proyectolagranja.ui.Pedidos.PedidosFragment"
+        android:label="Mis pedidos"
+        tools:layout="@layout/fragment_pedidos" >
+        <action
+            android:id="@+id/action_nav_pedidos_to_nav_catalogo"
+            app:destination="@id/nav_catalogo" />
+    </fragment>
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.proyectolagranja.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/nav_perfil"
+        android:name="com.example.proyectolagranja.ui.Perfil.PerfilFragment"
+        android:label="Perfil"
+        tools:layout="@layout/fragment_perfil" />
+    <fragment
+        android:id="@+id/nav_crear_cuenta"
+        android:name="com.example.proyectolagranja.ui.Autenticacion.CrearCuenta"
+        android:label="fragment_crear_cuenta"
+        tools:layout="@layout/fragment_crear_cuenta" >
+        <argument
+            android:name="telefono"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_nav_crear_cuenta_to_nav_catalogo"
+            app:destination="@id/nav_catalogo" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_inicio_sesion"
+        android:name="com.example.proyectolagranja.ui.Autenticacion.InicioSesion"
+        android:label="fragment_inicio_sesion"
+        tools:layout="@layout/fragment_inicio_sesion" >
+        <action
+            android:id="@+id/action_nav_inicio_sesion_to_nav_catalogo"
+            app:destination="@id/nav_catalogo" />
+        <action
+            android:id="@+id/action_nav_inicio_sesion_to_nav_crear_cuenta"
+            app:destination="@id/nav_crear_cuenta" />
+    </fragment>
 </navigation>

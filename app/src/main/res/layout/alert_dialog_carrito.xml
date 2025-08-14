@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="500dp"
+    android:layout_margin="16dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="6dp"
+    android:backgroundTint="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Encabezado -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Carrito"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/black" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCerrar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/color_rojo"
+                android:elevation="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:insetLeft="0dp"
+                android:insetRight="0dp"
+                android:text=""
+                app:cornerRadius="24dp"
+                app:icon="@drawable/ic_close"
+                app:iconTint="@android:color/white"
+                app:iconPadding="0dp"
+                app:strokeWidth="0dp"
+                style="@style/Widget.MaterialComponents.Button.Icon" />
+        </LinearLayout>
+
+        <!-- Lista de productos scrollable -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:scrollbars="vertical"
+                android:overScrollMode="ifContentScrolls"
+                tools:listitem="@layout/item_articulo_carrito" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Estado del pedido -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardview_estado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp">
+
+            <Spinner
+                android:id="@+id/spMedioPago"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:entries="@array/listado_estado"
+                android:padding="8dp" />
+        </androidx.cardview.widget.CardView>
+
+        <!-- Botón enviar pedido -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEnviarPedido"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:paddingVertical="12dp"
+            android:text="Enviar Pedido"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:backgroundTint="@color/color_rojo"
+            app:cornerRadius="28dp"
+            app:iconTint="@android:color/white"
+            app:iconPadding="8dp" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
