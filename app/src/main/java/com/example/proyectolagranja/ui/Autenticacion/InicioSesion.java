@@ -54,8 +54,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         View dialogView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.alert_dialog_confirmar_numero, null);
 
-        Button btnSi = dialogView.findViewById(R.id.btnSi);
-        Button btnNo = dialogView.findViewById(R.id.btnNo);
+        Button btnSi = dialogView.findViewById(R.id.btnConfirmarSi);
+        Button btnNo = dialogView.findViewById(R.id.btnConfirmarNo);
 
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogView)

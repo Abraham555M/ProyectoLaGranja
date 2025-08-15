@@ -1,6 +1,7 @@
 package com.example.proyectolagranja;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -105,6 +107,10 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
 
         TextView tvEmptyMessage = dialogView.findViewById(R.id.tvEmptyMessage);
+        EditText etDireccion = dialogView.findViewById(R.id.etDireccion);
+        TextView tvTotal = dialogView.findViewById(R.id.tvTotal);
+
+        cargarDireccionCliente(etDireccion);
 
         if (carrito.isEmpty()) {
             tvEmptyMessage.setVisibility(View.VISIBLE);
@@ -112,11 +118,20 @@ public class MainActivity extends AppCompatActivity {
         } else {
             tvEmptyMessage.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
+
+            double totalInicial = 0;
+            for (ItemCarrito item : carrito) {
+                double precio = Double.parseDouble(item.getArticulo().getPrecio());
+                totalInicial += precio * item.getCantidad();
+            }
+            tvTotal.setText("Total: S/" + totalInicial);
+
             recyclerView.setAdapter(new CarritoAdapter(
                     MainActivity.this,
                     carrito,
-                    () -> {
+                    total -> {
                         actualizarBadge();
+                        tvTotal.setText("Total: S/" + total);
                         if (carrito.isEmpty()) {
                             tvEmptyMessage.setVisibility(View.VISIBLE);
                             recyclerView.setVisibility(View.GONE);
@@ -145,6 +160,42 @@ public class MainActivity extends AppCompatActivity {
         } else {
             tvBadge.setVisibility(View.GONE);
         }
+    }
+
+    private void cargarDireccionCliente(EditText etDireccion) {
+         /*
+        SharedPreferences preferences = getSharedPreferences("DatosUsuario", MODE_PRIVATE);
+        int idCliente = preferences.getInt("id_cliente", -1);
+
+        if (idCliente == -1) {
+            Toast.makeText(this, "No se encontró el cliente logueado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+         */
+        int idCliente = 1; //Cliente para pruebas
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_obtener_direccion.php?id_cliente=" + idCliente;
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    if (json.has("dir_cliente")) {
+                        etDireccion.setText(json.getString("dir_cliente"));
+                    } else {
+                        Toast.makeText(MainActivity.this, "Dirección no encontrada", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    Toast.makeText(MainActivity.this, "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(MainActivity.this, "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void cargarMedioPago() {

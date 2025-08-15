@@ -26,6 +26,10 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         this.context = context;
         this.lista = lista;
         this.listener = listener;
+
+        if (listener != null) {
+            listener.onCarritoChange(calcularTotal()); // Muestra total al inicio
+        }
     }
 
     @NonNull
@@ -60,13 +64,22 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
             notifyItemRangeChanged(position, lista.size());
 
             if (listener != null) {
-                listener.onCarritoChange(); // Notifica a la actividad
+                listener.onCarritoChange(calcularTotal());
             }
         });
     }
 
     public interface OnCarritoChangeListener {
-        void onCarritoChange();
+        void onCarritoChange(double total);
+    }
+
+    private double calcularTotal() {
+        double total = 0;
+        for (ItemCarrito item : lista) {
+            double precio = Double.parseDouble(item.getArticulo().getPrecio());
+            total += precio * item.getCantidad();
+        }
+        return total;
     }
 
     @Override
