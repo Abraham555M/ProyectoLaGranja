@@ -6,6 +6,7 @@
     android:layout_margin="24dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="8dp"
+    android:background="@drawable/bg_dialog_rounded"
     android:backgroundTint="@android:color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout

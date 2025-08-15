@@ -1,6 +1,8 @@
 package com.example.proyectolagranja.ui.Pedidos;
 
 import android.app.DatePickerDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,7 @@ import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Clases.Venta;
 import com.example.proyectolagranja.ui.Pedidos.Adapter.PedidosAdapter;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -35,10 +38,10 @@ import java.util.List;
 public class PedidosFragment extends Fragment implements View.OnClickListener {
     private String fechaInicio = "", fechaFin = "";
     private EditText et_fecha_ini, et_fecha_fin;
-    private Button btnNuevoPedido;
+    private Button btnNuevoPedido, btnCancelarPedido, btnVerMasPedido;
     private RecyclerView recyclerViewPedidos;
     private PedidosAdapter adapter;
-    private List<Venta> listaPedidos = new ArrayList<>();
+    private List<Venta> listaVenta = new ArrayList<>();
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
@@ -47,8 +50,21 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         recyclerViewPedidos.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Inicializamos adapter vacío
-        adapter = new PedidosAdapter(getContext(), listaPedidos);
+        adapter = new PedidosAdapter(getContext(), listaVenta);
         recyclerViewPedidos.setAdapter(adapter);
+
+        // Aquí asignas el listener de los botones de cada ítem
+        adapter.setOnPedidoClickListener(new PedidosAdapter.OnPedidoClickListener() {
+            @Override
+            public void onCancelarClick(Venta venta) {
+                mostrarDialogCancelarPedido(venta);
+            }
+
+            @Override
+            public void onVerMasClick(Venta venta) {
+                Toast.makeText(getContext(), "Ver más del pedido #" + venta.getNum_venta(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         et_fecha_ini = rootView.findViewById(R.id.et_fecha_ini);
         et_fecha_fin = rootView.findViewById(R.id.et_fecha_fin);
@@ -106,18 +122,18 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     String respuesta = new String(responseBody, "UTF-8");
                     JSONArray jsonArray = new JSONArray(respuesta);
 
-                    listaPedidos.clear();
+                    listaVenta.clear();
 
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
-                        int idVenta = obj.getInt("id_venta");
-                        String numVenta = obj.getString("num_venta");
-                        String fecha = obj.getString("fec_venta");
-                        int idPago = obj.getInt("id_pago_medio");
-                        int estado = obj.getInt("act_venta");
-                        double total = obj.getDouble("tot_venta");
+                        int id_venta = obj.getInt("id_venta");
+                        String num_venta = obj.getString("num_venta");
+                        String fec_venta = obj.getString("fec_venta");
+                        int id_pago_medio = obj.getInt("id_pago_medio");
+                        int act_venta = obj.getInt("act_venta");
+                        double tot_venta = obj.getDouble("tot_venta");
 
-                        listaPedidos.add(new Venta(idVenta, numVenta, fecha, idPago, estado, total));
+                        listaVenta.add(new Venta(id_venta, num_venta, fec_venta, id_pago_medio, act_venta, tot_venta));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -134,7 +150,64 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         });
     }
 
+    private void mostrarDialogCancelarPedido(Venta venta) {
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_cancelar_pedido, null);
 
+        MaterialButton btnSi = dialogView.findViewById(R.id.btnCancelarSi);
+        MaterialButton btnNo = dialogView.findViewById(R.id.btnCancelarNo);
+
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        // Botón "Sí"
+        btnSi.setOnClickListener(v -> {
+            // Aquí llamas la función para cancelar el pedido
+            CancelarPedido(venta.getId_venta());
+            dialog.dismiss();
+        });
+
+        // Botón "No"
+        btnNo.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    public void CancelarPedido(Integer id_venta){
+        String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_cancelar.php?id_venta=" + id_venta;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONObject json = new JSONObject(respuesta);
+                    String status = json.getString("status");
+                    String message = json.getString("message");
+
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+
+                    if (status.equals("ok")) {
+                        // Actualizamos la lista y el RecyclerView
+                        cargarPedidosCliente();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     @Override
     public void onClick(View v) {
