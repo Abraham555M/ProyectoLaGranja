@@ -104,11 +104,26 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
 
-        recyclerView.setAdapter(new CarritoAdapter(
-                MainActivity.this,
-                carrito,
-                () -> actualizarBadge() //  listener
-        ));
+        TextView tvEmptyMessage = dialogView.findViewById(R.id.tvEmptyMessage);
+
+        if (carrito.isEmpty()) {
+            tvEmptyMessage.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            tvEmptyMessage.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            recyclerView.setAdapter(new CarritoAdapter(
+                    MainActivity.this,
+                    carrito,
+                    () -> {
+                        actualizarBadge();
+                        if (carrito.isEmpty()) {
+                            tvEmptyMessage.setVisibility(View.VISIBLE);
+                            recyclerView.setVisibility(View.GONE);
+                        }
+                    }
+            ));
+        }
 
         // Crear el AlertDialog
         androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)

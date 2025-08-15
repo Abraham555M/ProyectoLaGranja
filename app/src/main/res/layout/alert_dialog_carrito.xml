@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="500dp"
+    android:layout_height="wrap_content"
     android:layout_margin="16dp"
     app:cardCornerRadius="20dp"
     app:cardElevation="6dp"
@@ -52,7 +52,7 @@
                 style="@style/Widget.MaterialComponents.Button.Icon" />
         </LinearLayout>
 
-        <!-- Lista de productos scrollable -->
+        <!-- Lista de productos -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -60,17 +60,100 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="2dp">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp"
-                android:scrollbars="vertical"
-                android:overScrollMode="ifContentScrolls"
-                tools:listitem="@layout/item_articulo_carrito" />
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="ifContentScrolls"
+                    android:padding="8dp"
+                    android:scrollbars="vertical"
+                    tools:listitem="@layout/item_articulo_carrito" />
+
+                <TextView
+                    android:id="@+id/tvEmptyMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="16dp"
+                    android:text="No hay productos en el carrito"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:gravity="center"
+                    android:drawableTop="@drawable/ic_carrito_compras"
+                    android:drawablePadding="8dp"
+                    android:visibility="gone" />
+            </FrameLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Estado del pedido -->
+        <!-- Campo Detalle de Venta -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@android:color/white">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Detalle de la venta"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxBackgroundMode="outline"
+                app:boxCornerRadiusTopStart="8dp"
+                app:boxCornerRadiusTopEnd="8dp"
+                app:boxCornerRadiusBottomStart="8dp"
+                app:boxCornerRadiusBottomEnd="8dp"
+                app:boxStrokeColor="@color/color_verde"
+                app:hintTextColor="@color/color_verde"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDetalleVenta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
+                    android:minLines="3"
+                    android:gravity="top|start"
+                    android:textColor="@color/black"
+                    android:textSize="14sp"
+                    android:padding="8dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Campo Dirección -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Dirección de entrega"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxBackgroundMode="outline"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxStrokeColor="@color/color_verde"
+            app:hintTextColor="@color/color_verde"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="2dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etDireccion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:padding="8dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Medio de Pago -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardview_estado"
             android:layout_width="match_parent"
@@ -87,6 +170,28 @@
                 android:entries="@array/listado_estado"
                 android:padding="8dp" />
         </androidx.cardview.widget.CardView>
+
+        <!-- Total -->
+        <TextView
+            android:id="@+id/tvTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Total: S/ 0.00"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/black" />
+
+        <!-- Mensaje aclaratorio -->
+        <TextView
+            android:id="@+id/tvMensajeTotal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="(Este monto total solo es referencial, puede variar de acuerdo al peso y/o cantidad despachada)"
+            android:textSize="12sp"
+            android:textColor="@color/cardview_dark_background"
+            android:gravity="start" />
 
         <!-- Botón enviar pedido -->
         <com.google.android.material.button.MaterialButton
