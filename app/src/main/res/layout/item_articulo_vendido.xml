@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    android:layout_margin="8dp"
+    android:background="@android:color/darker_gray">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <!-- Imagen del artículo -->
+        <ImageView
+            android:id="@+id/imgArticulo"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_marginEnd="12dp"
+            android:contentDescription="Imagen del artículo"
+            android:src="@drawable/ic_launcher_background"
+            android:clipToOutline="true"
+            android:scaleType="centerCrop" />
+
+        <!-- Nombre y precio del artículo -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/nombreArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre del Artículo"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/precioArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Precio"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp" />
+            <TextView
+                android:id="@+id/cantidadArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cantidad"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp" />
+            <TextView
+                android:id="@+id/subTotalArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SubTotal"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

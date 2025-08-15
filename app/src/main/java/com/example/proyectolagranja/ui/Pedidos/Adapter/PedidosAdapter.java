@@ -68,6 +68,20 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
             case 5: estadoTexto = "Pagado"; break;
         }
         holder.tvEstado.setText("Estado: " + estadoTexto);
+
+        // Bloquear botón si estado es 2 (Pendiente)
+        if (venta.getAct_venta() > 2) {
+            holder.btnCancelarPedido.setEnabled(false);  // Desactiva el botón
+            holder.btnCancelarPedido.setAlpha(0.5f);      // Visualmente se ve deshabilitado
+        } else {
+            holder.btnCancelarPedido.setEnabled(true);
+            holder.btnCancelarPedido.setAlpha(1.0f);
+        }
+
+        // Listener de botones
+        holder.btnCancelarPedido.setOnClickListener(v -> {
+            if (listener != null) listener.onCancelarClick(venta);
+        });
     }
 
     @Override

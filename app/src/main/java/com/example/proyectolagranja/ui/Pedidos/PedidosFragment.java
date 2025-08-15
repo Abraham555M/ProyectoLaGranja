@@ -21,7 +21,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectolagranja.R;
+import com.example.proyectolagranja.ui.Catalogo.Adapter.ArticuloAdapter;
+import com.example.proyectolagranja.ui.Clases.Articulo;
+import com.example.proyectolagranja.ui.Clases.ArticuloDetalle;
 import com.example.proyectolagranja.ui.Clases.Venta;
+import com.example.proyectolagranja.ui.Pedidos.Adapter.ArticuloDetalleAdapter;
 import com.example.proyectolagranja.ui.Pedidos.Adapter.PedidosAdapter;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.button.MaterialButton;
@@ -62,7 +66,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onVerMasClick(Venta venta) {
-                Toast.makeText(getContext(), "Ver más del pedido #" + venta.getNum_venta(), Toast.LENGTH_SHORT).show();
+                mostrarDialogVerMas(venta);
             }
         });
 
@@ -176,6 +180,67 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
+
+    private void mostrarDialogVerMas(Venta venta) {
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_ver_mas_articulos, null);
+
+        RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerView);
+        TextView tvEmpty = dialogView.findViewById(R.id.tvEmptyMessage);
+        MaterialButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        List<ArticuloDetalle> listaArticulos = new ArrayList<>();
+        ArticuloDetalleAdapter adapterArticulos = new ArticuloDetalleAdapter(getContext(), listaArticulos);
+        recyclerView.setAdapter(adapterArticulos);
+
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(getContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create();
+
+        btnCerrar.setOnClickListener(v -> dialog.dismiss());
+
+        // Cargar artículos desde el servidor
+        String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_obtener_detalle.php?id_venta=" + venta.getId_venta();
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONArray jsonArray = new JSONArray(respuesta);
+
+                    listaArticulos.clear();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        String nombre = obj.getString("nombre");
+                        double precio = obj.getDouble("precio");
+                        int cantidad = obj.getInt("cantidad");
+                        double subTotal = obj.getDouble("subtotal");
+                        String imagenUrl = obj.getString("imagen"); // si tienes URL de imagen
+
+                        listaArticulos.add(new ArticuloDetalle(nombre, precio, cantidad, subTotal, imagenUrl));
+                    }
+
+                    adapterArticulos.notifyDataSetChanged();
+                    tvEmpty.setVisibility(listaArticulos.isEmpty() ? View.VISIBLE : View.GONE);
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.show();
+    }
+
+
 
     public void CancelarPedido(Integer id_venta){
         String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_cancelar.php?id_venta=" + id_venta;

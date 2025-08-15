@@ -43,13 +43,11 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         Articulo articulo = listaArticulos.get(position);
         holder.nombre.setText(articulo.getNombre());
         holder.precio.setText("S/ " + articulo.getPrecio());
-
         // Cargar imagen
         Glide.with(context)
                 .load(articulo.getImagen())
                 .into(holder.imagen);
 
-        // Listener del botón Agregar
         holder.btnAgregar.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onAgregarClick(articulo);
@@ -60,7 +58,6 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
     @Override
     public int getItemCount() {
         return listaArticulos.size();
-
     }
 
     public static class ArticuloViewHolder extends RecyclerView.ViewHolder {

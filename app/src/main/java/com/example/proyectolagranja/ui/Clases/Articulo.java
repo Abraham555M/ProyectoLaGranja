@@ -13,6 +13,8 @@ public class Articulo {
         this.imagen = imagen;
     }
 
+
+
     public String getId() { return id; }
     public String getNombre() { return nombre; }
     public String getPrecio() { return precio; }

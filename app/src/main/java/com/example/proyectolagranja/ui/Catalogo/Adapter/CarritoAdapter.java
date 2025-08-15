@@ -44,12 +44,12 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         ItemCarrito item = lista.get(position);
 
         holder.nombreArticulo.setText(item.getArticulo().getNombre());
-        holder.precioArticulo.setText("Precio: $" + item.getArticulo().getPrecio());
+        holder.precioArticulo.setText("Precio: S/" + item.getArticulo().getPrecio());
         holder.cantidadArticulo.setText("Cantidad: " + item.getCantidad());
 
         double precio = Double.parseDouble(item.getArticulo().getPrecio());
         double subtotal = precio * item.getCantidad();
-        holder.subTotalArticulo.setText("Subtotal: $" + subtotal);
+        holder.subTotalArticulo.setText("Subtotal: S/" + subtotal);
 
         // URL de imagen
         Glide.with(context)
