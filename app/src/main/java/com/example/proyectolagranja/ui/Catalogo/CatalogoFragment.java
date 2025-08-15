@@ -381,6 +381,7 @@ public class CatalogoFragment extends Fragment {
         TextInputEditText etCantidad = dialogView.findViewById(R.id.etCantidad);
         TextInputEditText etDetalle = dialogView.findViewById(R.id.etDetalle);
         MaterialButton btnAgregar = dialogView.findViewById(R.id.btnAgregar);
+        MaterialButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
 
         // Imprimir el encabezado del articulo
         nombreArticulo.setText(articulo.getNombre());
@@ -410,6 +411,9 @@ public class CatalogoFragment extends Fragment {
                 .setView(dialogView)
                 .create();
 
+        dialog.setCanceledOnTouchOutside(false); // 🔹 No cerrar al tocar fuera
+        dialog.setCancelable(false); // 🔹 No cerrar con botón atrás
+
         btnAgregar.setOnClickListener(v -> {
             String cantidadStr = etCantidad.getText().toString().trim();
             String detalle = etDetalle.getText().toString().trim();
@@ -435,6 +439,8 @@ public class CatalogoFragment extends Fragment {
             ((MainActivity) requireActivity()).actualizarBadge();
             dialog.dismiss();
         });
+
+        btnCerrar.setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
