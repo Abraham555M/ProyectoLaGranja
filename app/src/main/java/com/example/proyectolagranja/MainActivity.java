@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.proyectolagranja.ui.Catalogo.Adapter.CarritoAdapter;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
+import com.example.proyectolagranja.ui.Clases.MedioPago;
 import com.example.proyectolagranja.ui.Clases.Producto;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.badge.BadgeDrawable;
@@ -46,15 +47,18 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 import com.google.android.material.badge.ExperimentalBadgeUtils;
 import com.google.android.material.badge.BadgeUtils;
+import com.loopj.android.http.RequestParams;
+
 import androidx.annotation.OptIn;
 
 public class MainActivity extends AppCompatActivity {
-    private List<Producto> listaMedioPago = new ArrayList<>();
+    private List<MedioPago> listaMedioPago = new ArrayList<>();
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private Spinner spMedioPago;
-    private Button btnCerrar;
+    private Button btnCerrar, btnEnviarPedido;
     private TextView tvBadge;
+    private EditText etDireccion, etDetalleVenta;
     public static List<ItemCarrito> carrito = new ArrayList<>();
 
     @Override
@@ -101,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
         View dialogView = getLayoutInflater().inflate(R.layout.alert_dialog_carrito, null);
         spMedioPago = dialogView.findViewById(R.id.spMedioPago);
         btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+        btnEnviarPedido = dialogView.findViewById(R.id.btnEnviarPedido);
+        etDireccion = dialogView.findViewById(R.id.etDireccion);
+        etDetalleVenta = dialogView.findViewById(R.id.etDetalleVenta);
 
         // RecyclerView para mostrar el carrito ---
         RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerView);
@@ -109,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
         TextView tvEmptyMessage = dialogView.findViewById(R.id.tvEmptyMessage);
         EditText etDireccion = dialogView.findViewById(R.id.etDireccion);
         TextView tvTotal = dialogView.findViewById(R.id.tvTotal);
+
 
         cargarDireccionCliente(etDireccion);
 
@@ -146,10 +154,81 @@ public class MainActivity extends AppCompatActivity {
                 .create();
         btnCerrar.setOnClickListener(v -> dialog.dismiss());
 
+        // Crear el pedido:
+        btnEnviarPedido.setOnClickListener(v -> {
+            double total = 0;
+            for (ItemCarrito item : carrito) {
+                double precio = Double.parseDouble(item.getArticulo().getPrecio());
+                total += precio * item.getCantidad();
+            }
+
+            if (spMedioPago.getSelectedItemPosition() == 0) {
+                Toast.makeText(MainActivity.this, "Seleccione un medio de pago", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (etDireccion.getText().toString().trim().isEmpty()) {
+                Toast.makeText(MainActivity.this, "Ingrese la dirección", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            EnviarPedido(
+                    total,
+                    etDireccion.getText().toString().trim(),
+                    etDetalleVenta.getText().toString().trim(),
+                    dialog
+            );
+        });
+
         cargarMedioPago();
 
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    public void EnviarPedido(double total, String direccion, String detalle_venta, androidx.appcompat.app.AlertDialog dialog){
+        // Preparar envío
+        SharedPreferences preferences = getSharedPreferences("DatosUsuario", MODE_PRIVATE);
+        int idCliente = preferences.getInt("id_cliente", 1); // provisional
+
+        int idMedioPago = listaMedioPago.get(spMedioPago.getSelectedItemPosition()).getId_pago_medio();
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        params.put("id_cliente", idCliente);
+        params.put("id_pago_medio", idMedioPago);
+        params.put("tot_venta", total);
+        params.put("dir_cliente", direccion);
+        params.put("det_venta", detalle_venta);
+
+        String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_registrar.php";
+
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody);
+                    JSONObject json = new JSONObject(respuesta);
+
+                    if (json.getBoolean("success")) {
+                        int idVenta = json.getInt("id_venta");
+                        Toast.makeText(MainActivity.this, "Pedido registrado. ID: " + idVenta, Toast.LENGTH_SHORT).show();
+                        carrito.clear();
+                        actualizarBadge();
+                        dialog.dismiss();
+                    } else {
+                        String error = json.getString("error");
+                        Toast.makeText(MainActivity.this, "Error: " + error, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(MainActivity.this, "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void actualizarBadge() {
@@ -211,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // Primera opción por defecto
                     listaMedioPago.clear();
-                    listaMedioPago.add(new Producto(0, "Seleccione un medio de pago"));
+                    listaMedioPago.add(new MedioPago(0, "Seleccione un medio de pago"));
                     nombresProductos.add("Seleccione un medio de pago");
 
                     for (int i = 0; i < jsonArray.length(); i++) {
@@ -219,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
                         int id = obj.getInt("id_pago_medio");
                         String nombre = obj.getString("nom_pago_medio");
 
-                        listaMedioPago.add(new Producto(id, nombre));
+                        listaMedioPago.add(new MedioPago(id, nombre));
                         nombresProductos.add(nombre);
                     }
 
