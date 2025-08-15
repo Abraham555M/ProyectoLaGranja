@@ -23,6 +23,7 @@
             android:gravity="start">
 
             <TextView
+                android:id="@+id/tvNumeroVenta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nro:"
@@ -31,6 +32,7 @@
                 android:layout_marginBottom="4dp" />
 
             <TextView
+                android:id="@+id/tvFechaVenta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Fecha venta:"
@@ -39,6 +41,7 @@
                 android:layout_marginBottom="4dp" />
 
             <TextView
+                android:id="@+id/tvMedioPago"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Medio Pago:"
@@ -47,6 +50,7 @@
                 android:layout_marginBottom="4dp" />
 
             <TextView
+                android:id="@+id/tvEstado"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Estado:"
@@ -55,6 +59,7 @@
                 android:layout_marginBottom="4dp" />
 
             <TextView
+                android:id="@+id/tvTotal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Total:"
