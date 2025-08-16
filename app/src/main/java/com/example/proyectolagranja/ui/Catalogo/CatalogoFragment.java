@@ -54,6 +54,9 @@ public class CatalogoFragment extends Fragment {
     private List<Articulo> listaArticulos = new ArrayList<>();
     private List<Categoria> listaCategorias = new ArrayList<>();
     private List<Producto> listaProductos = new ArrayList<>();
+    private Integer categoriaSeleccionada = null;
+    private Integer productoSeleccionado = null;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -85,9 +88,14 @@ public class CatalogoFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position > 0 && position < listaCategorias.size()) {
                     Categoria seleccionada = listaCategorias.get(position);
-                    filtrarArticulosPorCategoria(seleccionada.getId_categoria());
+                    categoriaSeleccionada = seleccionada.getId_categoria();
+
+                    filtrarArticulosPorCategoria(categoriaSeleccionada);
+                    cargarProductosPorCategoria(categoriaSeleccionada);
                 } else {
+                    categoriaSeleccionada = null; // 🔹 Ninguna categoría
                     cargarArticulos(); // Mostrar todo si no se selecciona ninguna categoría válida
+                    cargarProductos();
                 }
             }
 
@@ -103,8 +111,11 @@ public class CatalogoFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position > 0 && position < listaProductos.size()) {
                     Producto seleccionado = listaProductos.get(position);
-                    filtrarArticulosPorProducto(seleccionado.getId_producto());
+                    productoSeleccionado = seleccionado.getId_producto();
+
+                    filtrarArticulosPorProducto(productoSeleccionado);
                 } else {
+                    productoSeleccionado = null; // 🔹 Ningún producto
                     cargarArticulos();
                 }
             }
@@ -140,7 +151,7 @@ public class CatalogoFragment extends Fragment {
                             if (!texto.isEmpty()) {
                                 buscarArticulosPorNombre(texto);
                             } else {
-                                cargarArticulos();
+                                aplicarFiltros();
                             }
                         });
                     }
@@ -183,6 +194,51 @@ public class CatalogoFragment extends Fragment {
         });
     }
 
+    private void cargarProductosPorCategoria(int idCategoria) {
+        String url = ServidorConfig.URL_SERVIDOR + "producto/producto_listar_categoria.php?id_categoria=" + idCategoria;
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONArray jsonArray = new JSONArray(new String(responseBody));
+                    List<String> nombresProductos = new ArrayList<>();
+                    nombresProductos.add("Productos");
+
+                    listaProductos.clear();
+                    listaProductos.add(null);
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        int id = obj.getInt("id_producto");
+                        String nombre = obj.getString("nom_producto");
+
+                        listaProductos.add(new Producto(id, nombre));
+                        nombresProductos.add(nombre);
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                            getContext(),
+                            android.R.layout.simple_spinner_item,
+                            nombresProductos
+                    );
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spProductos.setAdapter(adapter);
+
+                } catch (JSONException e) {
+                    Toast.makeText(getContext(), "Error al procesar productos", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al cargar productos", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
     private void filtrarArticulosPorCategoria(int idCategoria) {
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_categoria.php?id_categoria=" + idCategoria;
 
@@ -218,7 +274,16 @@ public class CatalogoFragment extends Fragment {
     }
 
     private void buscarArticulosPorNombre(String nombre) {
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_buscar_nombre.php?nom_articulo=" + nombre;
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_buscar_filtro.php?"
+                + "nom_articulo=" + nombre;
+
+        if (categoriaSeleccionada != null) {
+            url += "&id_categoria=" + categoriaSeleccionada;
+        }
+
+        if (productoSeleccionado != null) {
+            url += "&id_producto=" + productoSeleccionado;
+        }
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new JsonHttpResponseHandler() {
@@ -250,6 +315,17 @@ public class CatalogoFragment extends Fragment {
             }
         });
     }
+
+    private void aplicarFiltros() {
+        // Si hay categoría o producto seleccionado → hacer búsqueda filtrada
+        if (categoriaSeleccionada != null || productoSeleccionado != null) {
+            buscarArticulosPorNombre(""); // ← pasamos vacío pero respeta filtros
+        } else {
+            // Si no hay filtros, traer todos
+            cargarArticulos();
+        }
+    }
+
 
     private void cargarArticulos() {
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_catalogo.php";
