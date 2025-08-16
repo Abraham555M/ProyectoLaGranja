@@ -4,11 +4,14 @@ import android.app.DatePickerDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +34,7 @@ import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,6 +42,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 public class PedidosFragment extends Fragment implements View.OnClickListener {
     private String fechaInicio = "", fechaFin = "";
@@ -53,11 +59,53 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         recyclerViewPedidos = rootView.findViewById(R.id.recyclerViewPedidos);
         recyclerViewPedidos.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        Spinner spEstado = rootView.findViewById(R.id.sp_estado);
+        // Cuando el usuario selecciona un estado
+        spEstado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int act_venta;
+
+                switch (position) {
+                    case 0: // Todos
+                        act_venta = -1; // usamos -1 como bandera
+                        break;
+                    case 1: // Anulado
+                        act_venta = 0;
+                        break;
+                    case 2: // Pendiente
+                        act_venta = 2;
+                        break;
+                    case 3: // Despachado
+                        act_venta = 3;
+                        break;
+                    case 4: // Entregado
+                        act_venta = 4;
+                        break;
+                    case 5: // Pagado
+                        act_venta = 5;
+                        break;
+                    default:
+                        act_venta = -1;
+                        break;
+                }
+
+                if (act_venta == -1) {
+                    cargarPedidosCliente(); // todos los pedidos
+                } else {
+                    filtrarPorEstado(act_venta); // pedidos filtrados
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
         // Inicializamos adapter vacío
         adapter = new PedidosAdapter(getContext(), listaVenta);
         recyclerViewPedidos.setAdapter(adapter);
 
-        // Aquí asignas el listener de los botones de cada ítem
+        // listener de los botones de cada ítem
         adapter.setOnPedidoClickListener(new PedidosAdapter.OnPedidoClickListener() {
             @Override
             public void onCancelarClick(Venta venta) {
@@ -108,8 +156,106 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                 fechaFin = fecha;
                 et_fecha_fin.setText(fecha);
             }
+            filtrarPorFechas(fechaInicio, fechaFin);
         }, anio, mes, dia);
         datePicker.show();
+    }
+
+    private void filtrarPorFechas(String fecha_ini, String fecha_fin) {
+        int id_cliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
+                .getInt("id_cliente", 1);
+
+        String url = ServidorConfig.URL_SERVIDOR +
+                "pedido/pedido_filtro_fechas.php?id_cliente=" + id_cliente +
+                "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONArray jsonArray = new JSONArray(respuesta);
+
+                    listaVenta.clear(); // limpiar lista antes de agregar resultados
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        int id_venta = obj.getInt("id_venta");
+                        String num_venta = obj.getString("num_venta");
+                        String fec_venta = obj.getString("fec_venta");
+                        int id_pago_medio = obj.getInt("id_pago_medio");
+                        int act_venta = obj.getInt("act_venta");
+                        double tot_venta = obj.getDouble("tot_venta");
+
+                        listaVenta.add(new Venta(id_venta, num_venta, fec_venta, id_pago_medio, act_venta, tot_venta));
+                    }
+
+                    adapter.notifyDataSetChanged();
+
+                    if (listaVenta.isEmpty()) {
+                        Toast.makeText(getContext(), "No hay pedidos en ese rango de fechas", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+                error.printStackTrace();
+            }
+        });
+    }
+
+    private void filtrarPorEstado(int act_venta) {
+        int id_cliente = 1;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = ServidorConfig.URL_SERVIDOR +
+                "pedido/pedido_filtro_estado.php?act_venta=" +
+                act_venta + "&id_cliente=" + id_cliente;
+
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String response = new String(responseBody, "UTF-8");
+                    JSONArray jsonArray = new JSONArray(response);
+
+                    listaVenta.clear(); // Limpiamos la lista existente
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+
+                        int id_venta = obj.getInt("id_venta");
+                        String num_venta = obj.getString("num_venta");
+                        String fec_venta = obj.getString("fec_venta");
+                        int id_pago_medio = obj.getInt("id_pago_medio");
+                        int estado = obj.getInt("act_venta");
+                        double tot_venta = obj.getDouble("tot_venta");
+
+                        listaVenta.add(new Venta(id_venta, num_venta, fec_venta, id_pago_medio, estado, tot_venta));
+                    }
+
+                    adapter.notifyDataSetChanged();
+
+                    if (listaVenta.isEmpty()) {
+                        Toast.makeText(getContext(), "No hay pedidos de ese estado", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar los datos", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void cargarPedidosCliente() {
@@ -239,8 +385,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
         dialog.show();
     }
-
-
 
     public void CancelarPedido(Integer id_venta){
         String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_cancelar.php?id_venta=" + id_venta;

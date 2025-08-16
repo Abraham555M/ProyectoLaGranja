@@ -45,9 +45,9 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Venta venta = listaVenta.get(position);
-        holder.tvNumeroVenta.setText("Pedido #" + venta.getNum_venta());
-        holder.tvFechaVenta.setText("Fecha: " + venta.getFec_venta());
-        holder.tvTotal.setText("Total: S/" + venta.getTot_venta());
+        holder.tvNumeroVenta.setText(venta.getNum_venta());
+        holder.tvFechaVenta.setText(venta.getFec_venta());
+        holder.tvTotal.setText("S/ " + venta.getTot_venta());
 
         // Listener de botones
         holder.btnCancelarPedido.setOnClickListener(v -> {
@@ -58,19 +58,32 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
             if(listener != null) listener.onVerMasClick(venta);
         });
 
-        // Para el mensaje de los estados
-        String estadoTexto = "Desconocido";
+        // Medio de pago
+        String medioPagoTexto;
+        switch (venta.getId_pago_medio()) {
+            case 1: medioPagoTexto = "Efectivo"; break;
+            case 2: medioPagoTexto = "Tarjeta"; break;
+            case 3: medioPagoTexto = "App"; break;
+            case 4: medioPagoTexto = "Transferencia"; break;
+            case 5: medioPagoTexto = "Crédito"; break;
+            default: medioPagoTexto = "Desconocido"; break;
+        }
+        holder.tvMedioPago.setText(medioPagoTexto);
+
+        // Estados
+        String estadoTexto;
         switch (venta.getAct_venta()) {
-            case 1: estadoTexto = "Registrando"; break; // No se está usando
+            case 0: estadoTexto = "Cancelado"; break;
             case 2: estadoTexto = "Pendiente"; break;
             case 3: estadoTexto = "Despachado"; break;
             case 4: estadoTexto = "Entregado"; break;
             case 5: estadoTexto = "Pagado"; break;
+            default: estadoTexto = "Desconocido"; break;
         }
-        holder.tvEstado.setText("Estado: " + estadoTexto);
+        holder.tvEstado.setText(estadoTexto);
 
         // Bloquear botón si estado es 2 (Pendiente)
-        if (venta.getAct_venta() > 2) {
+        if (venta.getAct_venta() > 2 || venta.getAct_venta() == 0) {
             holder.btnCancelarPedido.setEnabled(false);  // Desactiva el botón
             holder.btnCancelarPedido.setAlpha(0.5f);      // Visualmente se ve deshabilitado
         } else {
@@ -90,14 +103,14 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvNumeroVenta, tvFechaVenta, tvTotal, tvEstado;
+        TextView tvNumeroVenta, tvFechaVenta, tvTotal, tvEstado, tvMedioPago;
         MaterialButton btnCancelarPedido, btnVerMasPedido;
-
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvNumeroVenta = itemView.findViewById(R.id.tvNumeroVenta);
             tvFechaVenta = itemView.findViewById(R.id.tvFechaVenta);
+            tvMedioPago = itemView.findViewById(R.id.tvMedioPago);
             tvTotal = itemView.findViewById(R.id.tvTotal);
             tvEstado = itemView.findViewById(R.id.tvEstado);
             btnCancelarPedido = itemView.findViewById(R.id.btnCancelarPedido);
