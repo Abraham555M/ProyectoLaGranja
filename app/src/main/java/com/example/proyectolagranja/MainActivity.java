@@ -180,7 +180,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         cargarMedioPago();
-
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
@@ -211,6 +210,8 @@ public class MainActivity extends AppCompatActivity {
 
                     if (json.getBoolean("success")) {
                         int idVenta = json.getInt("id_venta");
+                        // Enviar detalles del pedido
+                        EnviarDetallesPedido(idVenta);
                         Toast.makeText(MainActivity.this, "Pedido registrado. ID: " + idVenta, Toast.LENGTH_SHORT).show();
                         carrito.clear();
                         actualizarBadge();
@@ -219,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
                         String error = json.getString("error");
                         Toast.makeText(MainActivity.this, "Error: " + error, Toast.LENGTH_SHORT).show();
                     }
+
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
                 }
@@ -229,6 +231,33 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void EnviarDetallesPedido(int idVenta) {
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        for (ItemCarrito item : carrito) {
+            RequestParams params = new RequestParams();
+            params.put("id_venta", idVenta);
+            params.put("id_articulo", item.getArticulo().getId());
+            params.put("cant_venta_detalle", item.getCantidad());
+            params.put("prec_venta_detalle", item.getArticulo().getPrecio());
+
+            String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_registrar_detalle.php";
+
+            client.post(url, params, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    String respuesta = new String(responseBody);
+                    Toast.makeText(MainActivity.this, respuesta, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Toast.makeText(MainActivity.this, "Error al guardar detalle", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     public void actualizarBadge() {
@@ -242,15 +271,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cargarDireccionCliente(EditText etDireccion) {
-         /*
-        SharedPreferences preferences = getSharedPreferences("DatosUsuario", MODE_PRIVATE);
-        int idCliente = preferences.getInt("id_cliente", -1);
-
-        if (idCliente == -1) {
-            Toast.makeText(this, "No se encontró el cliente logueado", Toast.LENGTH_SHORT).show();
-            return;
-        }
-         */
         int idCliente = 1; //Cliente para pruebas
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_obtener_direccion.php?id_cliente=" + idCliente;
         AsyncHttpClient client = new AsyncHttpClient();
