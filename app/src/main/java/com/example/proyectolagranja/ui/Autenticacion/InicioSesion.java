@@ -1,6 +1,8 @@
 package com.example.proyectolagranja.ui.Autenticacion;
 
 import android.app.AlertDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -71,6 +73,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         btnNo.setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
     private void validarTelefono(String telefono) {

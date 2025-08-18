@@ -46,7 +46,6 @@
             style="@style/Widget.MaterialComponents.Button.Icon" />
     </LinearLayout>
 
-
     <!-- Precio del Artículo -->
     <TextView
         android:id="@+id/tvPrecioArticulo"
@@ -60,8 +59,6 @@
         android:paddingHorizontal="12dp"
         android:paddingVertical="4dp"
         android:layout_marginBottom="16dp" />
-
-
 
     <!-- Campo Cantidad -->
     <com.google.android.material.textfield.TextInputLayout
@@ -79,16 +76,69 @@
         app:hintTextColor="@android:color/darker_gray"
         android:elevation="2dp">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etCantidad"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="number"
-            android:textColor="@android:color/black"
-            android:textColorHint="@android:color/darker_gray"
-            android:hint="Cantidad(*)" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
+            <!-- Botón Restar con ícono -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRestar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/color_principal"
+                android:elevation="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:insetLeft="0dp"
+                android:insetRight="0dp"
+                android:padding="0dp"
+                android:text=""
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_restar"
+                app:iconTint="@android:color/white"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:strokeWidth="0dp"
+                style="@style/Widget.MaterialComponents.Button.Icon" />
+
+            <!-- Campo Cantidad -->
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etCantidad"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:inputType="number"
+                android:textColor="@android:color/black"
+                android:hint="Cantidad(*)"
+                android:textColorHint="@android:color/darker_gray"/>
+
+            <!-- Botón Sumar -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSumar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/color_principal"
+                android:elevation="4dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:insetLeft="0dp"
+                android:insetRight="0dp"
+                android:padding="0dp"
+                android:text=""
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_add"
+                app:iconTint="@android:color/white"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:strokeWidth="0dp"
+                style="@style/Widget.MaterialComponents.Button.Icon" />
+        </LinearLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Campo Detalle -->
     <com.google.android.material.textfield.TextInputLayout
@@ -118,7 +168,6 @@
             android:visibility="gone" />
     </com.google.android.material.textfield.TextInputLayout>
 
-
     <!-- Nota -->
     <TextView
         android:layout_width="match_parent"
@@ -142,5 +191,4 @@
         android:paddingLeft="32dp"
         android:paddingRight="32dp"
         android:layout_gravity="center_horizontal" />
-
 </LinearLayout>

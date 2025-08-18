@@ -46,6 +46,8 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         // Cargar imagen
         Glide.with(context)
                 .load(articulo.getImagen())
+                .placeholder(R.drawable.logo_la_granja) // mientras carga
+                .error(R.drawable.logo_la_granja)       // si falla
                 .into(holder.imagen);
 
         holder.btnAgregar.setOnClickListener(v -> {

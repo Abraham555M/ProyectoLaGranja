@@ -458,6 +458,32 @@ public class CatalogoFragment extends Fragment {
         TextInputEditText etDetalle = dialogView.findViewById(R.id.etDetalle);
         MaterialButton btnAgregar = dialogView.findViewById(R.id.btnAgregar);
         MaterialButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+        MaterialButton btnRestar = dialogView.findViewById(R.id.btnRestar);
+        MaterialButton btnSumar = dialogView.findViewById(R.id.btnSumar);
+
+        // Botón Restar
+        btnRestar.setOnClickListener(v -> {
+            String valorStr = etCantidad.getText().toString().trim();
+            if (!valorStr.isEmpty()) {
+                int valor = Integer.parseInt(valorStr);
+                if (valor > 1) {
+                    valor--;
+                    etCantidad.setText(String.valueOf(valor));
+                }
+            }
+        });
+
+        // Botón Sumar
+        btnSumar.setOnClickListener(v -> {
+            String valorStr = etCantidad.getText().toString().trim();
+            int valor;
+            if (valorStr.isEmpty()) {
+                valor = 1; // Si no hay valor, iniciar en 1
+            } else {
+                valor = Integer.parseInt(valorStr) + 1;
+            }
+            etCantidad.setText(String.valueOf(valor));
+        });
 
         // Imprimir el encabezado del articulo
         nombreArticulo.setText(articulo.getNombre());
