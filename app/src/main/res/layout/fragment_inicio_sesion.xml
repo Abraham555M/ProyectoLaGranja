@@ -53,6 +53,7 @@
                     android:layout_width="260dp"
                     android:layout_height="48dp"
                     android:background="#E9E9E9"
+                    android:textCursorDrawable="@drawable/cursor_color"
                     android:hint="Ej. +51 999 888 777"
                     android:inputType="phone"
                     android:paddingHorizontal="16dp"
@@ -111,6 +112,7 @@
                         android:inputType="number"
                         android:maxLength="1"
                         android:textSize="15sp"
+                        android:textCursorDrawable="@drawable/cursor_color"
                         android:layout_margin="2dp" />
 
                     <EditText
@@ -122,6 +124,7 @@
                         android:inputType="number"
                         android:maxLength="1"
                         android:textSize="15sp"
+                        android:textCursorDrawable="@drawable/cursor_color"
                         android:layout_margin="2dp" />
 
                     <EditText
@@ -133,6 +136,7 @@
                         android:inputType="number"
                         android:maxLength="1"
                         android:textSize="15sp"
+                        android:textCursorDrawable="@drawable/cursor_color"
                         android:layout_margin="2dp" />
 
                     <EditText
@@ -144,6 +148,7 @@
                         android:inputType="number"
                         android:maxLength="1"
                         android:textSize="15sp"
+                        android:textCursorDrawable="@drawable/cursor_color"
                         android:layout_margin="2dp" />
 
                     <EditText
@@ -154,6 +159,7 @@
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
+                        android:textCursorDrawable="@drawable/cursor_color"
                         android:textSize="15sp"
                         android:layout_margin="2dp" />
 
@@ -166,6 +172,7 @@
                         android:inputType="number"
                         android:maxLength="1"
                         android:textSize="15sp"
+                        android:textCursorDrawable="@drawable/cursor_color"
                         android:layout_margin="2dp" />
                 </LinearLayout>
 
