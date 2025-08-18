@@ -11,11 +11,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.proyectolagranja.R;
-import com.example.proyectolagranja.ui.Clases.Venta;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.textfield.TextInputLayout;
 import com.loopj.android.http.AsyncHttpClient;
@@ -23,16 +23,23 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 import cz.msebera.android.httpclient.Header;
 
 public class PerfilFragment extends Fragment implements View.OnClickListener {
-    private Button btnCambiar, btnGuardarCambios;
+    private Button btnGuardarCambios;
     private EditText etNombresEd, etDocumentoEd, etTelefonoEd, etDireccionEd;
-    private TextInputLayout tilTelefono;
+    private TextInputLayout tilTelefono, tilEditName, tilDireccion;
+
+    // 🔹 Variables para guardar los valores originales
+    private String nombresOriginal = "";
+    private String documentoOriginal = "";
+    private String telefonoOriginal = "";
+    private String direccionOriginal = "";
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -43,6 +50,8 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
         etTelefonoEd = rootView.findViewById(R.id.etTelefonoEd);
         etDireccionEd = rootView.findViewById(R.id.etDireccionEd);
         tilTelefono = rootView.findViewById(R.id.tilTelefono);
+        tilEditName = rootView.findViewById(R.id.tilEditName);
+        etDireccionEd = rootView.findViewById(R.id.etDireccionEd);
 
         // OnClick para cambiar el telefono
         tilTelefono.setEndIconOnClickListener(v -> onClick(tilTelefono));
@@ -50,8 +59,76 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
         btnGuardarCambios = rootView.findViewById(R.id.btnGuardarCambios);
         btnGuardarCambios.setOnClickListener(this);
 
+        // Desactivamos el botón al inicio
+        btnGuardarCambios.setEnabled(false);
+        // Escuchamos cambios en los EditText
+        agregarTextWatcher(etNombresEd);
+        agregarTextWatcher(etDocumentoEd);
+        agregarTextWatcher(etTelefonoEd);
+        agregarTextWatcher(etDireccionEd);
+
         cargarDatosUsuario();
         return rootView;
+    }
+
+    private void agregarTextWatcher(EditText editText) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Si cualquiera de los EditText tiene algo escrito, activamos el botón
+                verificarCampos();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) { }
+        });
+    }
+
+    private void verificarCampos() {
+        boolean hayCambios =
+                !etNombresEd.getText().toString().trim().equals(nombresOriginal) ||
+                !etDocumentoEd.getText().toString().trim().equals(documentoOriginal) ||
+                !etTelefonoEd.getText().toString().trim().equals(telefonoOriginal) ||
+                !etDireccionEd.getText().toString().trim().equals(direccionOriginal);
+
+        btnGuardarCambios.setEnabled(hayCambios);
+    }
+
+    private boolean validarCampos() {
+        boolean valido = true;
+
+        if (etNombresEd.getText().toString().trim().isEmpty()) {
+            etNombresEd.setError("El nombre no puede estar vacío");
+            valido = false;
+        } else {
+            etNombresEd.setError(null);
+        }
+
+        if (etDocumentoEd.getText().toString().trim().isEmpty()) {
+            etDocumentoEd.setError("El documento no puede estar vacío");
+            valido = false;
+        } else {
+            etDocumentoEd.setError(null);
+        }
+
+        if (etTelefonoEd.getText().toString().trim().isEmpty()) {
+            etTelefonoEd.setError("El teléfono no puede estar vacío");
+            valido = false;
+        } else {
+            etTelefonoEd.setError(null);
+        }
+
+        if (etDireccionEd.getText().toString().trim().isEmpty()) {
+            etDireccionEd.setError("La dirección no puede estar vacía");
+            valido = false;
+        } else {
+            etDireccionEd.setError(null);
+        }
+
+        return valido;
     }
 
     private void cargarDatosUsuario() {
@@ -65,10 +142,21 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, JSONObject response) {
                 try {
-                    etNombresEd.setText(response.getString("nom_cliente"));
-                    etDocumentoEd.setText(response.getString("num_doc_cliente"));
-                    etTelefonoEd.setText(response.getString("tel_cliente"));
-                    etDireccionEd.setText(response.getString("dir_cliente"));
+                    // Guardamos valores originales
+                    nombresOriginal = response.getString("nom_cliente");
+                    documentoOriginal = response.getString("num_doc_cliente");
+                    telefonoOriginal = response.getString("tel_cliente");
+                    direccionOriginal = response.getString("dir_cliente");
+
+                    // Seteamos los EditText
+                    etNombresEd.setText(nombresOriginal);
+                    etDocumentoEd.setText(documentoOriginal);
+                    etTelefonoEd.setText(telefonoOriginal);
+                    etDireccionEd.setText(direccionOriginal);
+
+                    // Al cargar datos → botón deshabilitado
+                    btnGuardarCambios.setEnabled(false);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Toast.makeText(requireContext(), "Error parseando JSON", Toast.LENGTH_SHORT).show();
@@ -89,12 +177,12 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
 
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_actualizar_perfil.php";
 
-        // Datos que enviaremos
         RequestParams params = new RequestParams();
         params.put("id_cliente", idCliente);
         params.put("nom_cliente", etNombresEd.getText().toString().trim());
         params.put("dir_cliente", etDireccionEd.getText().toString().trim());
         params.put("num_doc_cliente", etDocumentoEd.getText().toString().trim());
+
         AsyncHttpClient client = new AsyncHttpClient();
         client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
@@ -102,6 +190,14 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
                 String respuesta = new String(responseBody);
                 if (respuesta.equals("ok")) {
                     Toast.makeText(requireContext(), "Datos actualizados correctamente", Toast.LENGTH_SHORT).show();
+
+                    // 🔹 Actualizamos los valores originales con los nuevos
+                    nombresOriginal = etNombresEd.getText().toString().trim();
+                    documentoOriginal = etDocumentoEd.getText().toString().trim();
+                    telefonoOriginal = etTelefonoEd.getText().toString().trim();
+                    direccionOriginal = etDireccionEd.getText().toString().trim();
+
+                    btnGuardarCambios.setEnabled(false); // 🔹 Lo desactivamos porque ya está igual
                 } else {
                     Toast.makeText(requireContext(), "Error al actualizar", Toast.LENGTH_SHORT).show();
                 }
@@ -112,7 +208,6 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(requireContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     private void mostrarDialogoCambiarNumero() {
@@ -145,13 +240,44 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
+    private void mostrarDialogoActualizarPerfil() {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View dialogView = inflater.inflate(R.layout.alert_dialog_confirmacion_actualizar_perfil, null);
+
+        Button btnSi = dialogView.findViewById(R.id.btnCancelarSi);
+        Button btnNo = dialogView.findViewById(R.id.btnCancelarNo);
+
+        // Creamos el AlertDialog
+        androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false) //Si o No
+                .create();
+
+        // Acción botón "Sí"
+        btnSi.setOnClickListener(v -> {
+            actualizarDatosUsuario();
+            dialog.dismiss();
+        });
+
+        // Acción botón "No"
+        btnNo.setOnClickListener(v -> {
+            cargarDatosUsuario();
+            dialog.dismiss(); // Cerrar el diálogo
+        });
+
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
     @Override
     public void onClick(View view) {
         if(view == tilTelefono) {
             mostrarDialogoCambiarNumero();
         }
-        if(view == btnGuardarCambios){
-            actualizarDatosUsuario();
+        if (view == btnGuardarCambios) {
+            if (validarCampos()) {
+                mostrarDialogoActualizarPerfil();
+            }
         }
     }
 }
