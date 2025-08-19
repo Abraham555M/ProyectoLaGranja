@@ -29,6 +29,9 @@
         <action
             android:id="@+id/action_nav_perfil_to_nav_inicio_sesion"
             app:destination="@id/nav_inicio_sesion" />
+        <action
+            android:id="@+id/action_nav_perfil_to_nav_actualizar_telefono"
+            app:destination="@id/nav_actualizar_telefono" />
     </fragment>
     <fragment
         android:id="@+id/nav_crear_cuenta"
@@ -53,5 +56,13 @@
         <action
             android:id="@+id/action_nav_inicio_sesion_to_nav_crear_cuenta"
             app:destination="@id/nav_crear_cuenta" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_actualizar_telefono"
+        android:name="com.example.proyectolagranja.ui.Perfil.ActualizarTelefono"
+        android:label="ActualizarTelefono" >
+        <action
+            android:id="@+id/action_nav_actualizar_telefono_to_nav_catalogo"
+            app:destination="@id/nav_catalogo" />
     </fragment>
 </navigation>

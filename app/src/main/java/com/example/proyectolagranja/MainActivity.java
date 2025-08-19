@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Para que no sea visible el encabezado
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            if (destination.getId() == R.id.nav_crear_cuenta || destination.getId() == R.id.nav_inicio_sesion) {
+            if (destination.getId() == R.id.nav_crear_cuenta || destination.getId() == R.id.nav_inicio_sesion || destination.getId() == R.id.nav_actualizar_telefono) {
                 binding.appBarMain.toolbar.setVisibility(View.GONE); // Quitar el encabezado
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // 🔒 Desactiva swipe
                 binding.appBarMain.fab.setVisibility(View.GONE); // Quitar el carrito de compra

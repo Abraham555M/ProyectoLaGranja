@@ -228,7 +228,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
             dialog.dismiss();
             // Navegar al otro fragment
             Navigation.findNavController(requireView())
-                    .navigate(R.id.action_nav_perfil_to_nav_inicio_sesion);
+                    .navigate(R.id.action_nav_perfil_to_nav_actualizar_telefono);
         });
 
         // Acción botón "No"
