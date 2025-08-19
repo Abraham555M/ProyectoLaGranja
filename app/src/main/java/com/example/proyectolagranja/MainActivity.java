@@ -89,6 +89,14 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        View headerView = navigationView.getHeaderView(0);
+
+        // Referencias a los TextView del header
+        TextView tvNombre = headerView.findViewById(R.id.tvNombre);
+        TextView tvTelefono = headerView.findViewById(R.id.tvTelefono);
+
+        ObtenerDatosUsuario(tvNombre, tvTelefono);
+
         // Para que no sea visible el encabezado
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.nav_crear_cuenta || destination.getId() == R.id.nav_inicio_sesion || destination.getId() == R.id.nav_actualizar_telefono) {
@@ -99,6 +107,40 @@ public class MainActivity extends AppCompatActivity {
                 binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED); // ✅ Reactiva swipe
                 binding.appBarMain.fab.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void ObtenerDatosUsuario(TextView tvNombre, TextView tvTelefono){
+        SharedPreferences preferences = getSharedPreferences("DatosUsuario", MODE_PRIVATE);
+        int idCliente = preferences.getInt("id_cliente", 6); // valor provisional si no existe
+
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_obtener_datos.php?id_cliente=" + idCliente;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+
+                    if (json.has("nom_cliente") && json.has("tel_cliente")) {
+                        String nombre = json.getString("nom_cliente");
+                        String telefono = json.getString("tel_cliente");
+
+                        // Actualizar los TextView del header
+                        tvNombre.setText(nombre);
+                        tvTelefono.setText(telefono);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(MainActivity.this, "Error al procesar datos del usuario", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(MainActivity.this, "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
             }
         });
     }
