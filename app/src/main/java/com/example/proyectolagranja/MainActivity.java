@@ -1,10 +1,12 @@
 package com.example.proyectolagranja;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.widget.ArrayAdapter;
@@ -21,6 +23,7 @@ import com.example.proyectolagranja.ui.Clases.Producto;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.BadgeUtils;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -117,15 +120,16 @@ public class MainActivity extends AppCompatActivity {
         EditText etDireccion = dialogView.findViewById(R.id.etDireccion);
         TextView tvTotal = dialogView.findViewById(R.id.tvTotal);
 
-
         cargarDireccionCliente(etDireccion);
 
         if (carrito.isEmpty()) {
             tvEmptyMessage.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
+            btnEnviarPedido.setVisibility(View.GONE);
         } else {
             tvEmptyMessage.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
+            btnEnviarPedido.setVisibility(View.VISIBLE);
 
             double totalInicial = 0;
             for (ItemCarrito item : carrito) {
@@ -143,6 +147,11 @@ public class MainActivity extends AppCompatActivity {
                         if (carrito.isEmpty()) {
                             tvEmptyMessage.setVisibility(View.VISIBLE);
                             recyclerView.setVisibility(View.GONE);
+                            btnEnviarPedido.setVisibility(View.GONE);
+                        } else {
+                            tvEmptyMessage.setVisibility(View.GONE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            btnEnviarPedido.setVisibility(View.VISIBLE); // volver a mostrar si tiene algo
                         }
                     }
             ));
@@ -152,6 +161,9 @@ public class MainActivity extends AppCompatActivity {
         androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
                 .setView(dialogView)
                 .create();
+        dialog.setCancelable(false); // Evita que se cierre presionando atras
+        dialog.setCanceledOnTouchOutside(false); // Evita que se cierre tocando afuera
+
         btnCerrar.setOnClickListener(v -> dialog.dismiss());
 
         // Crear el pedido:
@@ -210,9 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if (json.getBoolean("success")) {
                         int idVenta = json.getInt("id_venta");
-                        // Enviar detalles del pedido
                         EnviarDetallesPedido(idVenta);
-                        Toast.makeText(MainActivity.this, "Pedido registrado. ID: " + idVenta, Toast.LENGTH_SHORT).show();
                         carrito.clear();
                         actualizarBadge();
                         dialog.dismiss();
@@ -248,8 +258,22 @@ public class MainActivity extends AppCompatActivity {
             client.post(url, params, new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    String respuesta = new String(responseBody);
-                    Toast.makeText(MainActivity.this, respuesta, Toast.LENGTH_SHORT).show();
+                    // Mostrar AlertDialog personalizado
+                    LayoutInflater inflater = getLayoutInflater();
+                    View view = inflater.inflate(R.layout.alert_dialog_pedido_realizado, null);
+                    MaterialButton btnCerrar = view.findViewById(R.id.btnCerrar);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setView(view);
+                    AlertDialog alertDialog = builder.create();
+                    // Evitar que se cierre tocando afuera o con botón atrás
+                    alertDialog.setCancelable(false);
+                    alertDialog.setCanceledOnTouchOutside(false);
+
+                    btnCerrar.setOnClickListener(v -> alertDialog.dismiss());
+
+                    alertDialog.show();
+                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 }
 
                 @Override
