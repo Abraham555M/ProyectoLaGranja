@@ -11,6 +11,8 @@
     <color name="color_principal">#004F8E</color>
     <color name="color_rojo">#EF5656</color>
     <color name="color_verde">#59C98E</color>
+    <color name="color_blanco">#FFFFFF</color>
+    <color name="color_secundario">#0A75C2</color>
 
-
+    #004F8E
 </resources>
