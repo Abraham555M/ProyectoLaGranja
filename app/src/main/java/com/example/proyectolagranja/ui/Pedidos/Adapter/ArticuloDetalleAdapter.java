@@ -35,15 +35,25 @@ public class ArticuloDetalleAdapter extends RecyclerView.Adapter<ArticuloDetalle
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ArticuloDetalle articulo = listaArticulos.get(position);
-        holder.nombre.setText(articulo.getNombre());
-        holder.precio.setText("S/. " + articulo.getPrecio());
-        holder.cantidad.setText("Cantidad: " + articulo.getCantidad());
-        holder.subTotal.setText("SubTotal: S/. " + articulo.getSubTotal());
 
-        // Cargar imagen
-        Glide.with(context)
-                .load(articulo.getImagenUrl())
-                .into(holder.imagen);
+        holder.nombre.setText(articulo.getNombre());
+        String precioFormateado = String.format("%.2f", articulo.getPrecio());
+        String subTotalFormateado = String.format("%.2f", articulo.getSubTotal());
+
+        holder.precio.setText("S/. " + precioFormateado);
+        holder.cantidad.setText("Cantidad: " + articulo.getCantidad());
+        holder.subTotal.setText("SubTotal: S/. " + subTotalFormateado);
+
+        // Cargar imagen con Glide
+        if (articulo.getImagenUrl() != null && !articulo.getImagenUrl().isEmpty()) {
+            Glide.with(context)
+                    .load(articulo.getImagenUrl())
+                    .placeholder(R.drawable.logo_la_granja) // mientras carga
+                    .error(R.drawable.logo_la_granja)       // si falla
+                    .into(holder.imagen);
+        } else {
+            holder.imagen.setImageResource(R.drawable.logo_la_granja);
+        }
     }
 
     @Override

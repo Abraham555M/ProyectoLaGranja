@@ -17,15 +17,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectolagranja.R;
-import com.example.proyectolagranja.ui.Catalogo.Adapter.ArticuloAdapter;
-import com.example.proyectolagranja.ui.Clases.Articulo;
 import com.example.proyectolagranja.ui.Clases.ArticuloDetalle;
 import com.example.proyectolagranja.ui.Clases.Venta;
 import com.example.proyectolagranja.ui.Pedidos.Adapter.ArticuloDetalleAdapter;
@@ -34,7 +31,6 @@ import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -346,9 +342,19 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
         btnCerrar.setOnClickListener(v -> dialog.dismiss());
 
-        // Cargar artículos desde el servidor
-        String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_obtener_detalle.php?id_venta=" + venta.getId_venta();
+        // Mostramos el Dialog
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        // Llamamos al método que hace la consulta
+        cargarDetallesVenta(venta.getId_venta(), listaArticulos, adapterArticulos, tvEmpty);
+    }
+
+    private void cargarDetallesVenta(int idVenta, List<ArticuloDetalle> listaArticulos,
+                                     ArticuloDetalleAdapter adapterArticulos, TextView tvEmpty) {
+
+        String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_obtener_detalle.php?id_venta=" + idVenta;
         AsyncHttpClient client = new AsyncHttpClient();
+
         client.get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
@@ -360,11 +366,11 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
-                        String nombre = obj.getString("nombre");
-                        double precio = obj.getDouble("precio");
-                        int cantidad = obj.getInt("cantidad");
-                        double subTotal = obj.getDouble("subtotal");
-                        String imagenUrl = obj.getString("imagen"); // si tienes URL de imagen
+                        String nombre = obj.getString("nom_articulo");
+                        double precio = obj.getDouble("prec_vent3_articulo");
+                        int cantidad = obj.getInt("cant_venta_detalle");
+                        double subTotal = precio * cantidad;
+                        String imagenUrl = obj.optString("foto_articulo");
 
                         listaArticulos.add(new ArticuloDetalle(nombre, precio, cantidad, subTotal, imagenUrl));
                     }
@@ -382,8 +388,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
             }
         });
-
-        dialog.show();
     }
 
     public void CancelarPedido(Integer id_venta){
