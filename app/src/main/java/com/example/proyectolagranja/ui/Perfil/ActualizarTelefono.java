@@ -1,6 +1,8 @@
 package com.example.proyectolagranja.ui.Perfil;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
 
@@ -169,6 +172,49 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
         });
     }
 
+    private void actualizarTelefonoEnServidor(String telefono) {
+        SharedPreferences prefs = requireContext().getSharedPreferences("UsuarioPrefs", Context.MODE_PRIVATE);
+        int idCliente = prefs.getInt("id_cliente", 1); // 👈 lo guardaste al iniciar sesión
+
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_actualizar_telefono.php";
+
+        RequestParams params = new RequestParams();
+        params.put("id_cliente", idCliente);
+        params.put("tel_cliente", telefono);
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String response = new String(responseBody).trim();
+                    if (response.contains("Teléfono actualizado correctamente")) {
+                        // Guardar nuevo teléfono
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putString("tel_cliente", telefono);
+                        editor.apply();
+
+                        Toast.makeText(requireContext(), "Teléfono actualizado correctamente", Toast.LENGTH_SHORT).show();
+                        NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
+                        navController.navigate(R.id.action_nav_actualizar_telefono_to_nav_catalogo);
+
+                        limpiarEspacios();
+                    } else {
+                        Toast.makeText(requireContext(), "Error: " + response, Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(requireContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
         if (v == btnEnviarTelefonoEd) {
@@ -217,6 +263,8 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                     et4.getText().toString() +
                     et5.getText().toString() +
                     et6.getText().toString();
+            String telefono = etTelefonoEd.getText().toString().trim();
+            actualizarTelefonoEnServidor(telefono);
         }
     }
 }
