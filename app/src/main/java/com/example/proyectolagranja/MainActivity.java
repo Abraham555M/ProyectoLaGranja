@@ -12,10 +12,12 @@ import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.proyectolagranja.ui.Catalogo.Adapter.CarritoAdapter;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.MedioPago;
@@ -94,6 +96,10 @@ public class MainActivity extends AppCompatActivity {
         // Referencias a los TextView del header
         TextView tvNombre = headerView.findViewById(R.id.tvNombre);
         TextView tvTelefono = headerView.findViewById(R.id.tvTelefono);
+        ImageView imageView = headerView.findViewById(R.id.imageView);
+        Glide.with(this)
+                .load("https://i.postimg.cc/3RcFbyqg/logo-blanco-1.png")
+                .into(imageView);
 
         ObtenerDatosUsuario(tvNombre, tvTelefono);
 
