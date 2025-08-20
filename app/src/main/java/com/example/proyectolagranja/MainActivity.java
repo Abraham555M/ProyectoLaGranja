@@ -293,6 +293,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void EnviarDetallesPedido(int idVenta) {
         AsyncHttpClient client = new AsyncHttpClient();
+        int totalDetalles = carrito.size();  // Cantidad de detalles a enviar
+        final int[] detallesEnviados = {0};
 
         for (ItemCarrito item : carrito) {
             RequestParams params = new RequestParams();
@@ -306,22 +308,12 @@ public class MainActivity extends AppCompatActivity {
             client.post(url, params, new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    // Mostrar AlertDialog personalizado
-                    LayoutInflater inflater = getLayoutInflater();
-                    View view = inflater.inflate(R.layout.alert_dialog_pedido_realizado, null);
-                    MaterialButton btnCerrar = view.findViewById(R.id.btnCerrar);
+                    detallesEnviados[0]++; // Contador
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setView(view);
-                    AlertDialog alertDialog = builder.create();
-                    // Evitar que se cierre tocando afuera o con botón atrás
-                    alertDialog.setCancelable(false);
-                    alertDialog.setCanceledOnTouchOutside(false);
-
-                    btnCerrar.setOnClickListener(v -> alertDialog.dismiss());
-
-                    alertDialog.show();
-                    alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    // Solo mostrar el AlertDialog cuando todos los detalles se hayan enviado
+                    if (detallesEnviados[0] == totalDetalles) {
+                        mostrarDialogPedidoRealizado();
+                    }
                 }
 
                 @Override
@@ -330,6 +322,24 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void mostrarDialogPedidoRealizado() {
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.alert_dialog_pedido_realizado, null);
+        MaterialButton btnCerrar = view.findViewById(R.id.btnCerrar);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setView(view);
+        AlertDialog alertDialog = builder.create();
+
+        alertDialog.setCancelable(false);
+        alertDialog.setCanceledOnTouchOutside(false);
+
+        btnCerrar.setOnClickListener(v -> alertDialog.dismiss());
+
+        alertDialog.show();
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
     public void actualizarBadge() {
