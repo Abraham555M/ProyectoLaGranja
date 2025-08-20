@@ -14,5 +14,9 @@
     <color name="color_blanco">#FFFFFF</color>
     <color name="color_secundario">#0A75C2</color>
 
-    #004F8E
+    <color name="color_cancelar">#FFE2E2</color>
+    <color name="color_pendiente">#DAFFCF</color>
+    <color name="color_despachado">#ECBDF0</color>
+    <color name="color_entregado">#AEEDFF</color>
+    <color name="color_pagado">#FFFFA3</color>
 </resources>

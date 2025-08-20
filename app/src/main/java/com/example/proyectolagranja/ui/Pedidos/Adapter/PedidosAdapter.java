@@ -1,6 +1,8 @@
 package com.example.proyectolagranja.ui.Pedidos.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,15 +74,43 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
 
         // Estados
         String estadoTexto;
+        int colorFondo;
         switch (venta.getAct_venta()) {
-            case 0: estadoTexto = "Cancelado"; break;
-            case 2: estadoTexto = "Pendiente"; break;
-            case 3: estadoTexto = "Despachado"; break;
-            case 4: estadoTexto = "Entregado"; break;
-            case 5: estadoTexto = "Pagado"; break;
-            default: estadoTexto = "Desconocido"; break;
+            case 0:
+                estadoTexto = "Cancelado";
+                colorFondo = context.getResources().getColor(R.color.color_cancelar);
+                break;
+            case 2:
+                estadoTexto = "Pendiente";
+                colorFondo = context.getResources().getColor(R.color.color_pendiente);
+                break;
+            case 3:
+                estadoTexto = "Despachado";
+                colorFondo = context.getResources().getColor(R.color.color_despachado);
+                break;
+            case 4:
+                estadoTexto = "Entregado";
+                colorFondo = context.getResources().getColor(R.color.color_entregado);
+                break;
+            case 5:
+                estadoTexto = "Pagado";
+                colorFondo = context.getResources().getColor(R.color.color_pagado);
+                break;
+            default:
+                estadoTexto = "Desconocido";
+                colorFondo = context.getResources().getColor(android.R.color.darker_gray);
+                break;
         }
+
+        // Crear el fondo con bordes
+        GradientDrawable drawable = new GradientDrawable();
+        drawable.setColor(colorFondo);
+        drawable.setCornerRadius(30f);
+
         holder.tvEstado.setText(estadoTexto);
+        holder.tvEstado.setBackground(drawable);
+        int padding = 20;
+        holder.tvEstado.setPadding(padding, padding/2, padding, padding/2);
 
         // Bloquear botón si estado es 2 (Pendiente)
         if (venta.getAct_venta() > 2 || venta.getAct_venta() == 0) {
@@ -105,6 +135,7 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvNumeroVenta, tvFechaVenta, tvTotal, tvEstado, tvMedioPago;
         MaterialButton btnCancelarPedido, btnVerMasPedido;
+        androidx.cardview.widget.CardView cardView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -115,6 +146,7 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
             tvEstado = itemView.findViewById(R.id.tvEstado);
             btnCancelarPedido = itemView.findViewById(R.id.btnCancelarPedido);
             btnVerMasPedido = itemView.findViewById(R.id.btnVerMasPedido);
+            cardView = (androidx.cardview.widget.CardView) itemView;
         }
     }
 }

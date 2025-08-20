@@ -88,6 +88,30 @@
                     android:textColor="@android:color/black"/>
             </LinearLayout>
 
+            <!-- Total -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total:"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:layout_marginEnd="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="--"
+                    android:textColor="@android:color/black"/>
+            </LinearLayout>
+
             <!-- Estado -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -107,28 +131,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="--"
-                    android:textColor="@android:color/black"/>
-            </LinearLayout>
-
-            <!-- Total -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Total:"
                     android:textStyle="bold"
-                    android:textColor="@android:color/black"
-                    android:layout_marginEnd="4dp"/>
-
-                <TextView
-                    android:id="@+id/tvTotal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="--"
                     android:textColor="@android:color/black"/>
             </LinearLayout>
         </LinearLayout>
