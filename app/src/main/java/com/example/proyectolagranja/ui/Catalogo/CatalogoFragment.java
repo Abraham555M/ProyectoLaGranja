@@ -94,8 +94,9 @@ public class CatalogoFragment extends Fragment {
                     cargarProductosPorCategoria(categoriaSeleccionada);
                 } else {
                     categoriaSeleccionada = null; // 🔹 Ninguna categoría
-                    cargarArticulos(); // Mostrar todo si no se selecciona ninguna categoría válida
-                    cargarProductos();
+                    //cargarArticulos(); // Mostrar todo si no se selecciona ninguna categoría válida
+                    //cargarProductos();
+                    aplicarFiltros();
                 }
             }
 
@@ -116,7 +117,8 @@ public class CatalogoFragment extends Fragment {
                     filtrarArticulosPorProducto(productoSeleccionado);
                 } else {
                     productoSeleccionado = null; // 🔹 Ningún producto
-                    cargarArticulos();
+                    //cargarArticulos();
+                    aplicarFiltros();
                 }
             }
 
@@ -237,7 +239,6 @@ public class CatalogoFragment extends Fragment {
             }
         });
     }
-
 
     private void filtrarArticulosPorCategoria(int idCategoria) {
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_categoria.php?id_categoria=" + idCategoria;
