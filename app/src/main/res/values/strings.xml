@@ -39,4 +39,9 @@
         <item>Entregado</item>
         <item>Pagado</item>
     </string-array>
+
+
+    <string name="text_bienvenida"><u>¡Bienvenido a La Granja!</u></string>
+    <string name="text_reenviar"><u>¿No recibiste el código? Reenviar</u></string>
+
 </resources>

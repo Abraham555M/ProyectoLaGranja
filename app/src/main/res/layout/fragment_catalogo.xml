@@ -22,7 +22,7 @@
             android:id="@+id/sp_categorias"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="3dp"
             android:padding="16dp" />
     </androidx.cardview.widget.CardView>
 
@@ -42,7 +42,7 @@
             android:id="@+id/sp_productos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_margin="3dp"
             android:padding="16dp" />
     </androidx.cardview.widget.CardView>
 

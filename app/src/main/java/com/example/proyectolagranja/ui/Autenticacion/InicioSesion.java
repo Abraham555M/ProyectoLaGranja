@@ -31,7 +31,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private LinearLayout layoutBienvenida, layoutCodigo;
     private EditText etTelefono;
     private Button btnEnviarTelefono, btnValidarCodigo;
-    private TextView etEnlaceReenviar;
+    private TextView etEnlaceReenviar, tvBienvenida;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,7 +43,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         btnEnviarTelefono = rootView.findViewById(R.id.btnEnviarTelefono);
         btnValidarCodigo = rootView.findViewById(R.id.btnValidarCodigo);
         etTelefono = rootView.findViewById(R.id.etTelefono);
-
+        tvBienvenida = rootView.findViewById(R.id.tvBienvenida);
 
         btnValidarCodigo.setOnClickListener(this);
         btnEnviarTelefono.setOnClickListener(this);
@@ -67,6 +67,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         btnSi.setOnClickListener(v -> {
             layoutBienvenida.setVisibility(View.GONE);
             layoutCodigo.setVisibility(View.VISIBLE);
+            tvBienvenida.setVisibility(View.GONE);
             dialog.dismiss();
         });
 

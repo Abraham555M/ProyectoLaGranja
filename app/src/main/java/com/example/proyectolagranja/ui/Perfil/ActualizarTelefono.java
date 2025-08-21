@@ -196,7 +196,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
 
                         Toast.makeText(requireContext(), "Teléfono actualizado correctamente", Toast.LENGTH_SHORT).show();
                         NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
-                        navController.navigate(R.id.action_nav_actualizar_telefono_to_nav_catalogo);
+                        navController.navigate(R.id.action_nav_actualizar_telefono_to_nav_perfil);
 
                         limpiarEspacios();
                     } else {

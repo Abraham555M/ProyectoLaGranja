@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/nav_catalogo"
         android:name="com.example.proyectolagranja.ui.Catalogo.CatalogoFragment"
-        android:label="Catalogo"
+        android:label="Catálogo"
         tools:layout="@layout/fragment_catalogo" />
 
     <fragment
@@ -64,5 +64,8 @@
         <action
             android:id="@+id/action_nav_actualizar_telefono_to_nav_catalogo"
             app:destination="@id/nav_catalogo" />
+        <action
+            android:id="@+id/action_nav_actualizar_telefono_to_nav_perfil"
+            app:destination="@id/nav_perfil" />
     </fragment>
 </navigation>
