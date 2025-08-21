@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,6 +29,7 @@ import com.example.proyectolagranja.ui.Clases.Articulo;
 import com.example.proyectolagranja.ui.Clases.Categoria;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.Producto;
+import com.example.proyectolagranja.ui.Clases.Venta;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -46,7 +48,7 @@ import java.util.TimerTask;
 
 import cz.msebera.android.httpclient.Header;
 
-public class CatalogoFragment extends Fragment {
+public class CatalogoFragment extends Fragment implements View.OnClickListener{
     private Spinner spCategorias, spProductos;
     private RecyclerView recyclerView;
     private ArticuloAdapter adapter;
@@ -56,7 +58,7 @@ public class CatalogoFragment extends Fragment {
     private List<Producto> listaProductos = new ArrayList<>();
     private Integer categoriaSeleccionada = null;
     private Integer productoSeleccionado = null;
-
+    private Button btnPromociones, btnFavoritos;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -65,6 +67,8 @@ public class CatalogoFragment extends Fragment {
         spCategorias = rootView.findViewById(R.id.sp_categorias);
         spProductos = rootView.findViewById(R.id.sp_productos);
         et_busqueda = rootView.findViewById(R.id.et_busqueda);
+        btnPromociones = rootView.findViewById(R.id.btnPromociones);
+        btnFavoritos = rootView.findViewById(R.id.btnFavoritos);
 
         recyclerView = rootView.findViewById(R.id.recyclerViewComentarios);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -78,6 +82,9 @@ public class CatalogoFragment extends Fragment {
         configurarSpinnerCategorias(); // Configuracion categorias
         configurarSpinnerProductos(); // Configuracion productos
         configurarBusquedaPorNombre(); // Configuracion nombre
+
+        btnPromociones.setOnClickListener(this);
+        btnFavoritos.setOnClickListener(this);
 
         return rootView;
     }
@@ -547,5 +554,96 @@ public class CatalogoFragment extends Fragment {
 
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    private void listarFavoritos(){
+        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
+                .getInt("id_cliente", 1);
+
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_favoritos.php?id_cliente=" + idCliente;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                try {
+                    JSONArray jsonArray = new JSONArray(new String(responseBody));
+                    listaArticulos.clear();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        String id = obj.getString("id_articulo");
+                        String nombre = obj.getString("nom_articulo");
+                        String imagen = obj.getString("foto_articulo");
+
+                        // verificamos si es promo
+                        int esPromo = obj.optInt("est_promo_articulo", 0);
+                        String precio;
+
+                        if (esPromo == 1) {
+                            precio = obj.optString("prec_promo_articulo", "0");
+                        } else {
+                            precio = obj.optString("prec_vent3_articulo", "0");
+                        }
+
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                    }
+                    adapter.notifyDataSetChanged();
+
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private  void listarPromociones(){
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_promociones.php";
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONArray jsonArray = new JSONArray(new String(responseBody));
+                    listaArticulos.clear();
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        String id = obj.getString("id_articulo");
+                        String nombre = obj.getString("nom_articulo");
+                        String precio = obj.getString("prec_promo_articulo");
+                        String imagen = obj.getString("foto_articulo");
+
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                    }
+
+                    adapter.notifyDataSetChanged();
+
+                } catch (JSONException e) {
+                    Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == btnFavoritos){
+            listarFavoritos();
+        }
+
+        if(view == btnPromociones){
+            listarPromociones();
+        }
     }
 }

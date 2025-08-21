@@ -27,6 +27,7 @@
             android:scaleType="centerCrop" />
 
         <!-- Nombre y precio del artículo -->
+        <!-- Nombre, precio y etiquetas -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -50,7 +51,54 @@
                 android:textColor="@android:color/black"
                 android:textSize="14sp"
                 android:layout_marginTop="6dp" />
+
+            <!-- Contenedor de etiquetas -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="5dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/etiqueta2"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:insetLeft="0dp"
+                    android:insetRight="0dp"
+                    android:text=""
+                    android:backgroundTint="@color/color_verde"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/ic_promociones"
+                    app:iconTint="@color/white"
+                    app:iconSize="18dp"
+                    app:iconGravity="textEnd"
+                    app:iconPadding="0dp"
+                    style="@style/Widget.MaterialComponents.Button.Icon" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/etiqueta1"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="8dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:insetLeft="0dp"
+                    android:insetRight="0dp"
+                    android:text=""
+                    android:backgroundTint="@color/color_rojo"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/ic_favoritos"
+                    app:iconTint="@color/white"
+                    app:iconSize="18dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    style="@style/Widget.MaterialComponents.Button.Icon" />
+            </LinearLayout>
         </LinearLayout>
+
 
         <!-- Contenedor del botón -->
         <LinearLayout
@@ -78,7 +126,6 @@
                 app:iconPadding="0dp"
                 app:strokeWidth="0dp"
                 style="@style/Widget.MaterialComponents.Button.Icon" />
-
 
         </LinearLayout>
     </LinearLayout>
