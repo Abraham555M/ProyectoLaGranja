@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -59,6 +60,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
     private Integer categoriaSeleccionada = null;
     private Integer productoSeleccionado = null;
     private Button btnPromociones, btnFavoritos;
+    private boolean mostrandoPromociones = false, mostrandoFavoritos = true;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -639,11 +641,41 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         if(view == btnFavoritos){
-            listarFavoritos();
+            if (mostrandoFavoritos) {
+                cargarArticulos(); // Lista completa
+                mostrandoFavoritos = false;
+
+                btnFavoritos.setBackgroundTintList(
+                        ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
+                );
+            } else {
+                // Mostrar favoritos
+                listarFavoritos();
+                mostrandoFavoritos = true;
+
+                btnFavoritos.setBackgroundTintList(
+                        ContextCompat.getColorStateList(getContext(), android.R.color.darker_gray)
+                );
+            }
         }
 
         if(view == btnPromociones){
-            listarPromociones();
+            if (mostrandoPromociones) {
+                cargarArticulos(); // Lista completa
+                mostrandoPromociones = false;
+
+                btnPromociones.setBackgroundTintList(
+                        ContextCompat.getColorStateList(getContext(), R.color.color_verde) // Cambiar de color al boton
+                );
+            } else {
+                // Mostrar promociones
+                listarPromociones();
+                mostrandoPromociones = true;
+
+                btnPromociones.setBackgroundTintList(
+                        ContextCompat.getColorStateList(getContext(), android.R.color.darker_gray)
+                );
+            }
         }
     }
 }
