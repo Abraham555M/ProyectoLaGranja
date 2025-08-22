@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -338,7 +339,10 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
 
     private void cargarArticulos() {
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_catalogo.php";
+        int id_cliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
+                .getInt("id_cliente", 1);
+
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_catalogo.php?id_cliente=" + id_cliente;
         AsyncHttpClient client = new AsyncHttpClient();
 
         client.get(url, new AsyncHttpResponseHandler() {
@@ -352,11 +356,21 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         JSONObject obj = jsonArray.getJSONObject(i);
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
-                        String precio = obj.getString("prec_vent3_articulo");
                         String imagen = obj.getString("foto_articulo");
+                        int esPromo = obj.optInt("est_promo_articulo", 0);
+                        int totalComprado = obj.optInt("total_comprado", 0);
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                        // Validación: si es promo usar precio de promo, caso contrario precio normal
+                        String precio;
+                        if (esPromo == 1) {
+                            precio = obj.optString("prec_promo_articulo", "0");
+                        } else {
+                            precio = obj.optString("prec_vent3_articulo", "0");
+                        }
+
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado));
                     }
+                    Log.d("ARTICULOS", "Total recibidos: " + jsonArray.length());
 
                     adapter.notifyDataSetChanged();
 
@@ -588,6 +602,10 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         }
 
                         listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                    }
+
+                    if (listaArticulos.isEmpty()) {
+                        Toast.makeText(getContext(), "No tienes artículos favoritos aún", Toast.LENGTH_SHORT).show();
                     }
                     adapter.notifyDataSetChanged();
 

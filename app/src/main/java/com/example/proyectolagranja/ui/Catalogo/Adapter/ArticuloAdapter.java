@@ -43,6 +43,21 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         Articulo articulo = listaArticulos.get(position);
         holder.nombre.setText(articulo.getNombre());
         holder.precio.setText("S/ " + articulo.getPrecio());
+
+        // Mostrar Promociones
+        if (articulo.getEsPromo() == 1) {
+            holder.etPromociones.setVisibility(View.VISIBLE);
+        } else {
+            holder.etPromociones.setVisibility(View.GONE);
+        }
+
+        // Mostrar Favoritos
+        if (articulo.getTotalComprado() > 2) {
+            holder.etFavoritos.setVisibility(View.VISIBLE);
+        } else {
+            holder.etFavoritos.setVisibility(View.GONE);
+        }
+
         // Cargar imagen
         Glide.with(context)
                 .load(articulo.getImagen())
@@ -65,7 +80,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
     public static class ArticuloViewHolder extends RecyclerView.ViewHolder {
         ImageView imagen;
         TextView nombre, precio;
-        MaterialButton btnAgregar;
+        MaterialButton btnAgregar, etPromociones, etFavoritos;
 
         public ArticuloViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -73,6 +88,8 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
             nombre = itemView.findViewById(R.id.nombreArticulo);
             precio = itemView.findViewById(R.id.precioArticulo);
             btnAgregar = itemView.findViewById(R.id.btnAgregarCantidad);
+            etPromociones = itemView.findViewById(R.id.etPromociones);
+            etFavoritos = itemView.findViewById(R.id.etFavoritos);
         }
     }
 }
