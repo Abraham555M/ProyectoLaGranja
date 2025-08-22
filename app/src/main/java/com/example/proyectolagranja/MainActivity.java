@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -167,17 +168,21 @@ public class MainActivity extends AppCompatActivity {
         TextView tvEmptyMessage = dialogView.findViewById(R.id.tvEmptyMessage);
         EditText etDireccion = dialogView.findViewById(R.id.etDireccion);
         TextView tvTotal = dialogView.findViewById(R.id.tvTotal);
+        LinearLayout layoutDetallesCarrito = dialogView.findViewById(R.id.layoutDetallesCarrito);
+        MaterialButton btnAgregarCarrito = dialogView.findViewById(R.id.btnAgregarCarrito);
 
         cargarDireccionCliente(etDireccion);
 
         if (carrito.isEmpty()) {
             tvEmptyMessage.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
-            btnEnviarPedido.setVisibility(View.GONE);
+            layoutDetallesCarrito.setVisibility(View.GONE);
+            btnAgregarCarrito.setVisibility(View.VISIBLE);
         } else {
             tvEmptyMessage.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-            btnEnviarPedido.setVisibility(View.VISIBLE);
+            layoutDetallesCarrito.setVisibility(View.VISIBLE);
+            btnAgregarCarrito.setVisibility(View.GONE);
 
             double totalInicial = 0;
             for (ItemCarrito item : carrito) {
@@ -186,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
             }
             tvTotal.setText("Total: S/" + totalInicial);
 
-            recyclerView.setAdapter(new CarritoAdapter(
+            recyclerView.setAdapter(new CarritoAdapter( // Carrito interactivo
                     MainActivity.this,
                     carrito,
                     total -> {
@@ -196,6 +201,8 @@ public class MainActivity extends AppCompatActivity {
                             tvEmptyMessage.setVisibility(View.VISIBLE);
                             recyclerView.setVisibility(View.GONE);
                             btnEnviarPedido.setVisibility(View.GONE);
+                            layoutDetallesCarrito.setVisibility(View.GONE);
+                            btnAgregarCarrito.setVisibility(View.VISIBLE);
                         } else {
                             tvEmptyMessage.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
@@ -213,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.setCanceledOnTouchOutside(false); // Evita que se cierre tocando afuera
 
         btnCerrar.setOnClickListener(v -> dialog.dismiss());
+        btnAgregarCarrito.setOnClickListener(v -> dialog.dismiss());
 
         // Crear el pedido:
         btnEnviarPedido.setOnClickListener(v -> {
