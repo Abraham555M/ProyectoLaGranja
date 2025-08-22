@@ -370,7 +370,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
                         listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado));
                     }
-                    Log.d("ARTICULOS", "Total recibidos: " + jsonArray.length());
 
                     adapter.notifyDataSetChanged();
 
@@ -590,18 +589,18 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
                         String imagen = obj.getString("foto_articulo");
-
-                        // verificamos si es promo
                         int esPromo = obj.optInt("est_promo_articulo", 0);
-                        String precio;
+                        int totalComprado = obj.optInt("total_comprado", 0);
 
+                        // Validación: si es promo usar precio de promo, caso contrario precio normal
+                        String precio;
                         if (esPromo == 1) {
                             precio = obj.optString("prec_promo_articulo", "0");
                         } else {
                             precio = obj.optString("prec_vent3_articulo", "0");
                         }
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado));
                     }
 
                     if (listaArticulos.isEmpty()) {
@@ -636,12 +635,20 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         JSONObject obj = jsonArray.getJSONObject(i);
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
-                        String precio = obj.getString("prec_promo_articulo");
                         String imagen = obj.getString("foto_articulo");
+                        int esPromo = obj.optInt("est_promo_articulo", 0);
+                        int totalComprado = obj.optInt("total_comprado", 0);
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                        // Validación: si es promo usar precio de promo, caso contrario precio normal
+                        String precio;
+                        if (esPromo == 1) {
+                            precio = obj.optString("prec_promo_articulo", "0");
+                        } else {
+                            precio = obj.optString("prec_vent3_articulo", "0");
+                        }
+
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado));
                     }
-
                     adapter.notifyDataSetChanged();
 
                 } catch (JSONException e) {
@@ -658,6 +665,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
+        // toggle exclusivo
         if(view == btnFavoritos){
             if (mostrandoFavoritos) {
                 cargarArticulos(); // Lista completa
@@ -673,6 +681,12 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
                 btnFavoritos.setBackgroundTintList(
                         ContextCompat.getColorStateList(getContext(), android.R.color.darker_gray)
+                );
+
+                // Resetear promociones
+                mostrandoPromociones = false;
+                btnPromociones.setBackgroundTintList(
+                        ContextCompat.getColorStateList(getContext(), R.color.color_verde)
                 );
             }
         }
@@ -692,6 +706,12 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
                 btnPromociones.setBackgroundTintList(
                         ContextCompat.getColorStateList(getContext(), android.R.color.darker_gray)
+                );
+
+                // Resetear favoritos
+                mostrandoFavoritos = false;
+                btnFavoritos.setBackgroundTintList(
+                        ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
                 );
             }
         }

@@ -112,6 +112,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:inputType="number"
+                android:textCursorDrawable="@drawable/cursor_color"
                 android:textColor="@android:color/black"
                 android:hint="Cantidad(*)"
                 android:textColorHint="@android:color/darker_gray"/>
