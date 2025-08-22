@@ -21,9 +21,10 @@
             android:background="@drawable/bg_dialog_rounded"
             android:elevation="4dp"
             android:gravity="center_horizontal"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="120dp"
             android:layout_marginBottom="40dp">
 
+            <!-- layout_bienvenida -->
             <LinearLayout
                 android:id="@+id/layout_bienvenida"
                 android:layout_width="match_parent"
@@ -34,41 +35,43 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Para continuar, necesitamos verificar tu número de teléfono.\nPor favor ingrésalo a continuación."
+                    android:text="Para continuar, necesitamos verificar tu número de celular.\nPor favor ingrésalo a continuación."
                     android:textSize="15sp"
-                    android:textAlignment="center"
+                    android:textAlignment="textStart"
                     android:layout_marginBottom="10dp" />
 
                 <EditText
                     android:id="@+id/etTelefonoEd"
-                    android:layout_width="260dp"
+                    android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:background="#E9E9E9"
                     android:textCursorDrawable="@drawable/cursor_color"
-                    android:hint="Ej. +51 999 888 777"
                     android:inputType="phone"
+                    android:hint="Ej. +51 999 888 777"
                     android:paddingHorizontal="16dp"
                     android:maxLength="9"
+                    android:background="@drawable/edittext_background"
                     android:textAlignment="center" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:text="Te enviaremos un código de verificación por SMS."
-                    android:textSize="13sp"
+                    android:textAlignment="textStart"
                     android:textColor="#666"
-                    android:layout_marginTop="6dp" />
+                    android:textSize="13sp" />
 
                 <Button
                     android:id="@+id/btnEnviarTelefonoEd"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Enviar codigo"
+                    android:text="Enviar código"
                     app:cornerRadius="16dp"
+                    android:layout_marginTop="15dp"
                     app:backgroundTint="@color/color_rojo" />
             </LinearLayout>
 
-            <!-- Sección Código -->
+            <!-- layout_codigo -->
             <LinearLayout
                 android:id="@+id/layout_codigo"
                 android:layout_width="match_parent"
@@ -80,7 +83,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Hemos enviado un código de 6 dígitos a tu teléfono.\nPor favor ingrésalo para confirmar tu identidad."
+                    android:text="Le envíamos un código al número ingresado, digitelo para comprobarlo por favor"
                     android:textSize="15sp"
                     android:textAlignment="center"
                     android:layout_marginTop="24dp"
@@ -167,25 +170,25 @@
                         android:layout_margin="2dp" />
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/etEnlaceReenviar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="¿No recibiste el código? Reenviar"
-                    android:textSize="13sp"
-                    android:textColor="#0A4D8C"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:layout_marginBottom="12dp" />
-
                 <Button
                     android:id="@+id/btnValidarCodigoEd"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Validar código"
-                    android:textColor="@android:color/white"
-                    android:backgroundTint="#FF5B5B"
-                    android:layout_gravity="center" />
+                    app:cornerRadius="16dp"
+                    android:layout_marginTop="5dp"
+                    app:backgroundTint="@color/color_rojo" />
+
+                <TextView
+                    android:id="@+id/etEnlaceReenviar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_reenviar"
+                    android:textSize="13sp"
+                    android:textColor="#0A4D8C"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginTop="5dp"/>
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>

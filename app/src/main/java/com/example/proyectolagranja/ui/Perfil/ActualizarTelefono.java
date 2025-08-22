@@ -38,7 +38,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_actualizar_telefono, container, false);
-        layoutBienvenida = rootView.findViewById(R.id.layout_bienvenida);
+        //layoutBienvenida = rootView.findViewById(R.id.layout_bienvenida);
         layoutCodigo = rootView.findViewById(R.id.layout_codigo);
         btnEnviarTelefonoEd = rootView.findViewById(R.id.btnEnviarTelefonoEd);
         btnValidarCodigoEd = rootView.findViewById(R.id.btnValidarCodigoEd);
@@ -156,7 +156,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                         Toast.makeText(requireContext(), "El número ya está registrado", Toast.LENGTH_SHORT).show();
                     } else {
                         // Solo si el número es nuevo → mostrar layoutCodigo
-                        layoutBienvenida.setVisibility(View.GONE);
+
                         layoutCodigo.setVisibility(View.VISIBLE);
                         dialog.dismiss();
                     }

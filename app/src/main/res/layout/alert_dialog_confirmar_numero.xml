@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:text="Sí"
             app:cornerRadius="16dp"
-            app:backgroundTint="@color/color_rojo" />
+            app:backgroundTint="@color/color_verde" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnConfirmarNo"
@@ -49,6 +49,6 @@
             android:text="No"
             app:cornerRadius="16dp"
             android:layout_marginStart="16dp"
-            app:backgroundTint="@color/color_principal"/>
+            app:backgroundTint="@color/color_rojo"/>
     </LinearLayout>
 </LinearLayout>
