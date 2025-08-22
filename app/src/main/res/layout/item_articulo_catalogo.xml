@@ -61,7 +61,7 @@
                 android:layout_marginTop="5dp">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/etiqueta2"
+                    android:id="@+id/etPromociones"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:insetTop="0dp"
@@ -79,7 +79,7 @@
                     style="@style/Widget.MaterialComponents.Button.Icon" />
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/etiqueta1"
+                    android:id="@+id/etFavoritos"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_marginStart="8dp"
