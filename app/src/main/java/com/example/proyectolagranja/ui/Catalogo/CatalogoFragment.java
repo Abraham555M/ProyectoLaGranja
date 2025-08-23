@@ -483,6 +483,8 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         MaterialButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
         MaterialButton btnRestar = dialogView.findViewById(R.id.btnRestar);
         MaterialButton btnSumar = dialogView.findViewById(R.id.btnSumar);
+        MaterialButton etPromociones = dialogView.findViewById(R.id.etPromociones);
+        MaterialButton etFavoritos = dialogView.findViewById(R.id.etFavoritos);
 
         // Botón Restar
         btnRestar.setOnClickListener(v -> {
@@ -507,6 +509,20 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             }
             etCantidad.setText(String.valueOf(valor));
         });
+
+        // Mostrar o ocultar el etPromociones
+        if (articulo.getEsPromo() == 1) {
+            etPromociones.setVisibility(View.VISIBLE);
+        } else {
+            etPromociones.setVisibility(View.GONE);
+        }
+
+        // Mostrar o ocultar el etFavoritos
+        if (articulo.getTotalComprado() >= 2) {
+            etFavoritos.setVisibility(View.VISIBLE);
+        } else {
+            etFavoritos.setVisibility(View.GONE);
+        }
 
         // Imprimir el encabezado del articulo
         nombreArticulo.setText(articulo.getNombre());
