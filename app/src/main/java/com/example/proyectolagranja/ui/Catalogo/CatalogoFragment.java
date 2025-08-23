@@ -103,7 +103,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                     categoriaSeleccionada = seleccionada.getId_categoria();
 
                     filtrarArticulosPorCategoria(categoriaSeleccionada);
-                    //cargarProductosPorCategoria(categoriaSeleccionada); - corregir con las etiquetas
+                    cargarProductosPorCategoria(categoriaSeleccionada); // corregir con las etiquetas
                 } else {
                     categoriaSeleccionada = null; // 🔹 Ninguna categoría
                     //cargarArticulos(); // Mostrar todo si no se selecciona ninguna categoría válida
@@ -321,8 +321,12 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
 
     private void buscarArticulosPorNombre(String nombre) {
+        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
+                .getInt("id_cliente", 1);
+
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_buscar_filtro.php?"
-                + "nom_articulo=" + nombre;
+                + "nom_articulo=" + nombre
+                + "&id_cliente=" + idCliente; // Agregar id_cliente
 
         if (categoriaSeleccionada != null) {
             url += "&id_categoria=" + categoriaSeleccionada;
@@ -341,16 +345,27 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                 try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject obj = response.getJSONObject(i);
+
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
-                        String precio = obj.getString("prec_vent1_articulo");
                         String imagen = obj.getString("foto_articulo");
+                        int esPromo = obj.optInt("est_promo_articulo", 0);
+                        int esFavorito = obj.optInt("es_favorito", 0);
+                        int totalComprado = obj.optInt("total_comprado", 0);
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                        // Elegir precio según promoción
+                        String precio;
+                        if (esPromo == 1) {
+                            precio = obj.optString("prec_promo_articulo", "0");
+                        } else {
+                            precio = obj.optString("prec_vent1_articulo", "0");
+                        }
+
+                        // Agregar artículo con todos los campos
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito));
                     }
 
                     adapter.notifyDataSetChanged();
-
                 } catch (JSONException e) {
                     Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
                 }
