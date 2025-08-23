@@ -13,6 +13,7 @@
     <color name="color_verde">#59C98E</color>
     <color name="color_blanco">#FFFFFF</color>
     <color name="color_secundario">#0A75C2</color>
+    <color name="color_fondo">#F3F3F3</color>
 
     <color name="color_cancelar">#FFE2E2</color>
     <color name="color_pendiente">#DAFFCF</color>

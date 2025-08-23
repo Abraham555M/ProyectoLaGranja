@@ -35,9 +35,13 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -126,6 +130,15 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        fechaInicio = "";
+        fechaFin = "";
+        if (et_fecha_ini != null) et_fecha_ini.setText("");
+        if (et_fecha_fin != null) et_fecha_fin.setText("");
+    }
+
     private void mostrarDatePicker(boolean esInicio) {
         final Calendar calendario = Calendar.getInstance();
         int anio = calendario.get(Calendar.YEAR);
@@ -152,10 +165,12 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                 fechaFin = fecha;
                 et_fecha_fin.setText(fecha);
             }
-            filtrarPorFechas(fechaInicio, fechaFin);
-        }, anio, mes, dia);
+            if (!fechaInicio.isEmpty() && !fechaFin.isEmpty()) {
+                filtrarPorFechas(fechaInicio, fechaFin);
+            }        }, anio, mes, dia);
         datePicker.show();
     }
+
 
     private void filtrarPorFechas(String fecha_ini, String fecha_fin) {
         int id_cliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)

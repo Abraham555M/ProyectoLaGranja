@@ -19,13 +19,14 @@
 
         <!-- Zona Izquierda: botones en vertical -->
         <LinearLayout
+            android:id="@+id/contenedorIzquierdo"
             android:layout_width="wrap_content"
-            android:layout_height="90dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="5dp"
-            android:gravity="center">
+            android:gravity="center"
+            android:layout_marginTop="5dp">
 
-            <com.google.android.material.button.MaterialButton
+        <com.google.android.material.button.MaterialButton
                 android:id="@+id/etPromociones"
                 style="@style/Widget.MaterialComponents.Button.Icon"
                 android:layout_width="30dp"

@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/color_fondo"
     tools:context=".ui.Catalogo.CatalogoFragment">
 
     <!-- CardView para el Spinner de categorías -->

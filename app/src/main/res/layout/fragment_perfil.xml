@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#EAEAEA"
+        android:background="@color/color_fondo"
         android:padding="16dp">
 
         <!-- Card para Editar Perfil centrado -->

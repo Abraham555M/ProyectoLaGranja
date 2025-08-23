@@ -14,11 +14,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -485,6 +487,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         MaterialButton btnSumar = dialogView.findViewById(R.id.btnSumar);
         MaterialButton etPromociones = dialogView.findViewById(R.id.etPromociones);
         MaterialButton etFavoritos = dialogView.findViewById(R.id.etFavoritos);
+        LinearLayout contenedorIzquierdo = dialogView.findViewById(R.id.contenedorIzquierdo);
 
         // Botón Restar
         btnRestar.setOnClickListener(v -> {
@@ -515,6 +518,9 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             etPromociones.setVisibility(View.VISIBLE);
         } else {
             etPromociones.setVisibility(View.GONE);
+
+            contenedorIzquierdo.removeView(etFavoritos);
+            contenedorIzquierdo.addView(etFavoritos, 0);
         }
 
         // Mostrar o ocultar el etFavoritos
@@ -523,6 +529,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         } else {
             etFavoritos.setVisibility(View.GONE);
         }
+
 
         // Imprimir el encabezado del articulo
         nombreArticulo.setText(articulo.getNombre());
