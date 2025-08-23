@@ -52,7 +52,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         }
 
         // Mostrar Favoritos
-        if (articulo.getTotalComprado() >= 2) { // Cambiar despues por 10
+        if (articulo.getEsFavorito() == 1) {
             holder.etFavoritos.setVisibility(View.VISIBLE);
         } else {
             holder.etFavoritos.setVisibility(View.GONE);

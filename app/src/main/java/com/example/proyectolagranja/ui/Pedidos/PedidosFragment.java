@@ -299,6 +299,11 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
                     adapter.notifyDataSetChanged();
 
+                    if (listaVenta.isEmpty()) {
+                        Toast.makeText(getContext(), "No hay pedidos registrados", Toast.LENGTH_SHORT).show();
+                    }
+
+
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
                 }
@@ -382,7 +387,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         String nombre = obj.getString("nom_articulo");
-                        double precio = obj.getDouble("prec_vent3_articulo");
+                        double precio = obj.getDouble("prec_vent1_articulo");
                         int cantidad = obj.getInt("cant_venta_detalle");
                         double subTotal = precio * cantidad;
                         String imagenUrl = obj.optString("foto_articulo");

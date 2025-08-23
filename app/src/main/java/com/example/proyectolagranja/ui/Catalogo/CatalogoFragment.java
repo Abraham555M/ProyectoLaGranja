@@ -103,7 +103,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                     categoriaSeleccionada = seleccionada.getId_categoria();
 
                     filtrarArticulosPorCategoria(categoriaSeleccionada);
-                    cargarProductosPorCategoria(categoriaSeleccionada);
+                    //cargarProductosPorCategoria(categoriaSeleccionada); - corregir con las etiquetas
                 } else {
                     categoriaSeleccionada = null; // 🔹 Ninguna categoría
                     //cargarArticulos(); // Mostrar todo si no se selecciona ninguna categoría válida
@@ -175,7 +175,13 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
     }
 
     private void filtrarArticulosPorProducto(int idProducto) {
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_producto.php?id_producto=" + idProducto;
+        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
+                .getInt("id_cliente", 1);
+
+        String url = ServidorConfig.URL_SERVIDOR
+                + "articulo/articulo_filtrar_producto.php?id_producto="
+                + idProducto
+                + "&id_cliente=" + idCliente;
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new JsonHttpResponseHandler() {
@@ -188,10 +194,21 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         JSONObject obj = response.getJSONObject(i);
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
-                        String precio = obj.getString("prec_vent3_articulo");
                         String imagen = obj.getString("foto_articulo");
+                        int esPromo = obj.optInt("est_promo_articulo", 0);
+                        int esFavorito = obj.optInt("es_favorito", 0);
+                        int totalComprado = obj.optInt("total_comprado", 0);
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                        // Validar qué precio usar
+                        String precio;
+                        if (esPromo == 1) {
+                            precio = obj.optString("prec_promo_articulo", "0");
+                        } else {
+                            precio = obj.optString("prec_vent1_articulo", "0");
+                        }
+
+                        // Usar el mismo constructor que en listarPromociones
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -253,7 +270,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
     }
 
     private void filtrarArticulosPorCategoria(int idCategoria) {
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_categoria.php?id_categoria=" + idCategoria;
+        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
+                .getInt("id_cliente", 1);
+
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_categoria.php?id_categoria="
+                + idCategoria + "&id_cliente=" + idCliente;
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new JsonHttpResponseHandler() {
@@ -264,12 +285,24 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                 try {
                     for (int i = 0; i < response.length(); i++) {
                         JSONObject obj = response.getJSONObject(i);
+
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
-                        String precio = obj.getString("prec_vent3_articulo");
                         String imagen = obj.getString("foto_articulo");
+                        int esPromo = obj.optInt("est_promo_articulo", 0);
+                        int totalComprado = obj.optInt("total_comprado", 0);
+                        int esFavorito = obj.optInt("es_favorito", 0);
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen));
+                        // Validar qué precio usar
+                        String precio;
+                        if (esPromo == 1) {
+                            precio = obj.optString("prec_promo_articulo", "0");
+                        } else {
+                            precio = obj.optString("prec_vent1_articulo", "0");
+                        }
+
+                        // Usar constructor extendido con favorito incluido
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -285,6 +318,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             }
         });
     }
+
 
     private void buscarArticulosPorNombre(String nombre) {
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_buscar_filtro.php?"
@@ -309,7 +343,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         JSONObject obj = response.getJSONObject(i);
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
-                        String precio = obj.getString("prec_vent3_articulo");
+                        String precio = obj.getString("prec_vent1_articulo");
                         String imagen = obj.getString("foto_articulo");
 
                         listaArticulos.add(new Articulo(id, nombre, precio, imagen));
@@ -339,7 +373,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         }
     }
 
-
     private void cargarArticulos() {
         int id_cliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
                 .getInt("id_cliente", 1);
@@ -361,16 +394,17 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         String imagen = obj.getString("foto_articulo");
                         int esPromo = obj.optInt("est_promo_articulo", 0);
                         int totalComprado = obj.optInt("total_comprado", 0);
+                        int esFavorito = obj.optInt("es_favorito", 0);
 
                         // Validación: si es promo usar precio de promo, caso contrario precio normal
                         String precio;
                         if (esPromo == 1) {
                             precio = obj.optString("prec_promo_articulo", "0");
                         } else {
-                            precio = obj.optString("prec_vent3_articulo", "0");
+                            precio = obj.optString("prec_vent1_articulo", "0");
                         }
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado));
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -524,7 +558,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         }
 
         // Mostrar o ocultar el etFavoritos
-        if (articulo.getTotalComprado() >= 2) {
+        if (articulo.getEsFavorito() == 1) {
             etFavoritos.setVisibility(View.VISIBLE);
         } else {
             etFavoritos.setVisibility(View.GONE);
@@ -613,6 +647,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         String nombre = obj.getString("nom_articulo");
                         String imagen = obj.getString("foto_articulo");
                         int esPromo = obj.optInt("est_promo_articulo", 0);
+                        int esFavorito = obj.optInt("es_favorito", 0);
                         int totalComprado = obj.optInt("total_comprado", 0);
 
                         // Validación: si es promo usar precio de promo, caso contrario precio normal
@@ -620,10 +655,10 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         if (esPromo == 1) {
                             precio = obj.optString("prec_promo_articulo", "0");
                         } else {
-                            precio = obj.optString("prec_vent3_articulo", "0");
+                            precio = obj.optString("prec_vent1_articulo", "0");
                         }
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado));
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito));
                     }
 
                     if (listaArticulos.isEmpty()) {
@@ -661,16 +696,17 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         String imagen = obj.getString("foto_articulo");
                         int esPromo = obj.optInt("est_promo_articulo", 0);
                         int totalComprado = obj.optInt("total_comprado", 0);
+                        int estFavorito = obj.optInt("es_favorito", 0);
 
                         // Validación: si es promo usar precio de promo, caso contrario precio normal
                         String precio;
                         if (esPromo == 1) {
                             precio = obj.optString("prec_promo_articulo", "0");
                         } else {
-                            precio = obj.optString("prec_vent3_articulo", "0");
+                            precio = obj.optString("prec_vent1_articulo", "0");
                         }
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado));
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, estFavorito));
                     }
                     adapter.notifyDataSetChanged();
 

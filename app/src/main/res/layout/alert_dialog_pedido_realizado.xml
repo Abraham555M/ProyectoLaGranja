@@ -13,15 +13,13 @@
         android:padding="24dp">
 
         <!-- Botón cerrar arriba a la derecha -->
-
-        <!-- Mensaje centrado -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCerrar"
             style="@style/Widget.MaterialComponents.Button.Icon"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:backgroundTint="@color/color_rojo"
-            android:elevation="4dp"
+            android:elevation="8dp"
             android:insetLeft="0dp"
             android:insetTop="0dp"
             android:insetRight="0dp"
@@ -37,30 +35,37 @@
             app:layout_constraintTop_toTopOf="parent"
             app:strokeWidth="0dp" />
 
-        <!-- Imagen encima del mensaje -->
+        <!-- Texto grande primero -->
 
-        <ImageView
-            android:id="@+id/imgPedido"
-            android:layout_width="93dp"
-            android:layout_height="83dp"
-            android:layout_marginTop="4dp"
-            android:src="@drawable/logo_la_granja"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnCerrar" />
 
+        <!-- Imagen debajo del texto -->
         <TextView
             android:id="@+id/tvMensajePedido"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:gravity="center"
-            android:text="Pedido realizado correctamente"
+            android:text="¡Pedido realizado correctamente!"
             android:textAlignment="center"
-            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
-            android:textColor="?android:textColorPrimary"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+            android:textColor="@color/color_principal"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imgPedido" />
+            app:layout_constraintTop_toBottomOf="@id/btnCerrar" />
+
+        <ImageView
+            android:id="@+id/imgPedido"
+            android:layout_width="93dp"
+            android:layout_height="93dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_circle_green"
+            android:padding="10dp"
+            android:src="@drawable/ic_check"
+            app:tint="@android:color/white"
+            app:layout_constraintTop_toBottomOf="@id/tvMensajePedido"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

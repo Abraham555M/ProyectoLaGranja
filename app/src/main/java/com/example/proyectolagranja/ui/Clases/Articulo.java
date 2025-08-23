@@ -7,6 +7,7 @@ public class Articulo {
     private String imagen;
     private int esPromo;
     private int totalComprado;
+    private int esFavorito;
 
     public Articulo(String id, String nombre, String precio, String imagen) {
         this.id = id;
@@ -23,7 +24,15 @@ public class Articulo {
         this.esPromo = esPromo;
         this.totalComprado = totalComprado;
     }
-
+    public Articulo(String id, String nombre, String precio, String imagen, int esPromo, int totalComprado, int esFavorito) {
+        this.id = id;
+        this.nombre = nombre;
+        this.precio = precio;
+        this.imagen = imagen;
+        this.esPromo = esPromo;
+        this.totalComprado = totalComprado;
+        this.esFavorito = esFavorito;
+    }
 
     public String getId() { return id; }
     public String getNombre() { return nombre; }
@@ -32,5 +41,7 @@ public class Articulo {
     public int getEsPromo() { return esPromo; }
     public int getTotalComprado() { return totalComprado; }
 
-
+    public int getEsFavorito() {
+        return esFavorito;
+    }
 }
