@@ -8,7 +8,8 @@
     android:background="@drawable/bg_dialog_rounded"
     android:gravity="center_horizontal"
     android:layout_marginHorizontal="16dp">
-    <!-- Encabezado -->
+
+    <!-- Encabezado con 3 zonas -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,16 +17,94 @@
         android:gravity="center_vertical"
         android:paddingBottom="8dp">
 
-        <TextView
-            android:id="@+id/tvNombreArticulo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Nombre del artículo"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:textColor="@color/black" />
+        <!-- Zona Izquierda: botones en vertical -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="90dp"
+            android:orientation="vertical"
+            android:layout_marginTop="5dp"
+            android:gravity="center">
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/etPromociones"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/color_verde"
+                android:elevation="4dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:text=""
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_promociones"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="15dp"
+                app:iconTint="@android:color/white"
+                app:strokeWidth="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/etFavoritos"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/color_rojo"
+                android:elevation="4dp"
+                android:layout_marginTop="5dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:text=""
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_favoritos"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="15dp"
+                app:iconTint="@android:color/white"
+                app:strokeWidth="0dp" />
+        </LinearLayout>
+
+        <!-- Zona Central: nombre y precio alineados al centro -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="95dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginTop="5dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tvNombreArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre del artículo"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="@color/black"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvPrecioArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="S/ 0.00"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:background="@drawable/bg_precio_rounded"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- Zona Derecha: botón cerrar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCerrar"
             android:layout_width="48dp"
@@ -37,6 +116,7 @@
             android:insetBottom="0dp"
             android:insetLeft="0dp"
             android:insetRight="0dp"
+            android:layout_marginBottom="22dp"
             android:text=""
             app:cornerRadius="24dp"
             app:icon="@drawable/ic_close"
@@ -45,20 +125,6 @@
             app:strokeWidth="0dp"
             style="@style/Widget.MaterialComponents.Button.Icon" />
     </LinearLayout>
-
-    <!-- Precio del Artículo -->
-    <TextView
-        android:id="@+id/tvPrecioArticulo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="127dp"
-        android:text="S/ 0.00"
-        android:textSize="16sp"
-        android:textColor="@android:color/white"
-        android:background="@drawable/bg_precio_rounded"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="4dp"
-        android:layout_marginBottom="16dp" />
 
     <!-- Campo Cantidad -->
     <com.google.android.material.textfield.TextInputLayout
@@ -85,24 +151,24 @@
             <!-- Botón Restar con ícono -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRestar"
+                style="@style/Widget.MaterialComponents.Button.Icon"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_gravity="center"
                 android:backgroundTint="@color/color_principal"
                 android:elevation="4dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
                 android:insetLeft="0dp"
+                android:insetTop="0dp"
                 android:insetRight="0dp"
+                android:insetBottom="0dp"
                 android:padding="0dp"
                 android:text=""
                 app:cornerRadius="18dp"
                 app:icon="@drawable/ic_restar"
-                app:iconTint="@android:color/white"
                 app:iconGravity="textStart"
                 app:iconPadding="0dp"
-                app:strokeWidth="0dp"
-                style="@style/Widget.MaterialComponents.Button.Icon" />
+                app:iconTint="@android:color/white"
+                app:strokeWidth="0dp" />
 
             <!-- Campo Cantidad -->
             <com.google.android.material.textfield.TextInputEditText

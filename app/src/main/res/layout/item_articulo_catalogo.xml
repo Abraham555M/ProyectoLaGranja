@@ -26,7 +26,6 @@
             android:clipToOutline="true"
             android:scaleType="centerCrop" />
 
-        <!-- Nombre y precio del artículo -->
         <!-- Nombre, precio y etiquetas -->
         <LinearLayout
             android:layout_width="0dp"
@@ -43,59 +42,75 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/precioArticulo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Precio"
-                android:textColor="@android:color/black"
-                android:textSize="14sp"
-                android:layout_marginTop="6dp" />
-
-            <!-- Contenedor de etiquetas -->
+            <!-- Precio + Etiquetas en una misma fila -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginTop="5dp">
+                android:gravity="center_vertical"
+                android:layout_marginTop="6dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/etPromociones"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:insetLeft="0dp"
-                    android:insetRight="0dp"
-                    android:text=""
-                    android:backgroundTint="@color/color_verde"
-                    app:cornerRadius="16dp"
-                    app:icon="@drawable/ic_promociones"
-                    app:iconTint="@color/white"
-                    app:iconSize="18dp"
-                    app:iconGravity="textEnd"
-                    app:iconPadding="0dp"
-                    style="@style/Widget.MaterialComponents.Button.Icon" />
+                <TextView
+                    android:id="@+id/precioArticulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="S/ 0.00"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/etFavoritos"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="8dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:insetLeft="0dp"
-                    android:insetRight="0dp"
-                    android:text=""
-                    android:backgroundTint="@color/color_rojo"
-                    app:cornerRadius="16dp"
-                    app:icon="@drawable/ic_favoritos"
-                    app:iconTint="@color/white"
-                    app:iconSize="18dp"
-                    app:iconGravity="textStart"
-                    app:iconPadding="0dp"
-                    style="@style/Widget.MaterialComponents.Button.Icon" />
+                <!-- Contenedor de etiquetas -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="12dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/etPromociones"
+                        style="@style/Widget.MaterialComponents.Button.Icon"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:backgroundTint="@color/color_verde"
+                        android:elevation="4dp"
+                        android:insetLeft="0dp"
+                        android:insetTop="0dp"
+                        android:insetRight="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="0dp"
+                        android:text=""
+                        app:cornerRadius="18dp"
+                        app:icon="@drawable/ic_promociones"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="15dp"
+                        app:iconTint="@android:color/white"
+                        app:strokeWidth="0dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/etFavoritos"
+                        style="@style/Widget.MaterialComponents.Button.Icon"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:backgroundTint="@color/color_rojo"
+                        android:layout_marginLeft="10dp"
+                        android:elevation="4dp"
+                        android:insetLeft="0dp"
+                        android:insetTop="0dp"
+                        android:insetRight="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="0dp"
+                        android:text=""
+                        app:cornerRadius="18dp"
+                        app:icon="@drawable/ic_favoritos"
+                        app:iconGravity="textStart"
+                        app:iconPadding="0dp"
+                        app:iconSize="15dp"
+                        app:iconTint="@android:color/white"
+                        app:strokeWidth="0dp" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
