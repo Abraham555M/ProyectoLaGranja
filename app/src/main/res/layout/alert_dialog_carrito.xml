@@ -33,21 +33,25 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCerrar"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:backgroundTint="@color/color_rojo"
+                android:backgroundTint="@android:color/white"
                 android:elevation="4dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:insetLeft="0dp"
                 android:insetRight="0dp"
+                android:padding="0dp"
                 android:text=""
                 app:cornerRadius="24dp"
                 app:icon="@drawable/ic_close"
-                app:iconTint="@android:color/white"
+                app:iconTint="@color/color_rojo"
+                app:iconGravity="textStart"
                 app:iconPadding="0dp"
-                app:strokeWidth="0dp"
+                app:iconSize="24dp"
+                app:strokeColor="@color/color_rojo"
+                app:strokeWidth="2dp"
                 style="@style/Widget.MaterialComponents.Button.Icon" />
         </LinearLayout>
 
