@@ -11,7 +11,7 @@
 
     <!-- Encabezado con 3 zonas -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
@@ -20,69 +20,67 @@
         <!-- Zona Izquierda: botones en vertical -->
         <LinearLayout
             android:id="@+id/contenedorIzquierdo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_gravity="top|center_horizontal"
-            android:paddingVertical="3dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/etPromociones"
-            style="@style/Widget.MaterialComponents.Button.Icon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:backgroundTint="@color/color_verde"
-            android:elevation="4dp"
-            android:insetLeft="0dp"
-            android:insetTop="0dp"
-            android:insetRight="0dp"
-            android:insetBottom="0dp"
-            android:padding="0dp"
-            android:text=""
-            app:cornerRadius="18dp"
-            app:icon="@drawable/ic_promociones"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="15dp"
-            app:iconTint="@android:color/white"
-            app:strokeWidth="0dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/etFavoritos"
-            style="@style/Widget.MaterialComponents.Button.Icon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
-            android:backgroundTint="@color/color_rojo"
-            android:elevation="4dp"
-            android:insetLeft="0dp"
-            android:insetTop="0dp"
-            android:insetRight="0dp"
-            android:insetBottom="0dp"
-            android:padding="0dp"
-            android:text=""
-            app:cornerRadius="18dp"
-            app:icon="@drawable/ic_favoritos"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="15dp"
-            app:iconTint="@android:color/white"
-            app:strokeWidth="0dp" />
-        </LinearLayout>
-
-        <!-- Zona Central: nombre y precio alineados al centro -->
-        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center_vertical|center"
+            android:orientation="horizontal"
+            android:gravity="start|center_vertical"
+            android:paddingVertical="3dp">
 
-            android:layout_marginTop="5dp"
-            android:paddingBottom="10dp">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/etPromociones"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/color_verde"
+                android:elevation="4dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:text=""
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_promociones"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="15dp"
+                app:iconTint="@android:color/white"
+                app:strokeWidth="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/etFavoritos"
+                style="@style/Widget.MaterialComponents.Button.Icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:backgroundTint="@color/color_rojo"
+                android:elevation="4dp"
+                android:insetLeft="0dp"
+                android:insetTop="0dp"
+                android:insetRight="0dp"
+                android:insetBottom="0dp"
+                android:padding="0dp"
+                android:text=""
+                app:cornerRadius="18dp"
+                app:icon="@drawable/ic_favoritos"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="15dp"
+                app:iconTint="@android:color/white"
+                app:strokeWidth="0dp" />
+            </LinearLayout>
+
+        <!-- Zona Central: nombre y precio alineados al centro -->
+        <LinearLayout
+            android:id="@+id/contenedorCentral"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginHorizontal="8dp">
 
             <TextView
                 android:id="@+id/tvNombreArticulo"
@@ -110,6 +108,13 @@
                 android:gravity="center" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/contenedorDerecho"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end|center_vertical">
+
         <!-- Zona Derecha: botón cerrar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCerrar"
@@ -132,6 +137,8 @@
             app:iconPadding="0dp"
             app:strokeWidth="0dp"
             style="@style/Widget.MaterialComponents.Button.Icon" />
+        </LinearLayout>
+
     </LinearLayout>
 
     <!-- Campo Cantidad -->
