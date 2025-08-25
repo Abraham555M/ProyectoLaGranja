@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 binding.appBarMain.toolbar.setVisibility(View.GONE); // Quitar el encabezado
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // 🔒 Desactiva swipe
                 binding.appBarMain.fab.setVisibility(View.GONE); // Quitar el carrito de compra
+                binding.appBarMain.tvBadge.setVisibility(View.GONE); // Quitar el icono rojo del carrito
             } else {
                 binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED); // ✅ Reactiva swipe

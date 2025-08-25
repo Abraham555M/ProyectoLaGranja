@@ -749,6 +749,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
                 );
             } else {
+                // 🔹 Primero resetear selección para que no dispare filtro después
+                spCategorias.setOnItemSelectedListener(null); // Desvincular listener temporal
+                spCategorias.setSelection(0);
+                spCategorias.post(() -> configurarSpinnerCategorias()); // volver a poner listener después
+
                 // Mostrar favoritos
                 listarFavoritos();
                 mostrandoFavoritos = true;
@@ -774,6 +779,16 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         ContextCompat.getColorStateList(getContext(), R.color.color_verde) // Cambiar de color al boton
                 );
             } else {
+                // 🔹 Primero resetear selección para que no dispare filtro después
+                spCategorias.setOnItemSelectedListener(null); // Desvincular listener temporal
+                spCategorias.setSelection(0);
+                spCategorias.post(() -> configurarSpinnerCategorias()); // volver a poner listener después
+
+                spProductos.setOnItemSelectedListener(null); // Quitar temporal
+                spProductos.setSelection(0);
+                //cargarProductos(); // Carga general de productos
+                spProductos.post(() -> configurarSpinnerProductos()); // Reasignar listener después
+
                 // Mostrar promociones
                 listarPromociones();
                 mostrandoPromociones = true;

@@ -35,9 +35,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:strokeWidth="0dp" />
 
-        <!-- Texto grande primero -->
-
-
         <!-- Imagen debajo del texto -->
         <TextView
             android:id="@+id/tvMensajePedido"
@@ -56,8 +53,8 @@
 
         <ImageView
             android:id="@+id/imgPedido"
-            android:layout_width="93dp"
-            android:layout_height="93dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_marginTop="12dp"
             android:background="@drawable/bg_circle_green"
             android:padding="10dp"

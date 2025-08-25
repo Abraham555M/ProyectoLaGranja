@@ -38,7 +38,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_actualizar_telefono, container, false);
-        //layoutBienvenida = rootView.findViewById(R.id.layout_bienvenida);
+        layoutBienvenida = rootView.findViewById(R.id.layout_bienvenida);
         layoutCodigo = rootView.findViewById(R.id.layout_codigo);
         btnEnviarTelefonoEd = rootView.findViewById(R.id.btnEnviarTelefonoEd);
         btnValidarCodigoEd = rootView.findViewById(R.id.btnValidarCodigoEd);
@@ -156,7 +156,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                         Toast.makeText(requireContext(), "El número ya está registrado", Toast.LENGTH_SHORT).show();
                     } else {
                         // Solo si el número es nuevo → mostrar layoutCodigo
-
+                        layoutBienvenida.setVisibility(View.GONE);
                         layoutCodigo.setVisibility(View.VISIBLE);
                         dialog.dismiss();
                     }
@@ -172,7 +172,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
         });
     }
 
-    private void actualizarTelefonoEnServidor(String telefono) {
+    private void actualizarTelefono(String telefono) {
         SharedPreferences prefs = requireContext().getSharedPreferences("UsuarioPrefs", Context.MODE_PRIVATE);
         int idCliente = prefs.getInt("id_cliente", 1); // 👈 lo guardaste al iniciar sesión
 
@@ -264,7 +264,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                     et5.getText().toString() +
                     et6.getText().toString();
             String telefono = etTelefonoEd.getText().toString().trim();
-            actualizarTelefonoEnServidor(telefono);
+            actualizarTelefono(telefono);
         }
     }
 }

@@ -38,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_carrito_compras"
+            app:tint="@android:color/white"
             app:backgroundTint="@color/color_verde" />
 
         <!-- Badge declarado después para que quede encima -->
@@ -56,7 +57,4 @@
             android:elevation="8dp"
             android:text="0"/>
     </FrameLayout>
-
-
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
