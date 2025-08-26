@@ -52,7 +52,7 @@ import java.util.TimerTask;
 
 import cz.msebera.android.httpclient.Header;
 
-public class CatalogoFragment extends Fragment implements View.OnClickListener{
+public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private Spinner spCategorias, spProductos;
     private RecyclerView recyclerView;
     private ArticuloAdapter adapter;
@@ -147,7 +147,8 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) { }
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
     }
 
@@ -288,6 +289,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             }
         });
     }
+
     private void resetFiltrosPromocionesYFavoritos() {
         // 🔹 Desactivar promociones si estaba activo
         if (mostrandoPromociones) {
@@ -357,7 +359,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             }
         });
     }
-
 
     private void buscarArticulosPorNombre(String nombre) {
         resetFiltrosPromocionesYFavoritos();
@@ -770,6 +771,10 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
                         listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, estFavorito));
                     }
+
+                    if (listaArticulos.isEmpty()) {
+                        Toast.makeText(getContext(), "No hay articulos en promoción", Toast.LENGTH_SHORT).show();
+                    }
                     adapter.notifyDataSetChanged();
 
                 } catch (JSONException e) {
@@ -782,28 +787,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                 Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void resetearProductos() {
-        if (spProductos != null) {
-            // Crear una lista temporal con solo la opción por defecto
-            List<Producto> listaVacia = new ArrayList<>();
-            listaVacia.add(new Producto(0, "Productos"));
-
-            // Crear un nuevo adaptador con esa lista
-            ArrayAdapter<Producto> adapter = new ArrayAdapter<>(
-                    getContext(),
-                    android.R.layout.simple_spinner_item,
-                    listaVacia
-            );
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-            // Asignar el adaptador al spinner
-            spProductos.setAdapter(adapter);
-
-            // Resetear variable de producto seleccionado
-            productoSeleccionado = null;
-        }
     }
 
     @Override
@@ -865,8 +848,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                 cargarProductos(false); // 👈 false = carga general, no filtrada
                 spProductos.setSelection(0);
                 spProductos.post(() -> configurarSpinnerProductos());
-                resetearProductos();
-
 
                 // 🔹 Mostrar solo promociones
                 listarPromociones();
