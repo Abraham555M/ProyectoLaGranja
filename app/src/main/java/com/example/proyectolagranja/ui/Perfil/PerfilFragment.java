@@ -156,6 +156,12 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
                     etTelefonoEd.setText(telefonoOriginal);
                     etDireccionEd.setText(direccionOriginal);
 
+                    // Limpiar errores al cargar los datos
+                    etNombresEd.setError(null);
+                    etDocumentoEd.setError(null);
+                    etTelefonoEd.setError(null);
+                    etDireccionEd.setError(null);
+
                     // Al cargar datos → botón deshabilitado
                     btnGuardarCambios.setEnabled(false);
 
