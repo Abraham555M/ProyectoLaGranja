@@ -175,6 +175,8 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
     }
 
     private void filtrarArticulosPorProducto(int idProducto) {
+        resetFiltrosPromocionesYFavoritos();
+
         int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
                 .getInt("id_cliente", 1);
 
@@ -268,8 +270,27 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             }
         });
     }
+    private void resetFiltrosPromocionesYFavoritos() {
+        // 🔹 Desactivar promociones si estaba activo
+        if (mostrandoPromociones) {
+            mostrandoPromociones = false;
+            btnPromociones.setBackgroundTintList(
+                    ContextCompat.getColorStateList(getContext(), R.color.color_verde)
+            );
+        }
+
+        // 🔹 Desactivar favoritos si estaba activo
+        if (mostrandoFavoritos) {
+            mostrandoFavoritos = false;
+            btnFavoritos.setBackgroundTintList(
+                    ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
+            );
+        }
+    }
 
     private void filtrarArticulosPorCategoria(int idCategoria) {
+        resetFiltrosPromocionesYFavoritos();
+
         int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
                 .getInt("id_cliente", 1);
 
