@@ -81,7 +81,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         recyclerView.setAdapter(adapter);
 
         cargarCategorias(); // Cargar Categorias en el spinner
-        cargarProductos(false); // Cargar Productos en el spinner
         cargarArticulos(); // Cargar Articulos
 
         configurarSpinnerCategorias(); // Configuracion categorias
@@ -122,14 +121,17 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         spProductos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // 🚫 Si estoy mostrando promociones, ignoro cualquier selección
-                if (mostrandoPromociones) {
-                    return;
-                }
-
                 if (position > 0 && position < listaProductos.size()) {
                     Producto seleccionado = listaProductos.get(position);
                     productoSeleccionado = seleccionado.getId_producto();
+
+                    // 👇 Si estaba en promociones, salir del modo promociones
+                    if (mostrandoPromociones) {
+                        mostrandoPromociones = false;
+                        btnPromociones.setBackgroundTintList(
+                                ContextCompat.getColorStateList(getContext(), R.color.color_verde)
+                        );
+                    }
 
                     filtrarArticulosPorProducto(productoSeleccionado);
                 } else {
@@ -141,6 +143,13 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        cargarProductos(true); // 🔹 Forzamos la carga SIEMPRE al volver
+        configurarSpinnerProductos();
     }
 
     private void configurarBusquedaPorNombre() {
@@ -773,7 +782,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         if (spProductos != null) {
             // Crear una lista temporal con solo la opción por defecto
             List<Producto> listaVacia = new ArrayList<>();
-            listaVacia.add(new Producto(0, "Seleccione producto"));
+            listaVacia.add(new Producto(0, "Productos"));
 
             // Crear un nuevo adaptador con esa lista
             ArrayAdapter<Producto> adapter = new ArrayAdapter<>(
