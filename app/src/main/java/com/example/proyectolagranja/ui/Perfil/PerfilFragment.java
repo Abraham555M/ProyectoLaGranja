@@ -1,5 +1,7 @@
 package com.example.proyectolagranja.ui.Perfil;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -196,6 +198,12 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
                     documentoOriginal = etDocumentoEd.getText().toString().trim();
                     telefonoOriginal = etTelefonoEd.getText().toString().trim();
                     direccionOriginal = etDireccionEd.getText().toString().trim();
+
+                    // 🔹 Guardar el nombre actualizado en SharedPreferences para el nav header
+                    SharedPreferences prefs = requireActivity().getSharedPreferences("UsuarioPrefs", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("nom_cliente", nombresOriginal);
+                    editor.apply(); // Esto disparará el listener en MainActivity
 
                     btnGuardarCambios.setEnabled(false); // 🔹 Lo desactivamos porque ya está igual
                 } else {

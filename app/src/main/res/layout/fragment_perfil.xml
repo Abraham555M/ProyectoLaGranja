@@ -46,6 +46,7 @@
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
+                    android:textCursorDrawable="@drawable/cursor_color"
                     app:boxStrokeColor="@color/color_principal"
                     app:hintTextColor="@color/color_principal">
 
@@ -69,6 +70,7 @@
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
+                    android:textCursorDrawable="@drawable/cursor_color"
                     app:boxStrokeColor="@color/color_principal"
                     app:hintTextColor="@color/color_principal">
 
@@ -92,10 +94,10 @@
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
-                    app:boxStrokeColor="@color/color_principal"
                     app:endIconMode="custom"
                     app:endIconDrawable="@drawable/ic_cambiar_numero"
-                    app:endIconTint="@color/color_principal"
+                    android:textCursorDrawable="@drawable/cursor_color"
+                    app:boxStrokeColor="@color/color_principal"
                     app:hintTextColor="@color/color_principal">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -123,6 +125,7 @@
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
                     app:boxCornerRadiusTopStart="12dp"
+                    android:textCursorDrawable="@drawable/cursor_color"
                     app:boxStrokeColor="@color/color_principal"
                     app:hintTextColor="@color/color_principal">
 

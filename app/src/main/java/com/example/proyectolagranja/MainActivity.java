@@ -88,12 +88,17 @@ public class MainActivity extends AppCompatActivity {
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals("tel_cliente")) {
-                    View headerView = binding.navView.getHeaderView(0);
-                    if (headerView != null) {
+                View headerView = binding.navView.getHeaderView(0);
+                if (headerView != null) {
+                    if (key.equals("tel_cliente")) {
                         TextView tvTelefono = headerView.findViewById(R.id.tvTelefono);
                         if (tvTelefono != null) {
                             tvTelefono.setText(sharedPreferences.getString("tel_cliente", ""));
+                        }
+                    } else if (key.equals("nom_cliente")) {
+                        TextView tvNombre = headerView.findViewById(R.id.tvNombre);
+                        if (tvNombre != null) {
+                            tvNombre.setText(sharedPreferences.getString("nom_cliente", ""));
                         }
                     }
                 }

@@ -387,7 +387,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         String nombre = obj.getString("nom_articulo");
-                        double precio = obj.getDouble("prec_vent1_articulo");
+                        double precio = obj.getDouble("prec_venta_detalle");
                         int cantidad = obj.getInt("cant_venta_detalle");
                         double subTotal = precio * cantidad;
                         String imagenUrl = obj.optString("foto_articulo");
