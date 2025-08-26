@@ -196,7 +196,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         resetFiltrosPromocionesYFavoritos();
 
         int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 1);
+                .getInt("id_cliente", 2267);
 
         String url = ServidorConfig.URL_SERVIDOR
                 + "articulo/articulo_filtrar_producto.php?id_producto="
@@ -310,7 +310,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         resetFiltrosPromocionesYFavoritos();
 
         int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 1);
+                .getInt("id_cliente", 2267);
 
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_categoria.php?id_categoria="
                 + idCategoria + "&id_cliente=" + idCliente;
@@ -361,7 +361,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
     private void buscarArticulosPorNombre(String nombre) {
         int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 1);
+                .getInt("id_cliente", 2267);
 
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_buscar_filtro.php?"
                 + "nom_articulo=" + nombre
@@ -430,7 +430,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
     private void cargarArticulos() {
         int id_cliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 1);
+                .getInt("id_cliente", 2267);
 
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_catalogo.php?id_cliente=" + id_cliente;
         AsyncHttpClient client = new AsyncHttpClient();
@@ -690,7 +690,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
     private void listarFavoritos(){
         int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 1);
+                .getInt("id_cliente", 2267);
 
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_favoritos.php?id_cliente=" + idCliente;
 
