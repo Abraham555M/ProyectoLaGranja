@@ -63,7 +63,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
     private Integer categoriaSeleccionada = null;
     private Integer productoSeleccionado = null;
     private Button btnPromociones, btnFavoritos;
-    private boolean mostrandoPromociones = false, mostrandoFavoritos = true;
+    private boolean mostrandoPromociones = false, mostrandoFavoritos = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -360,6 +360,8 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
 
     private void buscarArticulosPorNombre(String nombre) {
+        resetFiltrosPromocionesYFavoritos();
+
         int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
                 .getInt("id_cliente", 2267);
 
@@ -839,6 +841,8 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                 btnPromociones.setBackgroundTintList(
                         ContextCompat.getColorStateList(getContext(), R.color.color_verde)
                 );
+
+                et_busqueda.setText("");
             }
         }
 
@@ -877,6 +881,8 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                 btnFavoritos.setBackgroundTintList(
                         ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
                 );
+
+                et_busqueda.setText("");
             }
         }
     }
