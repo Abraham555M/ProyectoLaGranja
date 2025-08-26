@@ -66,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvBadge;
     private EditText etDireccion, etDetalleVenta;
     public static List<ItemCarrito> carrito = new ArrayList<>();
+    private SharedPreferences prefs;
+    private SharedPreferences.OnSharedPreferenceChangeListener listener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +80,28 @@ public class MainActivity extends AppCompatActivity {
 
         tvBadge = findViewById(R.id.tvBadge);
         binding.appBarMain.fab.setOnClickListener(v -> mostrarCarrito());
-
         actualizarBadge();
 
+        //************ Actualizar el telefono en el nav
+        prefs = getSharedPreferences("UsuarioPrefs", MODE_PRIVATE);
+
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals("tel_cliente")) {
+                    View headerView = binding.navView.getHeaderView(0);
+                    if (headerView != null) {
+                        TextView tvTelefono = headerView.findViewById(R.id.tvTelefono);
+                        if (tvTelefono != null) {
+                            tvTelefono.setText(sharedPreferences.getString("tel_cliente", ""));
+                        }
+                    }
+                }
+            }
+        };
+
+        prefs.registerOnSharedPreferenceChangeListener(listener);
+        //************
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
@@ -108,20 +130,28 @@ public class MainActivity extends AppCompatActivity {
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             if (destination.getId() == R.id.nav_crear_cuenta || destination.getId() == R.id.nav_inicio_sesion || destination.getId() == R.id.nav_actualizar_telefono) {
                 binding.appBarMain.toolbar.setVisibility(View.GONE); // Quitar el encabezado
-                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // 🔒 Desactiva swipe
+                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // Desactiva swipe
                 binding.appBarMain.fab.setVisibility(View.GONE); // Quitar el carrito de compra
                 binding.appBarMain.tvBadge.setVisibility(View.GONE); // Quitar el icono rojo del carrito
             } else {
                 binding.appBarMain.toolbar.setVisibility(View.VISIBLE);
-                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED); // ✅ Reactiva swipe
+                binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED); // Reactiva swipe
                 binding.appBarMain.fab.setVisibility(View.VISIBLE);
             }
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (prefs != null && listener != null) {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener);
+        }
+    }
+
     private void ObtenerDatosUsuario(TextView tvNombre, TextView tvTelefono){
         SharedPreferences preferences = getSharedPreferences("DatosUsuario", MODE_PRIVATE);
-        int idCliente = preferences.getInt("id_cliente", 6); // valor provisional si no existe
+        int idCliente = preferences.getInt("id_cliente", 2267); // valor provisional si no existe
 
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_obtener_datos.php?id_cliente=" + idCliente;
 
@@ -256,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
     public void EnviarPedido(double total, String direccion, String detalle_venta, androidx.appcompat.app.AlertDialog dialog){
         // Preparar envío
         SharedPreferences preferences = getSharedPreferences("DatosUsuario", MODE_PRIVATE);
-        int idCliente = preferences.getInt("id_cliente", 1); // provisional
+        int idCliente = preferences.getInt("id_cliente", 2267); // provisional
 
         int idMedioPago = listaMedioPago.get(spMedioPago.getSelectedItemPosition()).getId_pago_medio();
 
@@ -362,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cargarDireccionCliente(EditText etDireccion) {
-        int idCliente = 1; //Cliente para pruebas
+        int idCliente = 2267; //Cliente para pruebas
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_obtener_direccion.php?id_cliente=" + idCliente;
         AsyncHttpClient client = new AsyncHttpClient();
 

@@ -174,7 +174,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
 
     private void actualizarTelefono(String telefono) {
         SharedPreferences prefs = requireContext().getSharedPreferences("UsuarioPrefs", Context.MODE_PRIVATE);
-        int idCliente = prefs.getInt("id_cliente", 1); // 👈 lo guardaste al iniciar sesión
+        int idCliente = prefs.getInt("id_cliente", 2267); // 👈 lo guardaste al iniciar sesión
 
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_actualizar_telefono.php";
 

@@ -133,7 +133,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
 
     private void cargarDatosUsuario() {
         int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 1);
+                .getInt("id_cliente", 2267);
 
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_perfil.php?id_cliente=" + idCliente;
 
@@ -173,7 +173,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
     private void actualizarDatosUsuario() {
         int idCliente = requireActivity()
                 .getSharedPreferences("DatosUsuario", requireActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 1);
+                .getInt("id_cliente", 2267);
 
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_actualizar_perfil.php";
 

@@ -174,7 +174,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
     private void filtrarPorFechas(String fecha_ini, String fecha_fin) {
         int id_cliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 1);
+                .getInt("id_cliente", 2267);
 
         String url = ServidorConfig.URL_SERVIDOR +
                 "pedido/pedido_filtro_fechas.php?id_cliente=" + id_cliente +
@@ -223,7 +223,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     }
 
     private void filtrarPorEstado(int act_venta) {
-        int id_cliente = 1;
+        int id_cliente = 2267;
 
         AsyncHttpClient client = new AsyncHttpClient();
         String url = ServidorConfig.URL_SERVIDOR +
@@ -271,7 +271,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
     private void cargarPedidosCliente() {
         int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 1);
+                .getInt("id_cliente", 2267);
 
         String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_listar_cliente.php?id_cliente=" + idCliente;
 
