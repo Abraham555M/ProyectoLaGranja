@@ -132,6 +132,12 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                                 ContextCompat.getColorStateList(getContext(), R.color.color_verde)
                         );
                     }
+                    if (mostrandoFavoritos) {
+                        mostrandoFavoritos = false;
+                        btnFavoritos.setBackgroundTintList(
+                                ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
+                        );
+                    }
 
                     filtrarArticulosPorProducto(productoSeleccionado);
                 } else {
@@ -413,7 +419,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
 
     private void aplicarFiltros() {
         // 🚫 Si estoy en promociones, no aplicar filtros
-        if (mostrandoPromociones) return;
+        if (mostrandoPromociones|| mostrandoFavoritos) return;
 
         if (categoriaSeleccionada != null || productoSeleccionado != null) {
             buscarArticulosPorNombre("");
@@ -421,7 +427,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             cargarArticulos();
         }
     }
-
 
     private void cargarArticulos() {
         int id_cliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
@@ -515,8 +520,8 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
     }
 
     private void cargarProductos(boolean forzarTodos) {
-        if (!forzarTodos && mostrandoPromociones) {
-            // 🚫 Si estoy mostrando promociones, no recargar productos
+        if (!forzarTodos && (mostrandoPromociones || mostrandoFavoritos)) {
+            // Si estoy mostrando promociones, no recargar productos
             return;
         }
 
@@ -561,7 +566,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             }
         });
     }
-
 
     private void mostrarDialogoAgregar(Articulo articulo) {
         View dialogView = LayoutInflater.from(getContext())
@@ -816,6 +820,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                 spCategorias.setOnItemSelectedListener(null); // Desvincular listener temporal
                 spCategorias.setSelection(0);
                 spCategorias.post(() -> configurarSpinnerCategorias()); // volver a poner listener después
+
+                spProductos.setOnItemSelectedListener(null); // desvincular temporal
+                cargarProductos(false); // Recargar todos los productos
+                spProductos.setSelection(0);
+                spProductos.post(() -> configurarSpinnerProductos());
 
                 // Mostrar favoritos
                 listarFavoritos();
