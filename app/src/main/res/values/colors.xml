@@ -20,4 +20,12 @@
     <color name="color_despachado">#ECBDF0</color>
     <color name="color_entregado">#AEEDFF</color>
     <color name="color_pagado">#FFFFA3</color>
+
+    <color name="darker_gray">#FFA9A9A9</color>
+
+
+    <color name="mi_color_primario">#3F51B5</color>
+    <color name="mi_color_oscuro">#303F9F</color>
+    <color name="mi_color_botones">#FF4081</color>
+
 </resources>

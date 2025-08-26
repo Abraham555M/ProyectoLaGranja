@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
@@ -97,6 +98,14 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
                 !etDireccionEd.getText().toString().trim().equals(direccionOriginal);
 
         btnGuardarCambios.setEnabled(hayCambios);
+
+        if (hayCambios) {
+            // Cambiar a color activo (por ejemplo, azul)
+            btnGuardarCambios.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.color_principal));
+        } else {
+            // Cambiar a color deshabilitado (gris claro)
+            btnGuardarCambios.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.darker_gray));
+        }
     }
 
     private boolean validarCampos() {
@@ -270,6 +279,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
         // Acción botón "Sí"
         btnSi.setOnClickListener(v -> {
             actualizarDatosUsuario();
+            btnGuardarCambios.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.darker_gray));
             dialog.dismiss();
         });
 

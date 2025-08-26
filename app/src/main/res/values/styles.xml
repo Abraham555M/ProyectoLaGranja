@@ -1,3 +1,15 @@
 <resources>
+    <style name="MiDatePickerTheme" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <!-- Color de cabecera -->
+        <item name="colorPrimary">@color/mi_color_primario</item>
+        <item name="colorPrimaryDark">@color/mi_color_oscuro</item>
+        <!-- Color de botones -->
+        <item name="android:buttonBarPositiveButtonStyle">@style/MiDatePickerButton</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/MiDatePickerButton</item>
+    </style>
+
+    <style name="MiDatePickerButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/mi_color_botones</item>
+    </style>
 
 </resources>

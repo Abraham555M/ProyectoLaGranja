@@ -145,7 +145,10 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         int mes = calendario.get(Calendar.MONTH);
         int dia = calendario.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePicker = new DatePickerDialog(getContext(), (view, year, month, dayOfMonth) -> {
+        DatePickerDialog datePicker = new DatePickerDialog(
+                getContext(),
+                R.style.MiDatePickerTheme,
+                (view, year, month, dayOfMonth) -> {
             String fecha = year + "-" + String.format("%02d", (month + 1)) + "-" + String.format("%02d", dayOfMonth);
 
             if (esInicio) {
