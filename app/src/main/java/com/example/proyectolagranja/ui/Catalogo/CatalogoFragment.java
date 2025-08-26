@@ -81,7 +81,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         recyclerView.setAdapter(adapter);
 
         cargarCategorias(); // Cargar Categorias en el spinner
-        cargarProductos(); // Cargar Productos en el spinner
+        cargarProductos(false); // Cargar Productos en el spinner
         cargarArticulos(); // Cargar Articulos
 
         configurarSpinnerCategorias(); // Configuracion categorias
@@ -122,21 +122,22 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         spProductos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // 🚫 Si estoy mostrando promociones, ignoro cualquier selección
+                if (mostrandoPromociones) return;
+
                 if (position > 0 && position < listaProductos.size()) {
                     Producto seleccionado = listaProductos.get(position);
                     productoSeleccionado = seleccionado.getId_producto();
 
                     filtrarArticulosPorProducto(productoSeleccionado);
                 } else {
-                    productoSeleccionado = null; // 🔹 Ningún producto
-                    //cargarArticulos();
+                    productoSeleccionado = null;
                     aplicarFiltros();
                 }
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
+            public void onNothingSelected(AdapterView<?> parent) { }
         });
     }
 
@@ -400,14 +401,16 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
     }
 
     private void aplicarFiltros() {
-        // Si hay categoría o producto seleccionado → hacer búsqueda filtrada
+        // 🚫 Si estoy en promociones, no aplicar filtros
+        if (mostrandoPromociones) return;
+
         if (categoriaSeleccionada != null || productoSeleccionado != null) {
-            buscarArticulosPorNombre(""); // ← pasamos vacío pero respeta filtros
+            buscarArticulosPorNombre("");
         } else {
-            // Si no hay filtros, traer todos
             cargarArticulos();
         }
     }
+
 
     private void cargarArticulos() {
         int id_cliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
@@ -500,7 +503,12 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         });
     }
 
-    private void cargarProductos() {
+    private void cargarProductos(boolean forzarTodos) {
+        if (!forzarTodos && mostrandoPromociones) {
+            // 🚫 Si estoy mostrando promociones, no recargar productos
+            return;
+        }
+
         String url = ServidorConfig.URL_SERVIDOR + "producto/producto_listar.php";
         AsyncHttpClient client = new AsyncHttpClient();
 
@@ -542,6 +550,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             }
         });
     }
+
 
     private void mostrarDialogoAgregar(Articulo articulo) {
         View dialogView = LayoutInflater.from(getContext())
@@ -822,18 +831,20 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                         ContextCompat.getColorStateList(getContext(), R.color.color_verde) // Cambiar de color al boton
                 );
             } else {
-                // 🔹 Primero resetear selección para que no dispare filtro después
-                spCategorias.setOnItemSelectedListener(null); // Desvincular listener temporal
+                // 🔹 Resetear selección de spinners sin recargar productos
+                spCategorias.setOnItemSelectedListener(null);
                 spCategorias.setSelection(0);
-                spCategorias.post(() -> configurarSpinnerCategorias()); // volver a poner listener después
+                spCategorias.post(() -> configurarSpinnerCategorias());
 
-                // 🔹 Resetear productos (adapter limpio con "Productos")
-                resetearProductos();
+                // Resetear productos
                 spProductos.setOnItemSelectedListener(null);
-                spProductos.setSelection(0, false);
+                cargarProductos(false); // 👈 false = carga general, no filtrada
+                spProductos.setSelection(0);
                 spProductos.post(() -> configurarSpinnerProductos());
+                resetearProductos();
 
-                // Mostrar promociones
+
+                // 🔹 Mostrar solo promociones
                 listarPromociones();
                 mostrandoPromociones = true;
 
