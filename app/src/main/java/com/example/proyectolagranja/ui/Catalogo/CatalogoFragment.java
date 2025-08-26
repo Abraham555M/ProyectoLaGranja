@@ -123,7 +123,9 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // 🚫 Si estoy mostrando promociones, ignoro cualquier selección
-                if (mostrandoPromociones) return;
+                if (mostrandoPromociones) {
+                    return;
+                }
 
                 if (position > 0 && position < listaProductos.size()) {
                     Producto seleccionado = listaProductos.get(position);
