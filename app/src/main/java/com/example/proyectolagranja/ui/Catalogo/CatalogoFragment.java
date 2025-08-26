@@ -758,6 +758,28 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
         });
     }
 
+    private void resetearProductos() {
+        if (spProductos != null) {
+            // Crear una lista temporal con solo la opción por defecto
+            List<Producto> listaVacia = new ArrayList<>();
+            listaVacia.add(new Producto(0, "Seleccione producto"));
+
+            // Crear un nuevo adaptador con esa lista
+            ArrayAdapter<Producto> adapter = new ArrayAdapter<>(
+                    getContext(),
+                    android.R.layout.simple_spinner_item,
+                    listaVacia
+            );
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            // Asignar el adaptador al spinner
+            spProductos.setAdapter(adapter);
+
+            // Resetear variable de producto seleccionado
+            productoSeleccionado = null;
+        }
+    }
+
     @Override
     public void onClick(View view) {
         // toggle exclusivo
@@ -805,10 +827,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener{
                 spCategorias.setSelection(0);
                 spCategorias.post(() -> configurarSpinnerCategorias()); // volver a poner listener después
 
-                spProductos.setOnItemSelectedListener(null); // Quitar temporal
-                spProductos.setSelection(0);
-                //cargarProductos(); // Carga general de productos
-                spProductos.post(() -> configurarSpinnerProductos()); // Reasignar listener después
+                // 🔹 Resetear productos (adapter limpio con "Productos")
+                resetearProductos();
+                spProductos.setOnItemSelectedListener(null);
+                spProductos.setSelection(0, false);
+                spProductos.post(() -> configurarSpinnerProductos());
 
                 // Mostrar promociones
                 listarPromociones();
