@@ -130,20 +130,23 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-
     <!-- RecyclerView para mostrar los articulos -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewComentarios"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:padding="16dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="80dp"
         app:layout_constraintTop_toBottomOf="@id/cardview_botones"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/item_articulo_catalogo" />
+        app:layout_constraintBottom_toBottomOf="parent">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewComentarios"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="16dp"
+            tools:listitem="@layout/item_articulo_catalogo" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

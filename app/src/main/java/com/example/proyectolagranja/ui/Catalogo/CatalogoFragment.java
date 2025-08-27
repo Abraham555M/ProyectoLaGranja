@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.proyectolagranja.MainActivity;
 import com.example.proyectolagranja.R;
@@ -64,6 +65,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private Integer productoSeleccionado = null;
     private Button btnPromociones, btnFavoritos;
     private boolean mostrandoPromociones = false, mostrandoFavoritos = false;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -80,6 +82,12 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         adapter = new ArticuloAdapter(getContext(), listaArticulos, articulo -> mostrarDialogoAgregar(articulo));
         recyclerView.setAdapter(adapter);
 
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            // Cuando el usuario haga swipe hacia abajo, recargas datos
+            recargarCatalogo();
+        });
+
         cargarCategorias(); // Cargar Categorias en el spinner
         cargarArticulos(); // Cargar Articulos
 
@@ -91,6 +99,31 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         btnFavoritos.setOnClickListener(this);
 
         return rootView;
+    }
+
+    private void recargarCatalogo() {
+        // 👉 Limpiar filtros seleccionados
+        categoriaSeleccionada = null;
+        productoSeleccionado = null;
+
+        // 👉 Recargar artículos (ahora sin filtros aplicados)
+        cargarArticulos();
+        resetFiltrosPromocionesYFavoritos();
+
+        // 🔹 Resetear Spinners correctamente
+        spCategorias.setOnItemSelectedListener(null); // desvincular listener temporal
+        spCategorias.setSelection(0);
+        spCategorias.post(() -> configurarSpinnerCategorias()); // volver a poner listener después
+
+        spProductos.setOnItemSelectedListener(null); // desvincular temporal
+        cargarProductos(false); // recargar todos los productos
+        spProductos.setSelection(0);
+        spProductos.post(() -> configurarSpinnerProductos());
+
+        // Limpiar campo de búsqueda
+        et_busqueda.setText("");
+
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private void configurarSpinnerCategorias() {

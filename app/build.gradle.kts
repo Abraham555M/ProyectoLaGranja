@@ -45,6 +45,8 @@ dependencies {
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
     implementation ("com.google.firebase:firebase-auth")
+    //Swipe
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)
