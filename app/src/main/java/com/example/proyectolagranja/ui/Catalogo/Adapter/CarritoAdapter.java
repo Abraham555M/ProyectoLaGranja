@@ -16,6 +16,7 @@ import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 
 import java.util.List;
+import java.util.Locale;
 
 public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHolder> {
     private Context context;
@@ -49,7 +50,8 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
 
         double precio = Double.parseDouble(item.getArticulo().getPrecio());
         double subtotal = precio * item.getCantidad();
-        holder.subTotalArticulo.setText("Subtotal: S/" + subtotal);
+        String subtotalFormateado = String.format(Locale.US, "%.2f", subtotal); // Redondear
+        holder.subTotalArticulo.setText("Subtotal: S/" + subtotalFormateado);
 
         // URL de imagen
         Glide.with(context)

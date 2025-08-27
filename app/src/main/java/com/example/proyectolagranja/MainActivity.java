@@ -49,6 +49,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 import com.google.android.material.badge.ExperimentalBadgeUtils;
@@ -225,14 +226,14 @@ public class MainActivity extends AppCompatActivity {
                 double precio = Double.parseDouble(item.getArticulo().getPrecio());
                 totalInicial += precio * item.getCantidad();
             }
-            tvTotal.setText("Total: S/" + totalInicial);
+            tvTotal.setText("Total: S/" + dosDec(totalInicial));
 
             recyclerView.setAdapter(new CarritoAdapter( // Carrito interactivo
                     MainActivity.this,
                     carrito,
                     total -> {
                         actualizarBadge();
-                        tvTotal.setText("Total: S/" + total);
+                        tvTotal.setText("Total: S/" + dosDec(total));
                         if (carrito.isEmpty()) {
                             tvEmptyMessage.setVisibility(View.VISIBLE);
                             recyclerView.setVisibility(View.GONE);
@@ -276,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             EnviarPedido(
-                    total,
+                    Double.parseDouble(dosDec(total)),
                     etDireccion.getText().toString().trim(),
                     etDetalleVenta.getText().toString().trim(),
                     dialog
@@ -286,6 +287,10 @@ public class MainActivity extends AppCompatActivity {
         cargarMedioPago();
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    private String dosDec(double v) {
+        return String.format(Locale.US, "%.2f", v); // redondea a 2 decimales
     }
 
     public void EnviarPedido(double total, String direccion, String detalle_venta, androidx.appcompat.app.AlertDialog dialog){
