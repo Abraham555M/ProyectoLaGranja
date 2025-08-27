@@ -694,7 +694,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private void listarFavoritos(){
         int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
                 .getInt("id_cliente", 2267);
-
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_favoritos.php?id_cliente=" + idCliente;
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -742,9 +741,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     }
 
     private  void listarPromociones(){
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_promociones.php";
-        AsyncHttpClient client = new AsyncHttpClient();
+        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
+                .getInt("id_cliente", 2267);
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_promociones.php?id_cliente=" + idCliente;
 
+        AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {

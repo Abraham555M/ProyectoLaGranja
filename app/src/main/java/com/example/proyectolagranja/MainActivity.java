@@ -23,6 +23,7 @@ import com.example.proyectolagranja.ui.Catalogo.Adapter.CarritoAdapter;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.MedioPago;
 import com.example.proyectolagranja.ui.Clases.Producto;
+import com.example.proyectolagranja.ui.Clases.Venta;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.BadgeUtils;
@@ -226,14 +227,14 @@ public class MainActivity extends AppCompatActivity {
                 double precio = Double.parseDouble(item.getArticulo().getPrecio());
                 totalInicial += precio * item.getCantidad();
             }
-            tvTotal.setText("Total: S/" + dosDec(totalInicial));
+            tvTotal.setText("Total: S/" + redondearTotal(totalInicial));
 
             recyclerView.setAdapter(new CarritoAdapter( // Carrito interactivo
                     MainActivity.this,
                     carrito,
                     total -> {
                         actualizarBadge();
-                        tvTotal.setText("Total: S/" + dosDec(total));
+                        tvTotal.setText("Total: S/" + redondearTotal(total));
                         if (carrito.isEmpty()) {
                             tvEmptyMessage.setVisibility(View.VISIBLE);
                             recyclerView.setVisibility(View.GONE);
@@ -276,8 +277,8 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            EnviarPedido(
-                    Double.parseDouble(dosDec(total)),
+            mostrarDialogoConfirmacion(
+                    total,
                     etDireccion.getText().toString().trim(),
                     etDetalleVenta.getText().toString().trim(),
                     dialog
@@ -289,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
-    private String dosDec(double v) {
+    private String redondearTotal(double v) {
         return String.format(Locale.US, "%.2f", v); // redondea a 2 decimales
     }
 
@@ -372,6 +373,39 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
+
+    private void mostrarDialogoConfirmacion(double total, String direccion, String detalle, androidx.appcompat.app.AlertDialog dialogCarrito) {
+        // Inflar el layout personalizado
+        View view = getLayoutInflater().inflate(R.layout.alert_dialog_confirmar_pedido, null);
+
+        MaterialButton btnSi = view.findViewById(R.id.btnCancelarSi);
+        MaterialButton btnNo = view.findViewById(R.id.btnCancelarNo);
+
+        // Crear el AlertDialog con vista personalizada
+        androidx.appcompat.app.AlertDialog dialogConfirmacion = new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setView(view)
+                .create();
+
+        dialogConfirmacion.setCancelable(false);
+
+        // Botón Sí
+        btnSi.setOnClickListener(v -> {
+            EnviarPedido(
+                    Double.parseDouble(redondearTotal(total)),
+                    direccion,
+                    detalle,
+                    dialogCarrito
+            );
+            dialogConfirmacion.dismiss(); // cierro el de confirmación
+        });
+
+        // Botón No
+        btnNo.setOnClickListener(v -> dialogConfirmacion.dismiss());
+
+        dialogConfirmacion.show();
+        dialogConfirmacion.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
 
     private void mostrarDialogPedidoRealizado() {
         LayoutInflater inflater = getLayoutInflater();
