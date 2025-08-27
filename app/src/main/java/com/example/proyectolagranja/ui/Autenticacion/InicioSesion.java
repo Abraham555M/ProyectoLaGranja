@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.google.firebase.auth.FirebaseAuth;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -32,6 +33,10 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private EditText etTelefono;
     private Button btnEnviarTelefono, btnValidarCodigo;
     private TextView etEnlaceReenviar, tvBienvenida;
+
+    // Firebase
+    private String verificationId; // Guardar el ID de verificación
+    private FirebaseAuth mAuth;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,6 +54,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         btnEnviarTelefono.setOnClickListener(this);
 
         configurarAutoFocusCodigo(rootView);
+
+        mAuth = FirebaseAuth.getInstance();
 
         return rootView;
     }
