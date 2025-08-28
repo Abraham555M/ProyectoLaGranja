@@ -169,7 +169,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     }
 
     private void enviarCodigoFirebase(String telefono) {
-        if (telefono.equals("987654321")) { // Número de prueba
+        if (telefono.equals("325475745")) { // Número de prueba 987654321
             verificationId = "VERIFICATION_ID_TEST"; // Cualquier string único
             Toast.makeText(requireContext(), "Código de prueba listo: 123456", Toast.LENGTH_SHORT).show();
             return;
@@ -207,7 +207,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private void verificarCodigoFirebase(String codigoIngresado) {
         // Validación para número de prueba
         String telefono = etTelefono.getText().toString().trim();
-        if (telefono.equals("987654321") && codigoIngresado.equals("123456")) {
+        if (telefono.equals("325475745") && codigoIngresado.equals("123456")) {
             Toast.makeText(requireContext(), "Autenticación exitosa (prueba)", Toast.LENGTH_SHORT).show();
             validarTelefono(telefono);
             return;
@@ -223,7 +223,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
         signInWithPhoneAuthCredential(credential);
     }
-
 
     private void signInWithPhoneAuthCredential(com.google.firebase.auth.PhoneAuthCredential credential) {
         mAuth.signInWithCredential(credential)
@@ -266,10 +265,12 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v == btnEnviarTelefono) {
             String telefono = etTelefono.getText().toString().trim();
+            /*
             if (telefono.isEmpty() || telefono.length() < 9 || !telefono.startsWith("9")) {
                 Toast.makeText(requireContext(), "Número inválido", Toast.LENGTH_SHORT).show();
                 return;
             }
+            */
             mostrarDialogoConfirmarNumero();
         }
 

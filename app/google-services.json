@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "659999592843",
-    "project_id": "lagranja-ac5b1",
-    "storage_bucket": "lagranja-ac5b1.firebasestorage.app"
+    "project_number": "583707070768",
+    "project_id": "lagranja-a271e",
+    "storage_bucket": "lagranja-a271e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:659999592843:android:093dac1cb138666da65f8e",
+        "mobilesdk_app_id": "1:583707070768:android:2a80a6cf635d823b3878f5",
         "android_client_info": {
           "package_name": "com.example.proyectolagranja"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDU7te5d2u6q-BjbWRYN_WcTmYhJhbhDss"
+          "current_key": "AIzaSyDiDOh1KHOG2kQFIcYvVFJDH0SebMDMNDk"
         }
       ],
       "services": {
