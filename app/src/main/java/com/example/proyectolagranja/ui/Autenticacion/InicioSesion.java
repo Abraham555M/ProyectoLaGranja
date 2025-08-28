@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -59,6 +60,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
         return rootView;
     }
+
     private void mostrarDialogoConfirmarNumero() {
         View dialogView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.alert_dialog_confirmar_numero, null);
@@ -75,6 +77,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
             layoutBienvenida.setVisibility(View.GONE);
             layoutCodigo.setVisibility(View.VISIBLE);
             tvBienvenida.setVisibility(View.GONE);
+            enviarCodigoFirebase(etTelefono.getText().toString().trim()); // <- Aquí enviamos el código
+
             dialog.dismiss();
         });
 
@@ -164,6 +168,76 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         }
     }
 
+    private void enviarCodigoFirebase(String telefono) {
+        if (telefono.equals("987654321")) { // Número de prueba
+            verificationId = "VERIFICATION_ID_TEST"; // Cualquier string único
+            Toast.makeText(requireContext(), "Código de prueba listo: 123456", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Código real para envío de SMS (solo si fuera producción y región habilitada)
+        com.google.firebase.auth.PhoneAuthOptions options =
+                com.google.firebase.auth.PhoneAuthOptions.newBuilder(mAuth)
+                        .setPhoneNumber("+51" + telefono)
+                        .setTimeout(60L, java.util.concurrent.TimeUnit.SECONDS)
+                        .setActivity(requireActivity())
+                        .setCallbacks(new com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                            @Override
+                            public void onVerificationCompleted(@NonNull com.google.firebase.auth.PhoneAuthCredential credential) {
+                                signInWithPhoneAuthCredential(credential);
+                            }
+
+                            @Override
+                            public void onVerificationFailed(@NonNull com.google.firebase.FirebaseException e) {
+                                Toast.makeText(requireContext(), "Error verificación: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+
+                            @Override
+                            public void onCodeSent(@NonNull String verifId, @NonNull com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken token) {
+                                super.onCodeSent(verifId, token);
+                                verificationId = verifId;
+                                Toast.makeText(requireContext(), "Código enviado", Toast.LENGTH_SHORT).show();
+                            }
+                        }).build();
+
+        com.google.firebase.auth.PhoneAuthProvider.verifyPhoneNumber(options);
+    }
+
+
+    private void verificarCodigoFirebase(String codigoIngresado) {
+        // Validación para número de prueba
+        String telefono = etTelefono.getText().toString().trim();
+        if (telefono.equals("987654321") && codigoIngresado.equals("123456")) {
+            Toast.makeText(requireContext(), "Autenticación exitosa (prueba)", Toast.LENGTH_SHORT).show();
+            validarTelefono(telefono);
+            return;
+        }
+
+        if (verificationId == null) {
+            Toast.makeText(requireContext(), "No se ha enviado el código", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        com.google.firebase.auth.PhoneAuthCredential credential =
+                com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, codigoIngresado);
+
+        signInWithPhoneAuthCredential(credential);
+    }
+
+
+    private void signInWithPhoneAuthCredential(com.google.firebase.auth.PhoneAuthCredential credential) {
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(requireActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        // Usuario autenticado correctamente
+                        String telefono = etTelefono.getText().toString().trim();
+                        validarTelefono(telefono); // Tu función existente
+                    } else {
+                        Toast.makeText(requireContext(), "Código incorrecto", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     public void limpiarEspacios(){
         etTelefono.setText("");
 
@@ -192,17 +266,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v == btnEnviarTelefono) {
             String telefono = etTelefono.getText().toString().trim();
-
-            if (telefono.isEmpty()) {
-                Toast.makeText(requireContext(), "Ingrese su número de teléfono", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (telefono.length() < 9) {
-                Toast.makeText(requireContext(), "El número debe tener al menos 9 dígitos", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (!telefono.startsWith("9")) {
-                Toast.makeText(requireContext(), "El número debe comenzar con 9", Toast.LENGTH_SHORT).show();
+            if (telefono.isEmpty() || telefono.length() < 9 || !telefono.startsWith("9")) {
+                Toast.makeText(requireContext(), "Número inválido", Toast.LENGTH_SHORT).show();
                 return;
             }
             mostrarDialogoConfirmarNumero();
@@ -237,12 +302,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     et5.getText().toString() +
                     et6.getText().toString();
 
-            String telefono = etTelefono.getText().toString().trim();
-            if (!telefono.isEmpty() && telefono.length() >= 9) {
-                validarTelefono(telefono);
-            } else {
-                Toast.makeText(requireContext(), "Número de teléfono inválido", Toast.LENGTH_SHORT).show();
-            }
+            verificarCodigoFirebase(codigo);
         }
     }
 }
