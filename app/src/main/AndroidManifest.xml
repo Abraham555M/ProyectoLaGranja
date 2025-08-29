@@ -2,13 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Para SMS -->
+    <!-- Para SMS
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.SEND_SMS"/>
-
-    <!-- Aclarar que no es obligatorio tener hardware de telefonía -->
-    <uses-feature android:name="android.hardware.telephony" android:required="false"/>
+       -->
 
     <application
         android:allowBackup="true"

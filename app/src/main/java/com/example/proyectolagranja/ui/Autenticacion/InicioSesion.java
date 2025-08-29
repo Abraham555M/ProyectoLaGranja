@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -171,9 +172,13 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     }
 
     private void enviarCodigoFirebase(String telefono) {
-        // Enviar SMS mediante Firebase
+        String numeroPrueba = "+51987654321";
+
+        // Desactivar verificación de app para pruebas
+        FirebaseAuth.getInstance().getFirebaseAuthSettings().setAppVerificationDisabledForTesting(true);
+
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
-                .setPhoneNumber("+51 987 654 321")
+                .setPhoneNumber(numeroPrueba)
                 .setTimeout(60L, TimeUnit.SECONDS)
                 .setActivity(requireActivity())
                 .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -184,8 +189,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
+                        Log.e("PhoneAuth", "Verificación fallida", e);
                         Toast.makeText(requireContext(), "Error verificación: " + e.getMessage(), Toast.LENGTH_LONG).show();
-
                     }
 
                     @Override
@@ -193,6 +198,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                                            @NonNull PhoneAuthProvider.ForceResendingToken token) {
                         super.onCodeSent(verifId, token);
                         verificationId = verifId;
+                        Log.d("PhoneAuth", "Código enviado. ID: " + verifId);
                         Toast.makeText(requireContext(), "Código enviado", Toast.LENGTH_SHORT).show();
                     }
                 }).build();
@@ -216,9 +222,11 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(requireActivity(), task -> {
                     if (task.isSuccessful()) {
+                        Log.d("PhoneAuth", "Autenticación exitosa");
                         String telefono = etTelefono.getText().toString().trim();
                         validarTelefono(telefono);
                     } else {
+                        Log.e("PhoneAuth", "Autenticación fallida", task.getException());
                         Toast.makeText(requireContext(), "Código incorrecto", Toast.LENGTH_SHORT).show();
                     }
                 });
