@@ -20,6 +20,7 @@ import androidx.navigation.Navigation;
 
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.example.proyectolagranja.ui.Session.SessionManager;
 import com.google.android.material.textfield.TextInputLayout;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -43,10 +44,13 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
     private String documentoOriginal = "";
     private String telefonoOriginal = "";
     private String direccionOriginal = "";
+    private SessionManager session;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_perfil, container, false);
+
+        session = new SessionManager(requireContext());
 
         etNombresEd = rootView.findViewById(R.id.etNombresEd);
         etDocumentoEd = rootView.findViewById(R.id.etDocumentoEd);
@@ -143,8 +147,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
     }
 
     private void cargarDatosUsuario() {
-        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 2267);
+        int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_perfil.php?id_cliente=" + idCliente;
 
@@ -188,9 +191,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
     }
 
     private void actualizarDatosUsuario() {
-        int idCliente = requireActivity()
-                .getSharedPreferences("DatosUsuario", requireActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 2267);
+        int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_actualizar_perfil.php";
 

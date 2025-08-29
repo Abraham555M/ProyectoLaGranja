@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.example.proyectolagranja.ui.Session.SessionManager;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -33,11 +34,15 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
     private LinearLayout layoutBienvenida, layoutCodigo;
     private EditText etTelefonoEd;
     private Button btnEnviarTelefonoEd, btnValidarCodigoEd;
+    private SessionManager session;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_actualizar_telefono, container, false);
+
+        session = new SessionManager(requireContext());
+
         layoutBienvenida = rootView.findViewById(R.id.layout_bienvenida);
         layoutCodigo = rootView.findViewById(R.id.layout_codigo);
         btnEnviarTelefonoEd = rootView.findViewById(R.id.btnEnviarTelefonoEd);
@@ -173,8 +178,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
     }
 
     private void actualizarTelefono(String telefono) {
-        SharedPreferences prefs = requireContext().getSharedPreferences("UsuarioPrefs", Context.MODE_PRIVATE);
-        int idCliente = prefs.getInt("id_cliente", 2267); // 👈 lo guardaste al iniciar sesión
+        int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_actualizar_telefono.php";
 
@@ -190,9 +194,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                     String response = new String(responseBody).trim();
                     if (response.contains("Teléfono actualizado correctamente")) {
                         // Guardar nuevo teléfono
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("tel_cliente", telefono);
-                        editor.apply();
+                        session.updateTelefono(telefono);
 
                         Toast.makeText(requireContext(), "Teléfono actualizado correctamente", Toast.LENGTH_SHORT).show();
                         NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);

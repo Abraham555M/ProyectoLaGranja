@@ -28,6 +28,7 @@ import com.example.proyectolagranja.ui.Clases.Venta;
 import com.example.proyectolagranja.ui.Pedidos.Adapter.ArticuloDetalleAdapter;
 import com.example.proyectolagranja.ui.Pedidos.Adapter.PedidosAdapter;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.example.proyectolagranja.ui.Session.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -52,9 +53,13 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     private RecyclerView recyclerViewPedidos;
     private PedidosAdapter adapter;
     private List<Venta> listaVenta = new ArrayList<>();
+    private SessionManager session;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
+
+        session = new SessionManager(requireContext());
 
         recyclerViewPedidos = rootView.findViewById(R.id.recyclerViewPedidos);
         recyclerViewPedidos.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -174,13 +179,11 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         datePicker.show();
     }
 
-
     private void filtrarPorFechas(String fecha_ini, String fecha_fin) {
-        int id_cliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 2267);
+        int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR +
-                "pedido/pedido_filtro_fechas.php?id_cliente=" + id_cliente +
+                "pedido/pedido_filtro_fechas.php?id_cliente=" + idCliente +
                 "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin;
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -226,12 +229,12 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     }
 
     private void filtrarPorEstado(int act_venta) {
-        int id_cliente = 2267;
+        int idCliente = session.getIdCliente();
 
         AsyncHttpClient client = new AsyncHttpClient();
         String url = ServidorConfig.URL_SERVIDOR +
                 "pedido/pedido_filtro_estado.php?act_venta=" +
-                act_venta + "&id_cliente=" + id_cliente;
+                act_venta + "&id_cliente=" + idCliente;
 
         client.get(url, new AsyncHttpResponseHandler() {
             @Override
@@ -273,8 +276,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     }
 
     private void cargarPedidosCliente() {
-        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 2267);
+        int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_listar_cliente.php?id_cliente=" + idCliente;
 

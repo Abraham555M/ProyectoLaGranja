@@ -34,6 +34,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -102,12 +103,51 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        // 🔹 Manejo del logout
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if (id == R.id.nav_logout) {
+                // Limpiar la sesión
+                session.logout();
+
+                // Limpiar manualmente el header
+                View headerView2 = navigationView.getHeaderView(0);
+                TextView tvNombre = headerView2.findViewById(R.id.tvNombre);
+                TextView tvTelefono = headerView2.findViewById(R.id.tvTelefono);
+                tvNombre.setText("");
+                tvTelefono.setText("");
+
+                // Redirigir al inicio de sesión
+                navController.navigate(R.id.nav_inicio_sesion);
+
+                // Cerrar el drawer
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+            // Mantener el comportamiento normal de navegación
+            boolean handled = NavigationUI.onNavDestinationSelected(item, navController);
+            if (handled) {
+                drawer.closeDrawer(GravityCompat.START);
+            }
+            return handled;
+        });
+
         // Cargar imagen del logo
         View headerView = navigationView.getHeaderView(0);
         ImageView imageView = headerView.findViewById(R.id.imageView);
         Glide.with(this)
                 .load("https://i.postimg.cc/3RcFbyqg/logo-blanco-1.png")
                 .into(imageView);
+
+        // Actualizar el header
+        prefs = getSharedPreferences("DatosUsuario", MODE_PRIVATE);
+        listener = (sharedPrefs, key) -> {
+            if (key != null && (key.equals("tel_cliente") || key.equals("nom_cliente"))) {
+                actualizarHeader();
+            }
+        };
+        prefs.registerOnSharedPreferenceChangeListener(listener);
 
         // Mostrar datos si hay sesión activa
         if (session.isLoggedIn()) {

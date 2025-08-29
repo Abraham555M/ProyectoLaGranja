@@ -57,6 +57,10 @@ public class SessionManager {
         return logged;
     }
 
+    public void updateTelefono(String telefono) {
+        editor.putString(KEY_TELEFONO, telefono);
+        editor.apply();
+    }
 
     // Cerrar sesión
     public void logout() {

@@ -347,7 +347,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
 
     private void filtrarArticulosPorCategoria(int idCategoria) {
         resetFiltrosPromocionesYFavoritos();
-
         int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_categoria.php?id_categoria="
