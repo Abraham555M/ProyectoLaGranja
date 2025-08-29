@@ -21,22 +21,30 @@ import android.widget.Toast;
 
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import org.json.JSONObject;
 
+import java.util.concurrent.TimeUnit;
+
 import cz.msebera.android.httpclient.Header;
 
 public class InicioSesion extends Fragment implements View.OnClickListener {
+
     private LinearLayout layoutBienvenida, layoutCodigo;
     private EditText etTelefono;
     private Button btnEnviarTelefono, btnValidarCodigo;
-    private TextView etEnlaceReenviar, tvBienvenida;
+    private TextView tvBienvenida;
 
     // Firebase
-    private String verificationId; // Guardar el ID de verificación
+    private String verificationId;
     private FirebaseAuth mAuth;
 
     @Override
@@ -51,8 +59,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         etTelefono = rootView.findViewById(R.id.etTelefono);
         tvBienvenida = rootView.findViewById(R.id.tvBienvenida);
 
-        btnValidarCodigo.setOnClickListener(this);
         btnEnviarTelefono.setOnClickListener(this);
+        btnValidarCodigo.setOnClickListener(this);
 
         configurarAutoFocusCodigo(rootView);
 
@@ -77,8 +85,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
             layoutBienvenida.setVisibility(View.GONE);
             layoutCodigo.setVisibility(View.VISIBLE);
             tvBienvenida.setVisibility(View.GONE);
-            enviarCodigoFirebase(etTelefono.getText().toString().trim()); // <- Aquí enviamos el código
-
+            enviarCodigoFirebase(etTelefono.getText().toString().trim());
             dialog.dismiss();
         });
 
@@ -106,11 +113,9 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     );
 
                     if (existe) {
-                        // Si existe → ir al catálogo
                         limpiarEspacios();
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_catalogo);
                     } else {
-                        // Si no existe → ir al registro y pasar teléfono
                         Bundle bundle = new Bundle();
                         bundle.putString("telefono", telefono);
                         limpiarEspacios();
@@ -128,7 +133,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         });
     }
 
-    private void configurarAutoFocusCodigo(View rootView) { // Para los digitos del codigo
+    private void configurarAutoFocusCodigo(View rootView) {
         EditText[] edits = {
                 rootView.findViewById(R.id.etCodigo1),
                 rootView.findViewById(R.id.etCodigo2),
@@ -141,7 +146,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         for (int i = 0; i < edits.length; i++) {
             final int index = i;
 
-            // Avanzar si hay un dígito
             edits[i].addTextChangedListener(new android.text.TextWatcher() {
                 @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
                 @Override
@@ -153,11 +157,9 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                 @Override public void afterTextChanged(android.text.Editable s) {}
             });
 
-            // Retroceder si está vacío
             edits[i].setOnKeyListener((v, keyCode, event) -> {
                 if (keyCode == android.view.KeyEvent.KEYCODE_DEL &&
                         event.getAction() == android.view.KeyEvent.ACTION_DOWN) {
-
                     if (edits[index].getText().toString().isEmpty() && index > 0) {
                         edits[index - 1].requestFocus();
                         edits[index - 1].setSelection(edits[index - 1].getText().length());
@@ -169,78 +171,62 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     }
 
     private void enviarCodigoFirebase(String telefono) {
-        if (telefono.equals("325475745")) { // Número de prueba 987654321
-            verificationId = "VERIFICATION_ID_TEST"; // Cualquier string único
-            Toast.makeText(requireContext(), "Código de prueba listo: 123456", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        // Enviar SMS mediante Firebase
+        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
+                .setPhoneNumber("+51 987 654 321")
+                .setTimeout(60L, TimeUnit.SECONDS)
+                .setActivity(requireActivity())
+                .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                    @Override
+                    public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
+                        signInWithPhoneAuthCredential(credential);
+                    }
 
-        // Código real para envío de SMS (solo si fuera producción y región habilitada)
-        com.google.firebase.auth.PhoneAuthOptions options =
-                com.google.firebase.auth.PhoneAuthOptions.newBuilder(mAuth)
-                        .setPhoneNumber("+51" + telefono)
-                        .setTimeout(60L, java.util.concurrent.TimeUnit.SECONDS)
-                        .setActivity(requireActivity())
-                        .setCallbacks(new com.google.firebase.auth.PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                            @Override
-                            public void onVerificationCompleted(@NonNull com.google.firebase.auth.PhoneAuthCredential credential) {
-                                signInWithPhoneAuthCredential(credential);
-                            }
+                    @Override
+                    public void onVerificationFailed(@NonNull FirebaseException e) {
+                        Toast.makeText(requireContext(), "Error verificación: " + e.getMessage(), Toast.LENGTH_LONG).show();
 
-                            @Override
-                            public void onVerificationFailed(@NonNull com.google.firebase.FirebaseException e) {
-                                Toast.makeText(requireContext(), "Error verificación: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            }
+                    }
 
-                            @Override
-                            public void onCodeSent(@NonNull String verifId, @NonNull com.google.firebase.auth.PhoneAuthProvider.ForceResendingToken token) {
-                                super.onCodeSent(verifId, token);
-                                verificationId = verifId;
-                                Toast.makeText(requireContext(), "Código enviado", Toast.LENGTH_SHORT).show();
-                            }
-                        }).build();
+                    @Override
+                    public void onCodeSent(@NonNull String verifId,
+                                           @NonNull PhoneAuthProvider.ForceResendingToken token) {
+                        super.onCodeSent(verifId, token);
+                        verificationId = verifId;
+                        Toast.makeText(requireContext(), "Código enviado", Toast.LENGTH_SHORT).show();
+                    }
+                }).build();
 
-        com.google.firebase.auth.PhoneAuthProvider.verifyPhoneNumber(options);
+        PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
-
     private void verificarCodigoFirebase(String codigoIngresado) {
-        // Validación para número de prueba
-        String telefono = etTelefono.getText().toString().trim();
-        if (telefono.equals("325475745") && codigoIngresado.equals("123456")) {
-            Toast.makeText(requireContext(), "Autenticación exitosa (prueba)", Toast.LENGTH_SHORT).show();
-            validarTelefono(telefono);
-            return;
-        }
-
         if (verificationId == null) {
             Toast.makeText(requireContext(), "No se ha enviado el código", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        com.google.firebase.auth.PhoneAuthCredential credential =
-                com.google.firebase.auth.PhoneAuthProvider.getCredential(verificationId, codigoIngresado);
+        PhoneAuthCredential credential =
+                PhoneAuthProvider.getCredential(verificationId, codigoIngresado);
 
         signInWithPhoneAuthCredential(credential);
     }
-
-    private void signInWithPhoneAuthCredential(com.google.firebase.auth.PhoneAuthCredential credential) {
+    
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(requireActivity(), task -> {
                     if (task.isSuccessful()) {
-                        // Usuario autenticado correctamente
                         String telefono = etTelefono.getText().toString().trim();
-                        validarTelefono(telefono); // Tu función existente
+                        validarTelefono(telefono);
                     } else {
                         Toast.makeText(requireContext(), "Código incorrecto", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    public void limpiarEspacios(){
+    public void limpiarEspacios() {
         etTelefono.setText("");
 
-        // Limpiar campos de código
         if (getView() != null) {
             EditText et1 = getView().findViewById(R.id.etCodigo1);
             EditText et2 = getView().findViewById(R.id.etCodigo2);
@@ -249,14 +235,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
             EditText et5 = getView().findViewById(R.id.etCodigo5);
             EditText et6 = getView().findViewById(R.id.etCodigo6);
 
-            et1.setText("");
-            et2.setText("");
-            et3.setText("");
-            et4.setText("");
-            et5.setText("");
-            et6.setText("");
-
-            // Dejar el foco en el primer campo del código
+            et1.setText(""); et2.setText(""); et3.setText("");
+            et4.setText(""); et5.setText(""); et6.setText("");
             et1.requestFocus();
         }
     }
@@ -265,17 +245,14 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         if (v == btnEnviarTelefono) {
             String telefono = etTelefono.getText().toString().trim();
-            /*
-            if (telefono.isEmpty() || telefono.length() < 9 || !telefono.startsWith("9")) {
+            if (telefono.isEmpty() || telefono.length() < 9) {
                 Toast.makeText(requireContext(), "Número inválido", Toast.LENGTH_SHORT).show();
                 return;
             }
-            */
             mostrarDialogoConfirmarNumero();
         }
 
         if (v == btnValidarCodigo) {
-            // Referencias a los EditText de código
             EditText et1 = getView().findViewById(R.id.etCodigo1);
             EditText et2 = getView().findViewById(R.id.etCodigo2);
             EditText et3 = getView().findViewById(R.id.etCodigo3);
@@ -283,7 +260,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
             EditText et5 = getView().findViewById(R.id.etCodigo5);
             EditText et6 = getView().findViewById(R.id.etCodigo6);
 
-            // Verificar que todos tengan valor
             if (et1.getText().toString().trim().isEmpty() ||
                     et2.getText().toString().trim().isEmpty() ||
                     et3.getText().toString().trim().isEmpty() ||
@@ -295,7 +271,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                 return;
             }
 
-            // Si todos están llenos, concatenar el código
             String codigo = et1.getText().toString() +
                     et2.getText().toString() +
                     et3.getText().toString() +
