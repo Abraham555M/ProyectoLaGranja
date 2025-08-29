@@ -1,4 +1,4 @@
-package com.example.proyectolagranja.ui.Session;
+package com.example.proyectolagranja.ui.Servicios;
 
 import android.content.Context;
 import android.content.SharedPreferences;

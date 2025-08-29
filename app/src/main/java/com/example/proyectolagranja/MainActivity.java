@@ -1,8 +1,6 @@
 package com.example.proyectolagranja;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -20,18 +18,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.example.proyectolagranja.ui.Autenticacion.InicioSesion;
 import com.example.proyectolagranja.ui.Catalogo.Adapter.CarritoAdapter;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.MedioPago;
-import com.example.proyectolagranja.ui.Clases.Producto;
-import com.example.proyectolagranja.ui.Clases.Venta;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
-import com.example.proyectolagranja.ui.Session.SessionManager;
-import com.google.android.material.badge.BadgeDrawable;
-import com.google.android.material.badge.BadgeUtils;
+import com.example.proyectolagranja.ui.Servicios.SessionManager;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.core.view.GravityCompat;
@@ -57,11 +49,8 @@ import java.util.List;
 import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
-import com.google.android.material.badge.ExperimentalBadgeUtils;
-import com.google.android.material.badge.BadgeUtils;
-import com.loopj.android.http.RequestParams;
 
-import androidx.annotation.OptIn;
+import com.loopj.android.http.RequestParams;
 
 public class MainActivity extends AppCompatActivity {
     private List<MedioPago> listaMedioPago = new ArrayList<>();

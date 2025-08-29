@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +27,7 @@ import com.example.proyectolagranja.ui.Clases.Venta;
 import com.example.proyectolagranja.ui.Pedidos.Adapter.ArticuloDetalleAdapter;
 import com.example.proyectolagranja.ui.Pedidos.Adapter.PedidosAdapter;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
-import com.example.proyectolagranja.ui.Session.SessionManager;
+import com.example.proyectolagranja.ui.Servicios.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -36,13 +35,9 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 

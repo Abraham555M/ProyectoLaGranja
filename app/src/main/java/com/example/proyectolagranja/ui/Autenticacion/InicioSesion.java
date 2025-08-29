@@ -1,8 +1,6 @@
 package com.example.proyectolagranja.ui.Autenticacion;
 
 import android.app.AlertDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -24,7 +22,7 @@ import android.widget.Toast;
 
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
-import com.example.proyectolagranja.ui.Session.SessionManager;
+import com.example.proyectolagranja.ui.Servicios.SessionManager;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;

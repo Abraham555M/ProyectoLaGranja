@@ -48,6 +48,8 @@ dependencies {
     implementation ("com.google.firebase:firebase-auth")
     //Swipe
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    // Firebase Cloud Messaging
+    implementation("com.google.firebase:firebase-messaging:23.2.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)

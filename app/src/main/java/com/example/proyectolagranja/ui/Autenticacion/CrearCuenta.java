@@ -1,6 +1,5 @@
 package com.example.proyectolagranja.ui.Autenticacion;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -17,7 +16,7 @@ import android.widget.Toast;
 
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
-import com.example.proyectolagranja.ui.Session.SessionManager;
+import com.example.proyectolagranja.ui.Servicios.SessionManager;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
