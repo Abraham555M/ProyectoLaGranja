@@ -36,6 +36,7 @@ import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.Producto;
 import com.example.proyectolagranja.ui.Clases.Venta;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.example.proyectolagranja.ui.Session.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.loopj.android.http.AsyncHttpClient;
@@ -65,11 +66,15 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private Integer productoSeleccionado = null;
     private Button btnPromociones, btnFavoritos;
     private boolean mostrandoPromociones = false, mostrandoFavoritos = false;
+    private SessionManager session;
     private SwipeRefreshLayout swipeRefreshLayout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_catalogo, container, false);
+
+        //  Inicializas SessionManager aquí
+        session = new SessionManager(requireContext());
 
         spCategorias = rootView.findViewById(R.id.sp_categorias);
         spProductos = rootView.findViewById(R.id.sp_productos);
@@ -229,8 +234,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private void filtrarArticulosPorProducto(int idProducto) {
         resetFiltrosPromocionesYFavoritos();
 
-        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 2267);
+        int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR
                 + "articulo/articulo_filtrar_producto.php?id_producto="
@@ -344,8 +348,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private void filtrarArticulosPorCategoria(int idCategoria) {
         resetFiltrosPromocionesYFavoritos();
 
-        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 2267);
+        int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_categoria.php?id_categoria="
                 + idCategoria + "&id_cliente=" + idCliente;
@@ -396,8 +399,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private void buscarArticulosPorNombre(String nombre) {
         resetFiltrosPromocionesYFavoritos();
 
-        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 2267);
+        int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_buscar_filtro.php?"
                 + "nom_articulo=" + nombre
@@ -465,10 +467,9 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     }
 
     private void cargarArticulos() {
-        int id_cliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 2267);
+        int idCliente = session.getIdCliente();
 
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_catalogo.php?id_cliente=" + id_cliente;
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_catalogo.php?id_cliente=" + idCliente;
         AsyncHttpClient client = new AsyncHttpClient();
 
         client.get(url, new AsyncHttpResponseHandler() {
@@ -725,8 +726,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     }
 
     private void listarFavoritos(){
-        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 2267);
+        int idCliente = session.getIdCliente();
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_favoritos.php?id_cliente=" + idCliente;
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -774,8 +774,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     }
 
     private  void listarPromociones(){
-        int idCliente = getActivity().getSharedPreferences("DatosUsuario", getActivity().MODE_PRIVATE)
-                .getInt("id_cliente", 2267);
+        int idCliente = session.getIdCliente();
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_promociones.php?id_cliente=" + idCliente;
 
         AsyncHttpClient client = new AsyncHttpClient();
