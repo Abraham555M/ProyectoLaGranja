@@ -1,6 +1,8 @@
 package com.example.proyectolagranja.ui.Autenticacion;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.example.proyectolagranja.ui.Session.SessionManager;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -105,6 +108,10 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
                     String response = new String(responseBody);
+
+                    // 👀 Log para ver la respuesta exacta del backend
+                    Log.d("RESPUESTA_BACKEND", "Response: " + response);
+
                     JSONObject json = new JSONObject(response);
                     boolean existe = json.getBoolean("existe");
 
@@ -114,6 +121,16 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     );
 
                     if (existe) {
+                        String idClienteStr = json.getString("id_cliente");
+                        int idCliente = Integer.parseInt(idClienteStr);
+
+                        String nombre = json.getString("nom_cliente");
+                        String telCliente = json.getString("tel_cliente");
+
+                        // Guardar sesión con SessionManager
+                        SessionManager session = new SessionManager(requireContext());
+                        session.createLoginSession(idCliente, nombre, telCliente);
+
                         limpiarEspacios();
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_catalogo);
                     } else {
@@ -123,16 +140,19 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_crear_cuenta, bundle);
                     }
                 } catch (Exception e) {
+                    Log.e("JSON_ERROR", "Error procesando respuesta", e); // 👈 ahora imprime el error real
                     Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.e("HTTP_ERROR", "Código: " + statusCode, error); // 👈 imprime detalles del fallo
                 Toast.makeText(requireContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     private void configurarAutoFocusCodigo(View rootView) {
         EditText[] edits = {
@@ -224,6 +244,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     if (task.isSuccessful()) {
                         Log.d("PhoneAuth", "Autenticación exitosa");
                         String telefono = etTelefono.getText().toString().trim();
+
                         validarTelefono(telefono);
                     } else {
                         Log.e("PhoneAuth", "Autenticación fallida", task.getException());

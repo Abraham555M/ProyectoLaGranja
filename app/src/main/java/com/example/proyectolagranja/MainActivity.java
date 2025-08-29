@@ -2,6 +2,7 @@ package com.example.proyectolagranja;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -19,12 +20,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.proyectolagranja.ui.Autenticacion.InicioSesion;
 import com.example.proyectolagranja.ui.Catalogo.Adapter.CarritoAdapter;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.MedioPago;
 import com.example.proyectolagranja.ui.Clases.Producto;
 import com.example.proyectolagranja.ui.Clases.Venta;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.example.proyectolagranja.ui.Session.SessionManager;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.BadgeUtils;
 import com.google.android.material.button.MaterialButton;
@@ -70,12 +73,16 @@ public class MainActivity extends AppCompatActivity {
     public static List<ItemCarrito> carrito = new ArrayList<>();
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
-
+    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Inicializar SessionManager
+        session = new SessionManager(this);
+
+        // Siempre infla el layout principal
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.appBarMain.toolbar);
@@ -84,35 +91,9 @@ public class MainActivity extends AppCompatActivity {
         binding.appBarMain.fab.setOnClickListener(v -> mostrarCarrito());
         actualizarBadge();
 
-        //************ Actualizar el telefono en el nav
-        prefs = getSharedPreferences("UsuarioPrefs", MODE_PRIVATE);
-
-        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                View headerView = binding.navView.getHeaderView(0);
-                if (headerView != null) {
-                    if (key.equals("tel_cliente")) {
-                        TextView tvTelefono = headerView.findViewById(R.id.tvTelefono);
-                        if (tvTelefono != null) {
-                            tvTelefono.setText(sharedPreferences.getString("tel_cliente", ""));
-                        }
-                    } else if (key.equals("nom_cliente")) {
-                        TextView tvNombre = headerView.findViewById(R.id.tvNombre);
-                        if (tvNombre != null) {
-                            tvNombre.setText(sharedPreferences.getString("nom_cliente", ""));
-                        }
-                    }
-                }
-            }
-        };
-
-        prefs.registerOnSharedPreferenceChangeListener(listener);
-        //************
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_catalogo, R.id.nav_pedidos, R.id.nav_perfil)
                 .setOpenableLayout(drawer)
@@ -121,17 +102,22 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        // Cargar imagen del logo
         View headerView = navigationView.getHeaderView(0);
-
-        // Referencias a los TextView del header
-        TextView tvNombre = headerView.findViewById(R.id.tvNombre);
-        TextView tvTelefono = headerView.findViewById(R.id.tvTelefono);
         ImageView imageView = headerView.findViewById(R.id.imageView);
         Glide.with(this)
                 .load("https://i.postimg.cc/3RcFbyqg/logo-blanco-1.png")
                 .into(imageView);
 
-        ObtenerDatosUsuario(tvNombre, tvTelefono);
+        // Mostrar datos si hay sesión activa
+        if (session.isLoggedIn()) {
+            actualizarHeader();
+            ObtenerDatosUsuario(session.getIdCliente());
+            navController.navigate(R.id.nav_catalogo);
+        } else {
+            //  Si NO hay sesión → navegar al fragment de inicio de sesión
+            navController.navigate(R.id.nav_inicio_sesion);
+        }
 
         // Para que no sea visible el encabezado
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
@@ -156,10 +142,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void ObtenerDatosUsuario(TextView tvNombre, TextView tvTelefono){
-        SharedPreferences preferences = getSharedPreferences("DatosUsuario", MODE_PRIVATE);
-        int idCliente = preferences.getInt("id_cliente", 2267); // valor provisional si no existe
+    public void actualizarHeader() {
+        View headerView = binding.navView.getHeaderView(0);
+        TextView tvNombre = headerView.findViewById(R.id.tvNombre);
+        TextView tvTelefono = headerView.findViewById(R.id.tvTelefono);
 
+        if (session.isLoggedIn()) {
+            tvNombre.setText(session.getNombre());
+            tvTelefono.setText(session.getTelefono());
+        }
+    }
+
+    private void ObtenerDatosUsuario(int idCliente){
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_obtener_datos.php?id_cliente=" + idCliente;
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -173,9 +167,16 @@ public class MainActivity extends AppCompatActivity {
                         String nombre = json.getString("nom_cliente");
                         String telefono = json.getString("tel_cliente");
 
-                        // Actualizar los TextView del header
+                        // Actualizar UI
+                        View headerView = binding.navView.getHeaderView(0);
+                        TextView tvNombre = headerView.findViewById(R.id.tvNombre);
+                        TextView tvTelefono = headerView.findViewById(R.id.tvTelefono);
+
                         tvNombre.setText(nombre);
                         tvTelefono.setText(telefono);
+
+                        // Actualizar sesión
+                        session.createLoginSession(idCliente, nombre, telefono);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -295,10 +296,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void EnviarPedido(double total, String direccion, String detalle_venta, androidx.appcompat.app.AlertDialog dialog){
-        // Preparar envío
-        SharedPreferences preferences = getSharedPreferences("DatosUsuario", MODE_PRIVATE);
-        int idCliente = preferences.getInt("id_cliente", 2267); // provisional
-
+        int idCliente = session.getIdCliente(); // Suplanta al SharePreference -> obtiene el id del cliente
         int idMedioPago = listaMedioPago.get(spMedioPago.getSelectedItemPosition()).getId_pago_medio();
 
         AsyncHttpClient client = new AsyncHttpClient();
@@ -436,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cargarDireccionCliente(EditText etDireccion) {
-        int idCliente = 2267; //Cliente para pruebas
+        int idCliente = session.getIdCliente();
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_obtener_direccion.php?id_cliente=" + idCliente;
         AsyncHttpClient client = new AsyncHttpClient();
 
