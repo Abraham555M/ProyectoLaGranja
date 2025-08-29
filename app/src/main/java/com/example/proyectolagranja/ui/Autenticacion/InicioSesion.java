@@ -41,7 +41,6 @@ import java.util.concurrent.TimeUnit;
 import cz.msebera.android.httpclient.Header;
 
 public class InicioSesion extends Fragment implements View.OnClickListener {
-
     private LinearLayout layoutBienvenida, layoutCodigo;
     private EditText etTelefono;
     private Button btnEnviarTelefono, btnValidarCodigo;

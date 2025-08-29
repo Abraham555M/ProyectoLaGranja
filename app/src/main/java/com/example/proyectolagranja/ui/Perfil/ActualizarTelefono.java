@@ -84,17 +84,48 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
         btnSi.setOnClickListener(v -> {
             String telefono = etTelefonoEd.getText().toString().trim();
 
-            layoutBienvenida.setVisibility(View.GONE);
-            layoutCodigo.setVisibility(View.VISIBLE);
-
-            enviarCodigoFirebase("+51" + telefono); // 👈 importante: formato internacional
-            dialog.dismiss();
+            validarTelefono(telefono, dialog);
         });
 
         btnNo.setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    private void validarTelefono(String telefono, AlertDialog dialog) {
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_validar_telefono.php?tel_cliente=" + telefono;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String response = new String(responseBody);
+                    JSONObject json = new JSONObject(response);
+                    boolean existe = json.getBoolean("existe");
+
+                    if (existe) {
+                        Toast.makeText(requireContext(), "El número ya está registrado", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    } else {
+                        // Solo si el número es nuevo → mostrar layoutCodigo y enviar código
+                        layoutBienvenida.setVisibility(View.GONE);
+                        layoutCodigo.setVisibility(View.VISIBLE);
+
+                        enviarCodigoFirebase("+51" + telefono); // formato internacional
+                        dialog.dismiss();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(requireContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void enviarCodigoFirebase(String telefono) {

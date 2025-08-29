@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +17,12 @@ import android.widget.Toast;
 
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
+import com.example.proyectolagranja.ui.Session.SessionManager;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -50,7 +54,6 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
         String nom_cliente = etNombres.getText().toString();
         String num_doc_cliente = etDocumento.getText().toString();
         String dir_cliente = etDireccion.getText().toString();
-        // String tel_cliente = etDireccion.getText().toString();
 
         RequestParams params = new RequestParams();
         params.put("nom_cliente", nom_cliente);
@@ -64,15 +67,33 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
         client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                String response = new String(responseBody);
-                if (response.contains("success")) {
-                    Toast.makeText(getActivity(), "Cliente creado correctamente", Toast.LENGTH_SHORT).show();
-                    LimpiarCampos();
+                try {
+                    String response = new String(responseBody);
+                    JSONObject json = new JSONObject(response);
 
-                    NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
-                    navController.navigate(R.id.action_nav_crear_cuenta_to_nav_catalogo);
-                } else {
-                    Toast.makeText(getActivity(), "Error al crear el cliente", Toast.LENGTH_SHORT).show();
+                    if (json.getBoolean("success")) {
+                        Toast.makeText(getActivity(), "Cliente creado correctamente", Toast.LENGTH_SHORT).show();
+
+                        // ✅ Guardar sesión automáticamente
+                        int idCliente = json.getInt("id_cliente"); // tu PHP debe devolverlo
+                        SessionManager session = new SessionManager(requireContext());
+                        session.createLoginSession(idCliente, nom_cliente, telefono);
+
+                        LimpiarCampos();
+
+                        // Ir al catálogo
+                        NavController navController = Navigation.findNavController(
+                                getActivity(),
+                                R.id.nav_host_fragment_content_main
+                        );
+                        navController.navigate(R.id.action_nav_crear_cuenta_to_nav_catalogo);
+
+                    } else {
+                        Toast.makeText(getActivity(), "Error al crear el cliente", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Log.e("JSON_ERROR", "Error parseando respuesta", e);
+                    Toast.makeText(getActivity(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -117,6 +138,4 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
             }
         }
     }
-
-
 }
