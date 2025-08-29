@@ -7,10 +7,12 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,11 +24,18 @@ import android.widget.Toast;
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.example.proyectolagranja.ui.Session.SessionManager;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONObject;
+
+import java.util.concurrent.TimeUnit;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -35,6 +44,8 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
     private EditText etTelefonoEd;
     private Button btnEnviarTelefonoEd, btnValidarCodigoEd;
     private SessionManager session;
+    private String verificationId;
+    private FirebaseAuth mAuth;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,6 +64,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
         btnEnviarTelefonoEd.setOnClickListener(this);
 
         configurarAutoFocusCodigo(rootView);
+        mAuth = FirebaseAuth.getInstance();
 
         return rootView;
     }
@@ -71,7 +83,11 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
 
         btnSi.setOnClickListener(v -> {
             String telefono = etTelefonoEd.getText().toString().trim();
-            validarTelefono(telefono, dialog); // 👈 validar antes de avanzar
+
+            layoutBienvenida.setVisibility(View.GONE);
+            layoutCodigo.setVisibility(View.VISIBLE);
+
+            enviarCodigoFirebase("+51" + telefono); // 👈 importante: formato internacional
             dialog.dismiss();
         });
 
@@ -79,6 +95,119 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
 
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    private void enviarCodigoFirebase(String telefono) {
+        // Para pruebas puedes usar setAppVerificationDisabledForTesting(true)
+        FirebaseAuth.getInstance().getFirebaseAuthSettings()
+                .setAppVerificationDisabledForTesting(true);
+
+        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
+                .setPhoneNumber(telefono)
+                .setTimeout(60L, TimeUnit.SECONDS)
+                .setActivity(requireActivity())
+                .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                    @Override
+                    public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
+                        // Si Firebase logra auto-verificar (en algunos casos)
+                        signInWithPhoneAuthCredential(credential);
+                    }
+
+                    @Override
+                    public void onVerificationFailed(@NonNull FirebaseException e) {
+                        Log.e("PhoneAuth", "Verificación fallida", e);
+                        Toast.makeText(requireContext(), "Error verificación: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onCodeSent(@NonNull String verifId,
+                                           @NonNull PhoneAuthProvider.ForceResendingToken token) {
+                        super.onCodeSent(verifId, token);
+                        verificationId = verifId;
+                        Log.d("PhoneAuth", "Código enviado. ID: " + verifId);
+                        Toast.makeText(requireContext(), "Código enviado", Toast.LENGTH_SHORT).show();
+                    }
+                }).build();
+
+        PhoneAuthProvider.verifyPhoneNumber(options);
+    }
+
+    private void verificarCodigoFirebase(String codigoIngresado) {
+        if (verificationId == null) {
+            Toast.makeText(requireContext(), "No se ha enviado el código", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, codigoIngresado);
+        signInWithPhoneAuthCredential(credential);
+    }
+
+    private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(requireActivity(), task -> {
+                    if (task.isSuccessful()) {
+                        Log.d("PhoneAuth", "Código correcto ✔️");
+                        String telefono = etTelefonoEd.getText().toString().trim();
+                        actualizarTelefono(telefono); // 👈 aquí se actualiza en servidor
+                    } else {
+                        Log.e("PhoneAuth", "Código incorrecto", task.getException());
+                        Toast.makeText(requireContext(), "Código incorrecto", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void actualizarTelefono(String telefono) {
+        int idCliente = session.getIdCliente();
+
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_actualizar_telefono.php";
+
+        RequestParams params = new RequestParams();
+        params.put("id_cliente", idCliente);
+        params.put("tel_cliente", telefono);
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.post(url, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    String response = new String(responseBody).trim();
+                    if (response.contains("Teléfono actualizado correctamente")) {
+                        // Guardar nuevo teléfono
+                        session.updateTelefono(telefono);
+
+                        Toast.makeText(requireContext(), "Teléfono actualizado correctamente", Toast.LENGTH_SHORT).show();
+                        NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
+                        navController.navigate(R.id.action_nav_actualizar_telefono_to_nav_perfil);
+
+                        limpiarEspacios();
+                    } else {
+                        Toast.makeText(requireContext(), "Error: " + response, Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (Exception e) {
+                    Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Toast.makeText(requireContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    public void limpiarEspacios() {
+        etTelefonoEd.setText("");
+        if (getView() != null) {
+            EditText et1 = getView().findViewById(R.id.etCodigo1);
+            EditText et2 = getView().findViewById(R.id.etCodigo2);
+            EditText et3 = getView().findViewById(R.id.etCodigo3);
+            EditText et4 = getView().findViewById(R.id.etCodigo4);
+            EditText et5 = getView().findViewById(R.id.etCodigo5);
+            EditText et6 = getView().findViewById(R.id.etCodigo6);
+            et1.setText(""); et2.setText(""); et3.setText("");
+            et4.setText(""); et5.setText(""); et6.setText("");
+            et1.requestFocus();
+        }
     }
 
     private void configurarAutoFocusCodigo(View rootView) { // Para los digitos del codigo
@@ -121,117 +250,12 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
         }
     }
 
-    public void limpiarEspacios(){
-        etTelefonoEd.setText("");
-
-        // Limpiar campos de código
-        if (getView() != null) {
-            EditText et1 = getView().findViewById(R.id.etCodigo1);
-            EditText et2 = getView().findViewById(R.id.etCodigo2);
-            EditText et3 = getView().findViewById(R.id.etCodigo3);
-            EditText et4 = getView().findViewById(R.id.etCodigo4);
-            EditText et5 = getView().findViewById(R.id.etCodigo5);
-            EditText et6 = getView().findViewById(R.id.etCodigo6);
-
-            et1.setText("");
-            et2.setText("");
-            et3.setText("");
-            et4.setText("");
-            et5.setText("");
-            et6.setText("");
-
-            // Dejar el foco en el primer campo del código
-            et1.requestFocus();
-        }
-    }
-
-    private void validarTelefono(String telefono, AlertDialog dialog) {
-        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_comprobar_telefono.php?tel_cliente=" + telefono;
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    String response = new String(responseBody);
-                    JSONObject json = new JSONObject(response);
-                    boolean existe = json.getBoolean("existe");
-
-                    if (existe) {
-                        Toast.makeText(requireContext(), "El número ya está registrado", Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Solo si el número es nuevo → mostrar layoutCodigo
-                        layoutBienvenida.setVisibility(View.GONE);
-                        layoutCodigo.setVisibility(View.VISIBLE);
-                        dialog.dismiss();
-                    }
-                } catch (Exception e) {
-                    Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(requireContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void actualizarTelefono(String telefono) {
-        int idCliente = session.getIdCliente();
-
-        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_actualizar_telefono.php";
-
-        RequestParams params = new RequestParams();
-        params.put("id_cliente", idCliente);
-        params.put("tel_cliente", telefono);
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.post(url, params, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    String response = new String(responseBody).trim();
-                    if (response.contains("Teléfono actualizado correctamente")) {
-                        // Guardar nuevo teléfono
-                        session.updateTelefono(telefono);
-
-                        Toast.makeText(requireContext(), "Teléfono actualizado correctamente", Toast.LENGTH_SHORT).show();
-                        NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment_content_main);
-                        navController.navigate(R.id.action_nav_actualizar_telefono_to_nav_perfil);
-
-                        limpiarEspacios();
-                    } else {
-                        Toast.makeText(requireContext(), "Error: " + response, Toast.LENGTH_SHORT).show();
-                    }
-
-                } catch (Exception e) {
-                    Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(requireContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     @Override
     public void onClick(View v) {
         if (v == btnEnviarTelefonoEd) {
             String telefono = etTelefonoEd.getText().toString().trim();
-
-            if (telefono.isEmpty()) {
-                Toast.makeText(requireContext(), "Ingrese su número de teléfono", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (telefono.length() < 9) {
-                Toast.makeText(requireContext(), "El número debe tener al menos 9 dígitos", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (!telefono.startsWith("9")) {
-                Toast.makeText(requireContext(), "El número debe comenzar con 9", Toast.LENGTH_SHORT).show();
+            if (telefono.isEmpty() || telefono.length() < 9 || !telefono.startsWith("9")) {
+                Toast.makeText(requireContext(), "Número inválido", Toast.LENGTH_SHORT).show();
                 return;
             }
             mostrarDialogoConfirmarNumero();
@@ -265,8 +289,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                     et4.getText().toString() +
                     et5.getText().toString() +
                     et6.getText().toString();
-            String telefono = etTelefonoEd.getText().toString().trim();
-            actualizarTelefono(telefono);
+            verificarCodigoFirebase(codigo);
         }
     }
 }
