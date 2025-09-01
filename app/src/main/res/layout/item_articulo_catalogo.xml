@@ -8,141 +8,188 @@
     android:layout_margin="8dp"
     android:background="@android:color/darker_gray">
 
-    <LinearLayout
+    <!-- Contenedor con superposición -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+        android:layout_height="wrap_content">
 
-        <!-- Imagen del artículo -->
-        <ImageView
-            android:id="@+id/imgArticulo"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:layout_marginEnd="12dp"
-            android:contentDescription="Imagen del artículo"
-            android:src="@drawable/logo_la_granja"
-            android:clipToOutline="true"
-            android:scaleType="centerCrop" />
-
-        <!-- Nombre, precio y etiquetas -->
+        <!-- Contenido principal -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:paddingVertical="5dp"
-            android:layout_weight="2"
-            android:orientation="vertical">
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/nombreArticulo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Nombre del Artículo"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+            <!-- Contenedor de imagen + etiqueta -->
+            <FrameLayout
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_marginEnd="12dp">
 
-            <!-- Precio + Etiquetas en una misma fila -->
+                <!-- Imagen del artículo -->
+                <ImageView
+                    android:id="@+id/imgArticulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="Imagen del artículo"
+                    android:src="@drawable/logo_la_granja"
+                    android:clipToOutline="true"
+                    android:scaleType="centerCrop" />
+
+                <!-- Etiqueta recta debajo de la imagen -->
+                <TextView
+                    android:id="@+id/labelOferta"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/bg_descuento"
+                    android:gravity="center"
+                    android:padding="3dp"
+                    android:paddingLeft="4dp"
+                    android:text="OFERTA"
+                    android:textColor="@color/black"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:elevation="8dp" />
+            </FrameLayout>
+
+
+            <!-- Nombre, precio y etiquetas -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginTop="6dp">
+                android:paddingVertical="5dp"
+                android:layout_weight="2"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/precioArticulo"
+                    android:id="@+id/nombreArticulo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="S/ 0.00"
+                    android:text="Nombre del Artículo"
                     android:textColor="@android:color/black"
-                    android:textSize="14sp" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-                <!-- Contenedor de etiquetas -->
+                <!-- Precio + Etiquetas en una misma fila -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginStart="12dp">
+                    android:layout_marginTop="6dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/etPromociones"
-                        style="@style/Widget.MaterialComponents.Button.Icon"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:backgroundTint="@color/color_verde"
-                        android:elevation="4dp"
-                        android:insetLeft="0dp"
-                        android:insetTop="0dp"
-                        android:insetRight="0dp"
-                        android:insetBottom="0dp"
-                        android:padding="0dp"
-                        android:text=""
-                        app:cornerRadius="18dp"
-                        app:icon="@drawable/ic_promociones"
-                        app:iconGravity="textStart"
-                        app:iconPadding="0dp"
-                        app:iconSize="15dp"
-                        app:iconTint="@android:color/white"
-                        app:strokeWidth="0dp" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/etFavoritos"
-                        style="@style/Widget.MaterialComponents.Button.Icon"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="center"
-                        android:backgroundTint="@color/color_rojo"
-                        android:layout_marginLeft="10dp"
-                        android:elevation="4dp"
-                        android:insetLeft="0dp"
-                        android:insetTop="0dp"
-                        android:insetRight="0dp"
-                        android:insetBottom="0dp"
-                        android:padding="0dp"
-                        android:text=""
-                        app:cornerRadius="18dp"
-                        app:icon="@drawable/ic_favoritos"
-                        app:iconGravity="textStart"
-                        app:iconPadding="0dp"
-                        app:iconSize="15dp"
-                        app:iconTint="@android:color/white"
-                        app:strokeWidth="0dp" />
+                        <!-- Precio actual -->
+                        <TextView
+                            android:id="@+id/precioArticulo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="S/ 29.90"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold"/>
+
+                        <!-- Precio anterior tachado -->
+                        <TextView
+                            android:id="@+id/precioAnteriorArticulo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="S/ 39.90"
+                            android:textColor="@android:color/darker_gray"
+                            android:textSize="12sp"/>
+                    </LinearLayout>
+
+
+                    <!-- Contenedor de etiquetas -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginStart="12dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/etPromociones"
+                            style="@style/Widget.MaterialComponents.Button.Icon"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:backgroundTint="@color/color_verde"
+                            android:elevation="4dp"
+                            android:insetLeft="0dp"
+                            android:insetTop="0dp"
+                            android:insetRight="0dp"
+                            android:insetBottom="0dp"
+                            android:padding="0dp"
+                            android:text=""
+                            app:cornerRadius="18dp"
+                            app:icon="@drawable/ic_promociones"
+                            app:iconGravity="textStart"
+                            app:iconPadding="0dp"
+                            app:iconSize="15dp"
+                            app:iconTint="@android:color/white"
+                            app:strokeWidth="0dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/etFavoritos"
+                            style="@style/Widget.MaterialComponents.Button.Icon"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:backgroundTint="@color/color_rojo"
+                            android:layout_marginLeft="10dp"
+                            android:elevation="4dp"
+                            android:insetLeft="0dp"
+                            android:insetTop="0dp"
+                            android:insetRight="0dp"
+                            android:insetBottom="0dp"
+                            android:padding="0dp"
+                            android:text=""
+                            app:cornerRadius="18dp"
+                            app:icon="@drawable/ic_favoritos"
+                            app:iconGravity="textStart"
+                            app:iconPadding="0dp"
+                            app:iconSize="15dp"
+                            app:iconTint="@android:color/white"
+                            app:strokeWidth="0dp" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- Contenedor del botón -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp"
+                android:gravity="center">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAgregarCantidad"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:backgroundTint="@color/color_principal"
+                    android:elevation="4dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:insetLeft="0dp"
+                    android:insetRight="0dp"
+                    android:text=""
+                    app:cornerRadius="24dp"
+                    app:icon="@drawable/ic_carrito_compras_add"
+                    app:iconTint="@android:color/white"
+                    app:iconPadding="0dp"
+                    app:strokeWidth="0dp"
+                    style="@style/Widget.MaterialComponents.Button.Icon" />
+
+            </LinearLayout>
         </LinearLayout>
-
-
-        <!-- Contenedor del botón -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_marginStart="16dp"
-            android:gravity="center">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAgregarCantidad"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:backgroundTint="@color/color_principal"
-                android:elevation="4dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:insetLeft="0dp"
-                android:insetRight="0dp"
-                android:text=""
-                app:cornerRadius="24dp"
-                app:icon="@drawable/ic_carrito_compras_add"
-                app:iconTint="@android:color/white"
-                app:iconPadding="0dp"
-                app:strokeWidth="0dp"
-                style="@style/Widget.MaterialComponents.Button.Icon" />
-
-        </LinearLayout>
-    </LinearLayout>
+    </FrameLayout>
 </androidx.cardview.widget.CardView>

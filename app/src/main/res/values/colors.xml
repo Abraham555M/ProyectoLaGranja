@@ -12,6 +12,7 @@
     <color name="color_rojo">#EF5656</color>
     <color name="color_verde">#59C98E</color>
     <color name="color_blanco">#FFFFFF</color>
+    <color name="color_amarillo">#EBEB1D</color>
     <color name="color_secundario">#0A75C2</color>
     <color name="color_fondo">#F3F3F3</color>
 
@@ -19,10 +20,9 @@
     <color name="color_pendiente">#DAFFCF</color>
     <color name="color_despachado">#ECBDF0</color>
     <color name="color_entregado">#AEEDFF</color>
-    <color name="color_pagado">#FFFFA3</color>
+    <color name="color_pagado">#EBEB1D</color>
 
     <color name="darker_gray">#FFA9A9A9</color>
-
 
     <color name="mi_color_primario">#3F51B5</color>
     <color name="mi_color_oscuro">#303F9F</color>

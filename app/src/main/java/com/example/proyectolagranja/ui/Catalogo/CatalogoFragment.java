@@ -61,7 +61,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private List<Producto> listaProductos = new ArrayList<>();
     private Integer categoriaSeleccionada = null;
     private Integer productoSeleccionado = null;
-    private Button btnPromociones, btnFavoritos;
+    private Button btnOfertas, btnFavoritos;
     private boolean mostrandoPromociones = false, mostrandoFavoritos = false;
     private SessionManager session;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -76,7 +76,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         spCategorias = rootView.findViewById(R.id.sp_categorias);
         spProductos = rootView.findViewById(R.id.sp_productos);
         et_busqueda = rootView.findViewById(R.id.et_busqueda);
-        btnPromociones = rootView.findViewById(R.id.btnPromociones);
+        btnOfertas = rootView.findViewById(R.id.btnOfertas);
         btnFavoritos = rootView.findViewById(R.id.btnFavoritos);
 
         recyclerView = rootView.findViewById(R.id.recyclerViewComentarios);
@@ -97,7 +97,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         configurarSpinnerProductos(); // Configuracion productos
         configurarBusquedaPorNombre(); // Configuracion nombre
 
-        btnPromociones.setOnClickListener(this);
+        btnOfertas.setOnClickListener(this);
         btnFavoritos.setOnClickListener(this);
 
         return rootView;
@@ -163,7 +163,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                     // 👇 Si estaba en promociones, salir del modo promociones
                     if (mostrandoPromociones) {
                         mostrandoPromociones = false;
-                        btnPromociones.setBackgroundTintList(
+                        btnOfertas.setBackgroundTintList(
                                 ContextCompat.getColorStateList(getContext(), R.color.color_verde)
                         );
                     }
@@ -328,7 +328,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         // 🔹 Desactivar promociones si estaba activo
         if (mostrandoPromociones) {
             mostrandoPromociones = false;
-            btnPromociones.setBackgroundTintList(
+            btnOfertas.setBackgroundTintList(
                     ContextCompat.getColorStateList(getContext(), R.color.color_verde)
             );
         }
@@ -771,7 +771,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
 
     private  void listarPromociones(){
         int idCliente = session.getIdCliente();
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_promociones.php?id_cliente=" + idCliente;
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_ofertas.php?id_cliente=" + idCliente;
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new AsyncHttpResponseHandler() {
@@ -850,7 +850,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
 
                 // Resetear promociones
                 mostrandoPromociones = false;
-                btnPromociones.setBackgroundTintList(
+                btnOfertas.setBackgroundTintList(
                         ContextCompat.getColorStateList(getContext(), R.color.color_verde)
                 );
 
@@ -858,12 +858,12 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
             }
         }
 
-        if(view == btnPromociones){
+        if(view == btnOfertas){
             if (mostrandoPromociones) {
                 cargarArticulos(); // Lista completa
                 mostrandoPromociones = false;
 
-                btnPromociones.setBackgroundTintList(
+                btnOfertas.setBackgroundTintList(
                         ContextCompat.getColorStateList(getContext(), R.color.color_verde) // Cambiar de color al boton
                 );
             } else {
@@ -882,7 +882,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                 listarPromociones();
                 mostrandoPromociones = true;
 
-                btnPromociones.setBackgroundTintList(
+                btnOfertas.setBackgroundTintList(
                         ContextCompat.getColorStateList(getContext(), android.R.color.darker_gray)
                 );
 

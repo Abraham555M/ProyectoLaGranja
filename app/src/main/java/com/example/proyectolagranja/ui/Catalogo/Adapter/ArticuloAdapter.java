@@ -1,9 +1,11 @@
 package com.example.proyectolagranja.ui.Catalogo.Adapter;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -47,8 +49,18 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         // Mostrar Promociones
         if (articulo.getEsPromo() == 1) {
             holder.etPromociones.setVisibility(View.VISIBLE);
+            holder.labelOferta.setVisibility(View.VISIBLE);
+            holder.precioAnteriorArticulo.setVisibility(View.VISIBLE);
+
+            holder.precioAnteriorArticulo.setText("S/ " + articulo.getPrecio());
+            holder.precioAnteriorArticulo.setPaintFlags(
+                    holder.precioAnteriorArticulo.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
+            );
+
         } else {
             holder.etPromociones.setVisibility(View.GONE);
+            holder.labelOferta.setVisibility(View.GONE);
+            holder.precioAnteriorArticulo.setVisibility(View.GONE);
         }
 
         // Mostrar Favoritos
@@ -81,6 +93,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         ImageView imagen;
         TextView nombre, precio;
         MaterialButton btnAgregar, etPromociones, etFavoritos;
+        TextView labelOferta, precioAnteriorArticulo;
 
         public ArticuloViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,6 +103,8 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
             btnAgregar = itemView.findViewById(R.id.btnAgregarCantidad);
             etPromociones = itemView.findViewById(R.id.etPromociones);
             etFavoritos = itemView.findViewById(R.id.etFavoritos);
+            labelOferta = itemView.findViewById(R.id.labelOferta);
+            precioAnteriorArticulo = itemView.findViewById(R.id.precioAnteriorArticulo);
         }
     }
 }
