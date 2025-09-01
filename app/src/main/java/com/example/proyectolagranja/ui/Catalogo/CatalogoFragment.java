@@ -249,6 +249,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         JSONObject obj = response.getJSONObject(i);
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
+                        String codPresentacion = obj.getString("cod_presentacion");
                         String imagen = obj.getString("foto_articulo");
                         int esPromo = obj.optInt("est_promo_articulo", 0);
                         int esFavorito = obj.optInt("es_favorito", 0);
@@ -263,7 +264,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         }
 
                         // Usar el mismo constructor que en listarPromociones
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito));
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -361,6 +362,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
 
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
+                        String codPresentacion = obj.getString("cod_presentacion");
                         String imagen = obj.getString("foto_articulo");
                         int esPromo = obj.optInt("est_promo_articulo", 0);
                         int totalComprado = obj.optInt("total_comprado", 0);
@@ -375,7 +377,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         }
 
                         // Usar constructor extendido con favorito incluido
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito));
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -421,6 +423,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
 
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
+                        String codPresentacion = obj.getString("cod_presentacion");
                         String imagen = obj.getString("foto_articulo");
                         int esPromo = obj.optInt("est_promo_articulo", 0);
                         int esFavorito = obj.optInt("es_favorito", 0);
@@ -435,7 +438,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         }
 
                         // Agregar artículo con todos los campos
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito));
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -739,6 +742,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
+                        String codPresentacion = obj.getString("cod_presentacion");
                         String imagen = obj.getString("foto_articulo");
                         int esPromo = obj.optInt("est_promo_articulo", 0);
                         int esFavorito = obj.optInt("es_favorito", 0);
@@ -752,7 +756,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                             precio = obj.optString("prec_vent1_articulo", "0");
                         }
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito));
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
                     }
 
                     if (listaArticulos.isEmpty()) {
@@ -788,6 +792,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
+                        String codPresentacion = obj.getString("cod_presentacion");
                         String imagen = obj.getString("foto_articulo");
                         int esPromo = obj.optInt("est_promo_articulo", 0);
                         int totalComprado = obj.optInt("total_comprado", 0);
@@ -801,7 +806,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                             precio = obj.optString("prec_vent1_articulo", "0");
                         }
 
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, estFavorito));
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, estFavorito, codPresentacion));
                     }
 
                     if (listaArticulos.isEmpty()) {

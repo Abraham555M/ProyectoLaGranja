@@ -15,6 +15,7 @@ import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Clases.ArticuloDetalle;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ArticuloDetalleAdapter extends RecyclerView.Adapter<ArticuloDetalleAdapter.ViewHolder>{
     private Context context;
@@ -39,9 +40,10 @@ public class ArticuloDetalleAdapter extends RecyclerView.Adapter<ArticuloDetalle
         holder.nombre.setText(articulo.getNombre());
         String precioFormateado = String.format("%.2f", articulo.getPrecio());
         String subTotalFormateado = String.format("%.2f", articulo.getSubTotal());
+        String cantidadFormateada = String.format(Locale.US, "%.3f", (double) articulo.getCantidad());
 
         holder.precio.setText("S/. " + precioFormateado);
-        holder.cantidad.setText("Cantidad: " + articulo.getCantidad());
+        holder.cantidad.setText("Cantidad: " + cantidadFormateada);
         holder.subTotal.setText("SubTotal: S/. " + subTotalFormateado);
 
         // Cargar imagen con Glide

@@ -46,7 +46,8 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
 
         holder.nombreArticulo.setText(item.getArticulo().getNombre());
         holder.precioArticulo.setText("Precio: S/" + item.getArticulo().getPrecio());
-        holder.cantidadArticulo.setText("Cantidad: " + item.getCantidad());
+        String cantidadFormateada = String.format(Locale.US, "%.3f", (double) item.getCantidad());
+        holder.cantidadArticulo.setText("Cantidad: " + cantidadFormateada);
 
         double precio = Double.parseDouble(item.getArticulo().getPrecio());
         double subtotal = precio * item.getCantidad();
