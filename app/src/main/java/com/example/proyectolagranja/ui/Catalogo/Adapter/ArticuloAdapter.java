@@ -2,6 +2,9 @@ package com.example.proyectolagranja.ui.Catalogo.Adapter;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,14 +46,25 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
     @Override
     public void onBindViewHolder(@NonNull ArticuloAdapter.ArticuloViewHolder holder, int position) {
         Articulo articulo = listaArticulos.get(position);
-        holder.nombre.setText(articulo.getNombre());
+
+        String nombre = articulo.getNombre();
+        String codPresentacion = articulo.getCodPresensacion();
+
+        // Crear SpannableString: nombre normal + cod_presentacion subrayado
+        SpannableString textoSpannable = new SpannableString(nombre + " " + codPresentacion);
+        int start = nombre.length() + 1; // +1 por el espacio
+        int end = start + codPresentacion.length();
+        textoSpannable.setSpan(new UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        holder.nombre.setText(textoSpannable);
         holder.precio.setText("S/ " + articulo.getPrecio());
 
         // Mostrar Promociones
         if (articulo.getEsPromo() == 1) {
             holder.etPromociones.setVisibility(View.VISIBLE);
             holder.labelOferta.setVisibility(View.VISIBLE);
-            holder.precioAnteriorArticulo.setVisibility(View.VISIBLE);
+            holder.labelOferta.setVisibility(View.VISIBLE);
+            holder.tvMensajeKg.setVisibility(View.VISIBLE);
 
             holder.precioAnteriorArticulo.setText("S/ " + articulo.getPrecio());
             holder.precioAnteriorArticulo.setPaintFlags(
@@ -60,7 +74,8 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         } else {
             holder.etPromociones.setVisibility(View.GONE);
             holder.labelOferta.setVisibility(View.GONE);
-            holder.precioAnteriorArticulo.setVisibility(View.GONE);
+            holder.labelOferta.setVisibility(View.GONE);
+            holder.tvMensajeKg.setVisibility(View.GONE);
         }
 
         // Mostrar Favoritos
@@ -93,7 +108,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         ImageView imagen;
         TextView nombre, precio;
         MaterialButton btnAgregar, etPromociones, etFavoritos;
-        TextView labelOferta, precioAnteriorArticulo;
+        TextView labelOferta, precioAnteriorArticulo, tvMensajeKg;
 
         public ArticuloViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -105,6 +120,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
             etFavoritos = itemView.findViewById(R.id.etFavoritos);
             labelOferta = itemView.findViewById(R.id.labelOferta);
             precioAnteriorArticulo = itemView.findViewById(R.id.precioAnteriorArticulo);
+            tvMensajeKg = itemView.findViewById(R.id.tvMensajeKg);
         }
     }
 }

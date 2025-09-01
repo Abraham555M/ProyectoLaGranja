@@ -17,10 +17,6 @@
         android:paddingBottom="8dp"
         android:paddingTop="8dp">
 
-        <!-- Zona Izquierda: botones -->
-
-        <!-- Zona Central: nombre y precio -->
-
         <LinearLayout
             android:id="@+id/contenedorIzquierdo"
             android:layout_width="wrap_content"
@@ -114,6 +110,18 @@
                 android:paddingVertical="4dp"
                 android:layout_marginTop="10dp"
                 android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tvOfertaValida"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Oferta válida hasta agotar stock"
+                android:textSize="12sp"
+                android:textStyle="italic"
+                android:textColor="@color/color_rojo"
+                android:layout_marginTop="6dp"
+                android:gravity="center"/>
+
         </LinearLayout>
 
         <!-- Zona Derecha: botón cerrar -->

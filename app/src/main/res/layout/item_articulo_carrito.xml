@@ -42,7 +42,7 @@
                 android:padding="3dp"
                 android:paddingLeft="4dp"
                 android:text="OFERTA"
-                android:textColor="@color/black"
+                android:textColor="@color/color_rojo"
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:elevation="8dp" />

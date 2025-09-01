@@ -479,6 +479,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         String id = obj.getString("id_articulo");
                         String nombre = obj.getString("nom_articulo");
+                        String codPresentacion = obj.optString("cod_presentacion", "");
                         String imagen = obj.getString("foto_articulo");
                         int esPromo = obj.optInt("est_promo_articulo", 0);
                         int totalComprado = obj.optInt("total_comprado", 0);
@@ -491,8 +492,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         } else {
                             precio = obj.optString("prec_vent1_articulo", "0");
                         }
-
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito));
+                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -615,6 +615,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         MaterialButton etPromociones = dialogView.findViewById(R.id.etPromociones);
         MaterialButton etFavoritos = dialogView.findViewById(R.id.etFavoritos);
         LinearLayout contenedorIzquierdo = dialogView.findViewById(R.id.contenedorIzquierdo);
+        TextView tvOfertaValida = dialogView.findViewById(R.id.tvOfertaValida);
 
         // Botón Restar
         btnRestar.setOnClickListener(v -> {
@@ -643,8 +644,10 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         // Mostrar o ocultar el etPromociones
         if (articulo.getEsPromo() == 1) {
             etPromociones.setVisibility(View.VISIBLE);
+            tvOfertaValida.setVisibility(View.VISIBLE);
         } else {
             etPromociones.setVisibility(View.GONE);
+            tvOfertaValida.setVisibility(View.GONE);
 
             contenedorIzquierdo.removeView(etFavoritos);
             contenedorIzquierdo.addView(etFavoritos, 0);

@@ -48,12 +48,11 @@
                     android:padding="3dp"
                     android:paddingLeft="4dp"
                     android:text="OFERTA"
-                    android:textColor="@color/black"
+                    android:textColor="@color/color_rojo"
                     android:textSize="10sp"
                     android:textStyle="bold"
                     android:elevation="8dp" />
             </FrameLayout>
-
 
             <!-- Nombre, precio y etiquetas -->
             <LinearLayout
@@ -104,7 +103,6 @@
                             android:textColor="@android:color/darker_gray"
                             android:textSize="12sp"/>
                     </LinearLayout>
-
 
                     <!-- Contenedor de etiquetas -->
                     <LinearLayout
@@ -160,6 +158,15 @@
                             app:strokeWidth="0dp" />
                     </LinearLayout>
                 </LinearLayout>
+                <TextView
+                    android:id="@+id/tvMensajeKg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="A partir de 1 kg"
+                    android:textColor="@color/darker_gray"
+                    android:textSize="12sp"
+                    android:textStyle="italic"
+                    android:layout_marginTop="4dp"/>
             </LinearLayout>
 
             <!-- Contenedor del botón -->

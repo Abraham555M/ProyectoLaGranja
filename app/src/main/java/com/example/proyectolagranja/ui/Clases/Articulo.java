@@ -8,22 +8,8 @@ public class Articulo {
     private int esPromo;
     private int totalComprado;
     private int esFavorito;
+    private String codPresensacion;
 
-    public Articulo(String id, String nombre, String precio, String imagen) {
-        this.id = id;
-        this.nombre = nombre;
-        this.precio = precio;
-        this.imagen = imagen;
-    }
-
-    public Articulo(String id, String nombre, String precio, String imagen, int esPromo, int totalComprado) {
-        this.id = id;
-        this.nombre = nombre;
-        this.precio = precio;
-        this.imagen = imagen;
-        this.esPromo = esPromo;
-        this.totalComprado = totalComprado;
-    }
     public Articulo(String id, String nombre, String precio, String imagen, int esPromo, int totalComprado, int esFavorito) {
         this.id = id;
         this.nombre = nombre;
@@ -32,6 +18,16 @@ public class Articulo {
         this.esPromo = esPromo;
         this.totalComprado = totalComprado;
         this.esFavorito = esFavorito;
+    }
+    public Articulo(String id, String nombre, String precio, String imagen, int esPromo, int totalComprado, int esFavorito, String codPresensacion) {
+        this.id = id;
+        this.nombre = nombre;
+        this.precio = precio;
+        this.imagen = imagen;
+        this.esPromo = esPromo;
+        this.totalComprado = totalComprado;
+        this.esFavorito = esFavorito;
+        this.codPresensacion = codPresensacion;
     }
 
     public String getId() { return id; }
@@ -43,5 +39,13 @@ public class Articulo {
 
     public int getEsFavorito() {
         return esFavorito;
+    }
+
+    public String getCodPresensacion() {
+        return codPresensacion;
+    }
+
+    public void setCodPresensacion(String codPresensacion) {
+        this.codPresensacion = codPresensacion;
     }
 }
