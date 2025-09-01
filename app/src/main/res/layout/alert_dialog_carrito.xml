@@ -99,97 +99,110 @@
             android:layout_marginTop="16dp">
 
             <!-- Detalle de venta -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Detalle de mi venta"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
+            <!-- Detalle de venta -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilDetalleVenta"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxStrokeColor="@color/color_verde">
+                android:layout_marginTop="12dp"
+                android:hint="Detalle de mi compra"
+                app:boxBackgroundColor="@color/white"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                android:textCursorDrawable="@drawable/cursor_color"
+                app:boxStrokeColor="@color/color_principal"
+                app:hintTextColor="@color/color_principal">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDetalleVenta"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="top|start"
-                    android:inputType="textMultiLine"
-                    android:minLines="3"
                     android:textColor="@color/black"
-                    android:textSize="12sp" />
+                    android:inputType="textMultiLine"
+                    android:gravity="top|start"
+                    android:minLines="3"
+                    android:maxLines="6"
+                    android:scrollbars="vertical" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Dirección -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Dirección de entrega"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
 
+            <!-- Dirección -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilDireccion"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxStrokeColor="@color/color_verde">
+                android:layout_marginTop="12dp"
+                android:hint="Ingrese su dirección"
+                app:boxBackgroundColor="@color/white"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                android:textCursorDrawable="@drawable/cursor_color"
+                app:boxStrokeColor="@color/color_principal"
+                app:hintTextColor="@color/color_principal">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDireccion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPostalAddress"
                     android:textColor="@color/black"
-                    android:textSize="14sp" />
+                    android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Medio de pago -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Medio de Pago"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
-            <Spinner
-                android:id="@+id/spMedioPago"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="Paga con"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="14sp" />
-
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilMedioPago"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:boxStrokeColor="@color/color_verde">
+                android:hint="Medio de Pago"
+                app:boxBackgroundColor="@color/white"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                android:textCursorDrawable="@drawable/cursor_color"
+                app:boxStrokeColor="@color/color_principal"
+                app:hintTextColor="@color/color_principal">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/EfectivoVenta"
+                <Spinner
+                    android:id="@+id/spMedioPago"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Referencia de pago"
-                    android:inputType="text"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
+                    android:padding="12dp"
+                    android:backgroundTint="@android:color/transparent" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <!-- EditText adaptado al estilo de tu modelo -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilReferenciaPago"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Paga con"
+                app:boxBackgroundColor="@color/white"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                android:textCursorDrawable="@drawable/cursor_color"
+                app:boxStrokeColor="@color/color_principal"
+                app:hintTextColor="@color/color_principal">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etReferenciaPago"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:textColor="@color/black"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout

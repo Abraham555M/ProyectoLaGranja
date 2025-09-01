@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectolagranja.databinding.ActivityMainBinding;
+import com.google.android.material.textfield.TextInputLayout;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner spMedioPago;
     private Button btnCerrar, btnEnviarPedido;
     private TextView tvBadge;
-    private EditText etDireccion, etDetalleVenta;
+    private EditText etDireccion, etDetalleVenta, etReferenciaPago;
     public static List<ItemCarrito> carrito = new ArrayList<>();
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
@@ -228,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
         btnEnviarPedido = dialogView.findViewById(R.id.btnEnviarPedido);
         etDireccion = dialogView.findViewById(R.id.etDireccion);
         etDetalleVenta = dialogView.findViewById(R.id.etDetalleVenta);
+        etReferenciaPago = dialogView.findViewById(R.id.etReferenciaPago);
 
         // RecyclerView para mostrar el carrito ---
         RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerView);
@@ -238,6 +241,9 @@ public class MainActivity extends AppCompatActivity {
         TextView tvTotal = dialogView.findViewById(R.id.tvTotal);
         LinearLayout layoutDetallesCarrito = dialogView.findViewById(R.id.layoutDetallesCarrito);
         MaterialButton btnAgregarCarrito = dialogView.findViewById(R.id.btnAgregarCarrito);
+
+        TextInputLayout tilReferenciaPago = dialogView.findViewById(R.id.tilReferenciaPago);
+        tilReferenciaPago.setVisibility(View.GONE);
 
         cargarDireccionCliente(etDireccion);
 
@@ -279,6 +285,27 @@ public class MainActivity extends AppCompatActivity {
                     }
             ));
         }
+        cargarMedioPago();
+
+        spMedioPago.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // obtienes el MedioPago seleccionado de tu lista
+                MedioPago medioSeleccionado = listaMedioPago.get(position);
+
+                if ("EFECTIVO".equalsIgnoreCase(medioSeleccionado.getNom_pago_medio())) {
+                    tilReferenciaPago.setVisibility(View.VISIBLE);
+                } else {
+                    tilReferenciaPago.setVisibility(View.GONE);
+                    etReferenciaPago.setText("");
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                tilReferenciaPago.setVisibility(View.GONE);
+            }
+        });
 
         // Crear el AlertDialog
         androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this)
@@ -307,15 +334,37 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
+            double montoEntregado = 0;
+            // Validación: si es EFECTIVO, comprobar referencia
+            MedioPago medioSeleccionado = listaMedioPago.get(spMedioPago.getSelectedItemPosition());
+            if ("EFECTIVO".equalsIgnoreCase(medioSeleccionado.getNom_pago_medio())) {
+                String refText = etReferenciaPago.getText().toString().trim();
+                if (refText.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Ingrese el monto entregado", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                try {
+                    montoEntregado = Double.parseDouble(refText);
+                    if (montoEntregado < total) {
+                        Toast.makeText(MainActivity.this, "El monto entregado no puede ser menor al total (" + total + ")", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    Toast.makeText(MainActivity.this, "Ingrese un monto válido", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
             mostrarDialogoConfirmacion(
                     total,
+                    montoEntregado,
                     etDireccion.getText().toString().trim(),
                     etDetalleVenta.getText().toString().trim(),
                     dialog
             );
         });
 
-        cargarMedioPago();
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
@@ -324,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
         return String.format(Locale.US, "%.2f", v); // redondea a 2 decimales
     }
 
-    public void EnviarPedido(double total, String direccion, String detalle_venta, androidx.appcompat.app.AlertDialog dialog){
+    public void EnviarPedido(double total, double montoEntregado, String direccion, String detalle_venta, androidx.appcompat.app.AlertDialog dialog){
         int idCliente = session.getIdCliente(); // Suplanta al SharePreference -> obtiene el id del cliente
         int idMedioPago = listaMedioPago.get(spMedioPago.getSelectedItemPosition()).getId_pago_medio();
 
@@ -332,6 +381,7 @@ public class MainActivity extends AppCompatActivity {
         RequestParams params = new RequestParams();
         params.put("id_cliente", idCliente);
         params.put("id_pago_medio", idMedioPago);
+        params.put("efec_venta", montoEntregado);
         params.put("tot_venta", total);
         params.put("dir_cliente", direccion);
         params.put("det_venta", detalle_venta);
@@ -401,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void mostrarDialogoConfirmacion(double total, String direccion, String detalle, androidx.appcompat.app.AlertDialog dialogCarrito) {
+    private void mostrarDialogoConfirmacion(double total, double montoEntregado, String direccion, String detalle, androidx.appcompat.app.AlertDialog dialogCarrito) {
         // Inflar el layout personalizado
         View view = getLayoutInflater().inflate(R.layout.alert_dialog_confirmar_pedido, null);
 
@@ -419,6 +469,7 @@ public class MainActivity extends AppCompatActivity {
         btnSi.setOnClickListener(v -> {
             EnviarPedido(
                     Double.parseDouble(redondearTotal(total)),
+                    montoEntregado,
                     direccion,
                     detalle,
                     dialogCarrito
@@ -432,7 +483,6 @@ public class MainActivity extends AppCompatActivity {
         dialogConfirmacion.show();
         dialogConfirmacion.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
-
 
     private void mostrarDialogPedidoRealizado() {
         LayoutInflater inflater = getLayoutInflater();
