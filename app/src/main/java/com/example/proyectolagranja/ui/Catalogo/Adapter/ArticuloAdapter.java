@@ -76,6 +76,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
             holder.labelOferta.setVisibility(View.GONE);
             holder.labelOferta.setVisibility(View.GONE);
             holder.tvMensajeKg.setVisibility(View.GONE);
+            holder.precioAnteriorArticulo.setVisibility(View.GONE);
         }
 
         // Mostrar Favoritos
