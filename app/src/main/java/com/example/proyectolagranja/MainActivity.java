@@ -325,6 +325,10 @@ public class MainActivity extends AppCompatActivity {
                 total += precio * item.getCantidad();
             }
 
+            if (total < 15) {
+                Toast.makeText(MainActivity.this, "El monto mínimo del pedido es S/15", Toast.LENGTH_LONG).show();
+                return;
+            }
             if (spMedioPago.getSelectedItemPosition() == 0) {
                 Toast.makeText(MainActivity.this, "Seleccione un medio de pago", Toast.LENGTH_SHORT).show();
                 return;

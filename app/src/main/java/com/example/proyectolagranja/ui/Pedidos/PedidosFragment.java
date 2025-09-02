@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -100,6 +102,67 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onNothingSelected(AdapterView<?> parent) { }
         });
+
+        //********
+        String[] estados = getResources().getStringArray(R.array.listado_estado);
+
+        ArrayAdapter<String> adapterSpinner = new ArrayAdapter<String>(
+                requireContext(),
+                R.layout.item_spinner_estado, // layout personalizado
+                estados
+        ) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                setColorFondo(position, view);
+                return view;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                setColorFondo(position, view);
+                return view;
+            }
+
+            private void setColorFondo(int position, View view) {
+                int color;
+                switch (getItem(position)) {
+                    case "Anulado":
+                        color = ContextCompat.getColor(requireContext(), R.color.color_cancelar);
+                        break;
+                    case "Pendiente":
+                        color = ContextCompat.getColor(requireContext(), R.color.color_pendiente);
+                        break;
+                    case "Despachado":
+                        color = ContextCompat.getColor(requireContext(), R.color.color_despachado);
+                        break;
+                    case "Entregado":
+                        color = ContextCompat.getColor(requireContext(), R.color.color_entregado);
+                        break;
+                    case "Pagado":
+                        color = ContextCompat.getColor(requireContext(), R.color.darker_gray);
+                        break;
+                    default: // "Todos" u otros
+                        color = ContextCompat.getColor(requireContext(), android.R.color.white);
+                        break;
+                }
+
+                // Fondo del item
+                view.setBackgroundColor(color);
+
+                // Texto siempre en negro para que sea legible
+                TextView tv = view.findViewById(R.id.tvEstado);
+                if (tv != null) {
+                    tv.setTextColor(Color.BLACK);
+                }
+            }
+        };
+
+        spEstado.setAdapter(adapterSpinner);
+    //********
+
+
 
         // Inicializamos adapter vacío
         adapter = new PedidosAdapter(getContext(), listaVenta);

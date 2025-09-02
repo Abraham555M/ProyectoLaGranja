@@ -23,9 +23,9 @@
             android:id="@+id/sp_estado"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="3dp"
-            android:entries="@array/listado_estado"
-            android:padding="16dp" />
+
+            android:padding="12dp"
+            android:spinnerMode="dropdown"/>
     </androidx.cardview.widget.CardView>
 
     <!-- CardView para los Filtros de Fechas -->
