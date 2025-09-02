@@ -72,6 +72,7 @@
     </androidx.cardview.widget.CardView>
 
     <!-- RecyclerView para mostrar los pedidos -->
+    <!-- Botón debajo del RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewPedidos"
         android:layout_width="0dp"
@@ -84,7 +85,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardview_fechas"
         tools:listitem="@layout/item_pedido" />
-    <!-- Botón debajo del RecyclerView -->
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnNuevoPedido"
         android:layout_width="0dp"
