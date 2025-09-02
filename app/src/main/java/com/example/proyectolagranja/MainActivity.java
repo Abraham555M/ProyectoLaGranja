@@ -229,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
         btnCerrar = dialogView.findViewById(R.id.btnCerrar);
         btnEnviarPedido = dialogView.findViewById(R.id.btnEnviarPedido);
         etDireccion = dialogView.findViewById(R.id.etDireccion);
-        etDetalleVenta = dialogView.findViewById(R.id.etDetalleVenta);
         etReferenciaPago = dialogView.findViewById(R.id.etReferenciaPago);
 
         // RecyclerView para mostrar el carrito ---
@@ -237,7 +236,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
 
         TextView tvEmptyMessage = dialogView.findViewById(R.id.tvEmptyMessage);
-        EditText etDireccion = dialogView.findViewById(R.id.etDireccion);
         TextView tvTotal = dialogView.findViewById(R.id.tvTotal);
         LinearLayout layoutDetallesCarrito = dialogView.findViewById(R.id.layoutDetallesCarrito);
         MaterialButton btnAgregarCarrito = dialogView.findViewById(R.id.btnAgregarCarrito);
@@ -360,11 +358,25 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            StringBuilder detallesArticulos = new StringBuilder();
+            for (int i = 0; i < carrito.size(); i++) {
+                ItemCarrito item = carrito.get(i);
+
+                if (item.getDetalle() != null && !item.getDetalle().trim().isEmpty()) {
+                    detallesArticulos.append(item.getDetalle());
+                }
+
+                // Solo agregamos el separador "|" si no es el último elemento
+                if (i < carrito.size() - 1) {
+                    detallesArticulos.append(" | ");
+                }
+            }
+
             mostrarDialogoConfirmacion(
                     total,
                     montoEntregado,
                     etDireccion.getText().toString().trim(),
-                    etDetalleVenta.getText().toString().trim(),
+                    detallesArticulos.toString(),
                     dialog
             );
         });

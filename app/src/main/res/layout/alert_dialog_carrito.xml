@@ -70,12 +70,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:drawableTop="@drawable/ic_carrito_compras"
+            android:drawablePadding="8dp"
             android:gravity="center"
             android:text="No hay productos en el carrito"
             android:textColor="@color/black"
             android:textSize="14sp"
-            android:drawableTop="@drawable/ic_carrito_compras"
-            android:drawablePadding="8dp"
             android:visibility="gone" />
 
         <com.google.android.material.button.MaterialButton
@@ -95,37 +95,8 @@
             android:id="@+id/layoutDetallesCarrito"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp">
-
-            <!-- Detalle de venta -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilDetalleVenta"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="Detalle de mi compra"
-                app:boxBackgroundColor="@color/white"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                android:textCursorDrawable="@drawable/cursor_color"
-                app:boxStrokeColor="@color/color_principal"
-                app:hintTextColor="@color/color_principal">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etDetalleVenta"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:inputType="textMultiLine"
-                    android:gravity="top|start"
-                    android:minLines="3"
-                    android:maxLines="6"
-                    android:scrollbars="vertical" />
-            </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginTop="16dp"
+            android:orientation="vertical">
 
             <!-- Dirección -->
             <com.google.android.material.textfield.TextInputLayout
@@ -135,21 +106,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="Ingrese su dirección"
+                android:textCursorDrawable="@drawable/cursor_color"
                 app:boxBackgroundColor="@color/white"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                android:textCursorDrawable="@drawable/cursor_color"
-                app:boxStrokeColor="@color/color_principal"
-                app:hintTextColor="@color/color_principal">
+                app:boxStrokeColor="@color/darker_gray"
+                app:hintTextColor="@color/darker_gray">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDireccion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:textColor="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Medio de pago -->
@@ -160,12 +131,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="Medio de Pago"
+                android:textCursorDrawable="@drawable/cursor_color"
                 app:boxBackgroundColor="@color/white"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                android:textCursorDrawable="@drawable/cursor_color"
                 app:boxStrokeColor="@color/color_principal"
                 app:hintTextColor="@color/color_principal">
 
@@ -173,8 +144,8 @@
                     android:id="@+id/spMedioPago"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="12dp"
-                    android:backgroundTint="@android:color/transparent" />
+                    android:backgroundTint="@android:color/transparent"
+                    android:padding="12dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -186,12 +157,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="Paga con"
+                android:textCursorDrawable="@drawable/cursor_color"
                 app:boxBackgroundColor="@color/white"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                android:textCursorDrawable="@drawable/cursor_color"
                 app:boxStrokeColor="@color/color_principal"
                 app:hintTextColor="@color/color_principal">
 
@@ -200,23 +171,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_marginTop="16dp"
                 android:gravity="center_horizontal"
-                android:layout_marginTop="16dp">
+                android:orientation="vertical">
+
                 <TextView
                     android:id="@+id/tvTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total: S/ 0.00"
-                    android:textStyle="bold"
+                    android:textColor="@color/black"
                     android:textSize="18sp"
-                    android:textColor="@color/black" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvMensajeTotal"
@@ -224,8 +196,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:text="(Monto referencial, puede variar según el peso y cantidad)"
-                    android:textSize="12sp"
-                    android:textColor="@color/cardview_dark_background" />
+                    android:textColor="@color/cardview_dark_background"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <!-- Botón enviar -->
@@ -234,11 +206,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:backgroundTint="@color/color_verde"
                 android:text="Enviar Pedido"
+                android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:backgroundTint="@color/color_verde"
                 app:cornerRadius="28dp" />
         </LinearLayout>
 

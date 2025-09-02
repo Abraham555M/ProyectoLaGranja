@@ -1,6 +1,8 @@
 package com.example.proyectolagranja.ui.Catalogo.Adapter;
 
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import com.bumptech.glide.Glide;
 import com.example.proyectolagranja.MainActivity;
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +43,11 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         return new ViewHolder(view);
     }
 
+    public abstract class SimpleTextWatcher implements TextWatcher {
+        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+        @Override public void afterTextChanged(Editable s) {}
+    }
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ItemCarrito item = lista.get(position);
@@ -60,16 +68,37 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(holder.imgArticulo);
 
+        //*********
+
+        // IMPORTANTE: limpiar TextWatcher previo antes de asignar
+        holder.etDetalleArticulo.removeTextChangedListener(holder.textWatcher);
+
+        // Rellenar si ya tenía valor
+        holder.etDetalleArticulo.setText(item.getDetalle());
+        // Crear nuevo watcher
+        holder.textWatcher = new SimpleTextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                item.setDetalle(s.toString()); // Guardar en modelo
+            }
+        };
+        holder.etDetalleArticulo.addTextChangedListener(holder.textWatcher);
+
+        //*********
         // Botón para eliminar artículo del carrito
         holder.btnEliminarArticulo.setOnClickListener(v -> {
-            MainActivity.carrito.remove(position);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, lista.size());
+            int pos = holder.getAdapterPosition();
+            if (pos != RecyclerView.NO_POSITION) {
+                MainActivity.carrito.remove(pos);
+                notifyItemRemoved(pos);
+                notifyItemRangeChanged(pos, lista.size());
 
-            if (listener != null) {
-                listener.onCarritoChange(calcularTotal());
+                if (listener != null) {
+                    listener.onCarritoChange(calcularTotal());
+                }
             }
         });
+
     }
 
     public interface OnCarritoChangeListener {
@@ -94,6 +123,8 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         ImageView imgArticulo;
         TextView nombreArticulo, precioArticulo, cantidadArticulo, subTotalArticulo;
         View btnEliminarArticulo;
+        TextInputEditText etDetalleArticulo;
+        TextWatcher textWatcher;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -103,7 +134,7 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
             cantidadArticulo = itemView.findViewById(R.id.cantidadArticulo);
             subTotalArticulo = itemView.findViewById(R.id.subTotalArticulo);
             btnEliminarArticulo = itemView.findViewById(R.id.btnEliminarArticulo);
-
+            etDetalleArticulo = itemView.findViewById(R.id.etDetalleArticulo);
         }
     }
 }
