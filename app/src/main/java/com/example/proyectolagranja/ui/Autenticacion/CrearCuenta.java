@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.example.proyectolagranja.ui.Servicios.SessionManager;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -54,53 +55,64 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
         String num_doc_cliente = etDocumento.getText().toString();
         String dir_cliente = etDireccion.getText().toString();
 
-        RequestParams params = new RequestParams();
-        params.put("nom_cliente", nom_cliente);
-        params.put("num_doc_cliente", num_doc_cliente);
-        params.put("dir_cliente", dir_cliente);
-        params.put("tel_cliente", telefono);
-
-        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_crear.php";
-        AsyncHttpClient client = new AsyncHttpClient();
-
-        client.post(url, params, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    String response = new String(responseBody);
-                    JSONObject json = new JSONObject(response);
-
-                    if (json.getBoolean("success")) {
-                        Toast.makeText(getActivity(), "Cliente creado correctamente", Toast.LENGTH_SHORT).show();
-
-                        // ✅ Guardar sesión automáticamente
-                        int idCliente = json.getInt("id_cliente"); // tu PHP debe devolverlo
-                        SessionManager session = new SessionManager(requireContext());
-                        session.createLoginSession(idCliente, nom_cliente, telefono);
-
-                        LimpiarCampos();
-
-                        // Ir al catálogo
-                        NavController navController = Navigation.findNavController(
-                                getActivity(),
-                                R.id.nav_host_fragment_content_main
-                        );
-                        navController.navigate(R.id.action_nav_crear_cuenta_to_nav_catalogo);
-
-                    } else {
-                        Toast.makeText(getActivity(), "Error al crear el cliente", Toast.LENGTH_SHORT).show();
+        // Obtener el token de Firebase antes de enviar
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("FCM_TOKEN", "Fetching FCM registration token failed", task.getException());
+                        Toast.makeText(getActivity(), "No se pudo obtener token de notificación", Toast.LENGTH_SHORT).show();
+                        return;
                     }
-                } catch (Exception e) {
-                    Log.e("JSON_ERROR", "Error parseando respuesta", e);
-                    Toast.makeText(getActivity(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
-                }
-            }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getActivity(), "Error en la conexión", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    String fcmToken = task.getResult(); // ✅ token del dispositivo
+
+                    RequestParams params = new RequestParams();
+                    params.put("nom_cliente", nom_cliente);
+                    params.put("num_doc_cliente", num_doc_cliente);
+                    params.put("dir_cliente", dir_cliente);
+                    params.put("tel_cliente", telefono);
+                    params.put("tok_fcm_cliente", fcmToken); // 👈 lo mandas al backend
+
+                    String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_crear.php";
+                    AsyncHttpClient client = new AsyncHttpClient();
+
+                    client.post(url, params, new AsyncHttpResponseHandler() {
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                            try {
+                                String response = new String(responseBody);
+                                JSONObject json = new JSONObject(response);
+
+                                if (json.getBoolean("success")) {
+                                    Toast.makeText(getActivity(), "Cliente creado correctamente", Toast.LENGTH_SHORT).show();
+
+                                    int idCliente = json.getInt("id_cliente"); // tu PHP debe devolverlo
+                                    SessionManager session = new SessionManager(requireContext());
+                                    session.createLoginSession(idCliente, nom_cliente, telefono);
+
+                                    LimpiarCampos();
+
+                                    NavController navController = Navigation.findNavController(
+                                            getActivity(),
+                                            R.id.nav_host_fragment_content_main
+                                    );
+                                    navController.navigate(R.id.action_nav_crear_cuenta_to_nav_catalogo);
+
+                                } else {
+                                    Toast.makeText(getActivity(), "Error al crear el cliente", Toast.LENGTH_SHORT).show();
+                                }
+                            } catch (Exception e) {
+                                Log.e("JSON_ERROR", "Error parseando respuesta", e);
+                                Toast.makeText(getActivity(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                            Toast.makeText(getActivity(), "Error en la conexión", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
     }
 
     public void LimpiarCampos() {
