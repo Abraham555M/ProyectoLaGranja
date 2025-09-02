@@ -128,7 +128,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
             private void setColorFondo(int position, View view) {
                 int color;
                 switch (getItem(position)) {
-                    case "Anulado":
+                    case "Cancelado":
                         color = ContextCompat.getColor(requireContext(), R.color.color_cancelar);
                         break;
                     case "Pendiente":
