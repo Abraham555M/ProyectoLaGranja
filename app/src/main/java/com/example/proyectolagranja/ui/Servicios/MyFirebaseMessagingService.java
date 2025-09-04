@@ -31,13 +31,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             String body = remoteMessage.getNotification().getBody();
             showNotification(title, body);
         }
-
-        if (remoteMessage.getData().size() > 0) {
-            // Si envías datos personalizados desde PHP
-            String estado = remoteMessage.getData().get("estado");
-            String pedido = remoteMessage.getData().get("pedido");
-            showNotification("Pedido " + pedido, "Nuevo estado: " + estado);
-        }
     }
 
     private void showNotification(String title, String message) {
