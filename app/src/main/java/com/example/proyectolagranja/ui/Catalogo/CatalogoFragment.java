@@ -55,7 +55,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private Spinner spCategorias, spProductos;
     private RecyclerView recyclerView;
     private ArticuloAdapter adapter;
-    private EditText et_busqueda;
+    private EditText etBusqueda;
     private List<Articulo> listaArticulos = new ArrayList<>();
     private List<Categoria> listaCategorias = new ArrayList<>();
     private List<Producto> listaProductos = new ArrayList<>();
@@ -73,9 +73,9 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         //  Inicializas SessionManager aquí
         session = new SessionManager(requireContext());
 
-        spCategorias = rootView.findViewById(R.id.sp_categorias);
-        spProductos = rootView.findViewById(R.id.sp_productos);
-        et_busqueda = rootView.findViewById(R.id.et_busqueda);
+        spCategorias = rootView.findViewById(R.id.spCategorias);
+        spProductos = rootView.findViewById(R.id.spProductos);
+        etBusqueda = rootView.findViewById(R.id.etBusqueda);
         btnOfertas = rootView.findViewById(R.id.btnOfertas);
         btnFavoritos = rootView.findViewById(R.id.btnFavoritos);
 
@@ -104,26 +104,26 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     }
 
     private void recargarCatalogo() {
-        // 👉 Limpiar filtros seleccionados
+        // Limpiar filtros seleccionados
         categoriaSeleccionada = null;
         productoSeleccionado = null;
 
-        // 👉 Recargar artículos (ahora sin filtros aplicados)
+        // Recargar artículos (Sin filtros aplicados)
         cargarArticulos();
         resetFiltrosPromocionesYFavoritos();
 
-        // 🔹 Resetear Spinners correctamente
-        spCategorias.setOnItemSelectedListener(null); // desvincular listener temporal
+        // Resetear Spinners correctamente
+        spCategorias.setOnItemSelectedListener(null); // Desvincular listener temporal
         spCategorias.setSelection(0);
-        spCategorias.post(() -> configurarSpinnerCategorias()); // volver a poner listener después
+        spCategorias.post(() -> configurarSpinnerCategorias()); // Volver a poner listener después
 
-        spProductos.setOnItemSelectedListener(null); // desvincular temporal
-        cargarProductos(false); // recargar todos los productos
+        spProductos.setOnItemSelectedListener(null); // Desvincular temporal
+        cargarProductos(false); // Recargar todos los productos
         spProductos.setSelection(0);
         spProductos.post(() -> configurarSpinnerProductos());
 
         // Limpiar campo de búsqueda
-        et_busqueda.setText("");
+        etBusqueda.setText("");
 
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -137,9 +137,9 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                     categoriaSeleccionada = seleccionada.getId_categoria();
 
                     filtrarArticulosPorCategoria(categoriaSeleccionada);
-                    cargarProductosPorCategoria(categoriaSeleccionada); // corregir con las etiquetas
+                    cargarProductosPorCategoria(categoriaSeleccionada);
                 } else {
-                    categoriaSeleccionada = null; // 🔹 Ninguna categoría
+                    categoriaSeleccionada = null; // Ninguna categoría
                     //cargarArticulos(); // Mostrar todo si no se selecciona ninguna categoría válida
                     //cargarProductos();
                     aplicarFiltros();
@@ -160,7 +160,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                     Producto seleccionado = listaProductos.get(position);
                     productoSeleccionado = seleccionado.getId_producto();
 
-                    // 👇 Si estaba en promociones, salir del modo promociones
+                    // Si estaba en promociones, salir del modo promociones
                     if (mostrandoPromociones) {
                         mostrandoPromociones = false;
                         btnOfertas.setBackgroundTintList(
@@ -190,12 +190,12 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        cargarProductos(true); // 🔹 Forzamos la carga SIEMPRE al volver
+        cargarProductos(true); // Forzamos la carga SIEMPRE al volver
         configurarSpinnerProductos();
     }
 
     private void configurarBusquedaPorNombre() {
-        et_busqueda.addTextChangedListener(new TextWatcher() {
+        etBusqueda.addTextChangedListener(new TextWatcher() {
             private Timer timer = new Timer();
             private static final long DELAY = 500;
 
@@ -263,7 +263,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                             precio = obj.optString("prec_vent1_articulo", "0");
                         }
 
-                        // Usar el mismo constructor que en listarPromociones
                         listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
                     }
 
@@ -326,7 +325,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     }
 
     private void resetFiltrosPromocionesYFavoritos() {
-        // 🔹 Desactivar promociones si estaba activo
+        // Desactivar promociones si estaba activo
         if (mostrandoPromociones) {
             mostrandoPromociones = false;
             btnOfertas.setBackgroundTintList(
@@ -334,7 +333,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
             );
         }
 
-        // 🔹 Desactivar favoritos si estaba activo
+        // Desactivar favoritos si estaba activo
         if (mostrandoFavoritos) {
             mostrandoFavoritos = false;
             btnFavoritos.setBackgroundTintList(
@@ -401,7 +400,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
 
         String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_buscar_filtro.php?"
                 + "nom_articulo=" + nombre
-                + "&id_cliente=" + idCliente; // Agregar id_cliente
+                + "&id_cliente=" + idCliente;
 
         if (categoriaSeleccionada != null) {
             url += "&id_categoria=" + categoriaSeleccionada;
@@ -437,7 +436,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                             precio = obj.optString("prec_vent1_articulo", "0");
                         }
 
-                        // Agregar artículo con todos los campos
                         listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
                     }
 
@@ -455,7 +453,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     }
 
     private void aplicarFiltros() {
-        // 🚫 Si estoy en promociones, no aplicar filtros
+        // Si estoy en promociones, no aplicar filtros
         if (mostrandoPromociones|| mostrandoFavoritos) return;
 
         if (categoriaSeleccionada != null || productoSeleccionado != null) {
@@ -488,7 +486,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         int totalComprado = obj.optInt("total_comprado", 0);
                         int esFavorito = obj.optInt("es_favorito", 0);
 
-                        // Validación: si es promo usar precio de promo, caso contrario precio normal
                         String precio;
                         if (esPromo == 1) {
                             precio = obj.optString("prec_promo_articulo", "0");
@@ -525,7 +522,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                     nombresCategorias.add("Categoría");
 
                     listaCategorias.clear();
-                    listaCategorias.add(null); // Posición 0 reservada para "Categoría"
+                    listaCategorias.add(null);
 
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
@@ -862,7 +859,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         ContextCompat.getColorStateList(getContext(), R.color.color_verde)
                 );
 
-                et_busqueda.setText("");
+                etBusqueda.setText("");
             }
         }
 
@@ -900,7 +897,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
                 );
 
-                et_busqueda.setText("");
+                etBusqueda.setText("");
             }
         }
     }

@@ -29,7 +29,7 @@ import cz.msebera.android.httpclient.Header;
 public class CrearCuenta extends Fragment implements View.OnClickListener{
     private Button btnCrearUsuario;
     private EditText etNombres, etDocumento, etDireccion;
-    private String telefono; // aquí guardamos el teléfono recibido
+    private String telefono; // Guardamos el telefono recibido
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,14 +64,14 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
                         return;
                     }
 
-                    String fcmToken = task.getResult(); // ✅ token del dispositivo
+                    String fcmToken = task.getResult(); // Token del dispositivo
 
                     RequestParams params = new RequestParams();
                     params.put("nom_cliente", nom_cliente);
                     params.put("num_doc_cliente", num_doc_cliente);
                     params.put("dir_cliente", dir_cliente);
                     params.put("tel_cliente", telefono);
-                    params.put("tok_fcm_cliente", fcmToken); // 👈 lo mandas al backend
+                    params.put("tok_fcm_cliente", fcmToken);
 
                     String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_crear.php";
                     AsyncHttpClient client = new AsyncHttpClient();
@@ -86,11 +86,11 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
                                 if (json.getBoolean("success")) {
                                     Toast.makeText(getActivity(), "Cliente creado correctamente", Toast.LENGTH_SHORT).show();
 
-                                    int idCliente = json.getInt("id_cliente"); // tu PHP debe devolverlo
+                                    int idCliente = json.getInt("id_cliente"); // El metodo, devuelve el id
                                     SessionManager session = new SessionManager(requireContext());
                                     session.createLoginSession(idCliente, nom_cliente, telefono);
 
-                                    LimpiarCampos();
+                                    limpiarCampos();
 
                                     NavController navController = Navigation.findNavController(
                                             getActivity(),
@@ -115,7 +115,7 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
                 });
     }
 
-    public void LimpiarCampos() {
+    public void limpiarCampos() {
         etNombres.setText("");
         etDocumento.setText("");
         etDireccion.setText("");

@@ -20,7 +20,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <Spinner
-            android:id="@+id/sp_categorias"
+            android:id="@+id/spCategorias"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
@@ -40,7 +40,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <Spinner
-            android:id="@+id/sp_productos"
+            android:id="@+id/spProductos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="3dp"
@@ -65,7 +65,7 @@
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/et_busqueda"
+                android:id="@+id/etBusqueda"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Nombre del articulo"

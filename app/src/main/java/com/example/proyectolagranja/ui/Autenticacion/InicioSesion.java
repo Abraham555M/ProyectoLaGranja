@@ -43,7 +43,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private EditText etTelefono;
     private Button btnEnviarTelefono, btnValidarCodigo;
     private TextView tvBienvenida;
-
     // Firebase
     private String verificationId;
     private FirebaseAuth mAuth;
@@ -105,8 +104,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
                     String response = new String(responseBody);
-
-                    // 👀 Log para ver la respuesta exacta del backend
                     Log.d("RESPUESTA_BACKEND", "Response: " + response);
 
                     JSONObject json = new JSONObject(response);
@@ -124,7 +121,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                         String nombre = json.getString("nom_cliente");
                         String telCliente = json.getString("tel_cliente");
 
-                        // Guardar sesión con SessionManager
+                        // Guardamos sesion con SessionManager
                         SessionManager session = new SessionManager(requireContext());
                         session.createLoginSession(idCliente, nombre, telCliente);
 
@@ -137,14 +134,14 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_crear_cuenta, bundle);
                     }
                 } catch (Exception e) {
-                    Log.e("JSON_ERROR", "Error procesando respuesta", e); // 👈 ahora imprime el error real
+                    Log.e("JSON_ERROR", "Error procesando respuesta", e);
                     Toast.makeText(requireContext(), "Error procesando respuesta", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Log.e("HTTP_ERROR", "Código: " + statusCode, error); // 👈 imprime detalles del fallo
+                Log.e("HTTP_ERROR", "Código: " + statusCode, error);
                 Toast.makeText(requireContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
