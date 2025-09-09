@@ -100,7 +100,7 @@
             android:gravity="center"
             android:padding="8dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnOfertas"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -108,13 +108,16 @@
                 android:layout_marginEnd="6dp"
                 android:text="Ofertas"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white"
-                android:backgroundTint="@color/color_verde"
+                android:textColor="@color/color_verde"
+                android:backgroundTint="@color/color_blanco"
                 app:icon="@drawable/ic_promociones"
-                android:drawablePadding="8dp"
+                app:iconTint="@color/color_verde"
+                app:strokeColor="@color/color_verde"
+                app:strokeWidth="2dp"
+                app:cornerRadius="8dp"
                 android:padding="8dp"/>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnFavoritos"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -122,10 +125,13 @@
                 android:layout_marginStart="6dp"
                 android:text="Mis Favoritos"
                 android:textAllCaps="false"
-                android:textColor="@android:color/white"
-                android:backgroundTint="@color/color_rojo"
+                android:textColor="@color/color_rojo"
+                android:backgroundTint="@android:color/white"
                 app:icon="@drawable/ic_favoritos"
-                android:drawablePadding="8dp"
+                app:iconTint="@color/color_rojo"
+                app:strokeColor="@color/color_rojo"
+                app:strokeWidth="2dp"
+                app:cornerRadius="8dp"
                 android:padding="8dp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

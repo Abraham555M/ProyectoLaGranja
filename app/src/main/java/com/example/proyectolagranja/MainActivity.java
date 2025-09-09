@@ -104,21 +104,7 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if (id == R.id.nav_logout) {
-                // Limpiar la sesión
-                session.logout();
-
-                // Limpiar manualmente el header
-                View headerView2 = navigationView.getHeaderView(0);
-                TextView tvNombre = headerView2.findViewById(R.id.tvNombre);
-                TextView tvTelefono = headerView2.findViewById(R.id.tvTelefono);
-                tvNombre.setText("");
-                tvTelefono.setText("");
-
-                // Redirigir al inicio de sesión
-                navController.navigate(R.id.nav_inicio_sesion);
-
-                // Cerrar el drawer
-                drawer.closeDrawer(GravityCompat.START);
+                mostrarDialogoLogout(navigationView, navController, drawer);
                 return true;
             }
             // Mantener el comportamiento normal de navegación
@@ -206,6 +192,48 @@ public class MainActivity extends AppCompatActivity {
         tvTelefono.setText(telefono);
     }
 
+    private void mostrarDialogoLogout(NavigationView navigationView, NavController navController, DrawerLayout drawer) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.alert_dialog_confirmar_salir, null); // tu layout personalizado
+        builder.setView(view);
+
+        AlertDialog dialog = builder.create();
+
+        MaterialButton btnSi = view.findViewById(R.id.btnConfirmarSi);
+        MaterialButton btnNo = view.findViewById(R.id.btnConfirmarNo);
+
+        btnSi.setOnClickListener(v -> {
+            // 🔹 Cerrar sesión
+            session.logout();
+
+            // Limpiar manualmente el header
+            View headerView2 = navigationView.getHeaderView(0);
+            TextView tvNombre = headerView2.findViewById(R.id.tvNombre);
+            TextView tvTelefono = headerView2.findViewById(R.id.tvTelefono);
+            tvNombre.setText("");
+            tvTelefono.setText("");
+
+            // Redirigir al inicio de sesión
+            navController.navigate(R.id.nav_inicio_sesion);
+
+            // Cerrar el drawer
+            drawer.closeDrawer(GravityCompat.START);
+
+            dialog.dismiss();
+        });
+
+        btnNo.setOnClickListener(v -> {
+            dialog.dismiss(); // 🔹 Cierra el diálogo sin cerrar sesión
+        });
+
+        // Para que respete tu fondo redondeado
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        dialog.show();
+    }
 
 
     private void ObtenerDatosUsuario(int idCliente){

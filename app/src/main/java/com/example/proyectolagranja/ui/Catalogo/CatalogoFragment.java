@@ -61,7 +61,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private List<Producto> listaProductos = new ArrayList<>();
     private Integer categoriaSeleccionada = null;
     private Integer productoSeleccionado = null;
-    private Button btnOfertas, btnFavoritos;
+    private MaterialButton btnOfertas, btnFavoritos;
     private boolean mostrandoPromociones = false, mostrandoFavoritos = false;
     private SessionManager session;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -325,21 +325,39 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     }
 
     private void resetFiltrosPromocionesYFavoritos() {
-        // Desactivar promociones si estaba activo
-        if (mostrandoPromociones) {
-            mostrandoPromociones = false;
-            btnOfertas.setBackgroundTintList(
-                    ContextCompat.getColorStateList(getContext(), R.color.color_verde)
-            );
-        }
+        // Resetear bandera
+        mostrandoPromociones = false;
+        mostrandoFavoritos = false;
 
-        // Desactivar favoritos si estaba activo
-        if (mostrandoFavoritos) {
-            mostrandoFavoritos = false;
-            btnFavoritos.setBackgroundTintList(
-                    ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
-            );
-        }
+        // Restaurar Ofertas al estado inicial
+        btnOfertas.setBackgroundTintList(
+                ContextCompat.getColorStateList(getContext(), R.color.color_blanco)
+        );
+        btnOfertas.setTextColor(
+                ContextCompat.getColor(getContext(), R.color.color_verde)
+        );
+        btnOfertas.setIconTint(
+                ContextCompat.getColorStateList(getContext(), R.color.color_verde)
+        );
+        btnOfertas.setStrokeColor(
+                ContextCompat.getColorStateList(getContext(), R.color.color_verde)
+        );
+        btnOfertas.setStrokeWidth(2);
+
+        // Restaurar Favoritos al estado inicial
+        btnFavoritos.setBackgroundTintList(
+                ContextCompat.getColorStateList(getContext(), R.color.color_blanco)
+        );
+        btnFavoritos.setTextColor(
+                ContextCompat.getColor(getContext(), R.color.color_rojo)
+        );
+        btnFavoritos.setIconTint(
+                ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
+        );
+        btnFavoritos.setStrokeColor(
+                ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
+        );
+        btnFavoritos.setStrokeWidth(2);
     }
 
     private void filtrarArticulosPorCategoria(int idCategoria) {
@@ -832,8 +850,10 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                 mostrandoFavoritos = false;
 
                 btnFavoritos.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
+                        ContextCompat.getColorStateList(getContext(), android.R.color.white)
                 );
+                btnFavoritos.setTextColor(ContextCompat.getColor(getContext(), R.color.color_rojo));
+                btnFavoritos.setIconTint(ContextCompat.getColorStateList(getContext(), R.color.color_rojo));
             } else {
                 // 🔹 Primero resetear selección para que no dispare filtro después
                 spCategorias.setOnItemSelectedListener(null); // Desvincular listener temporal
@@ -850,14 +870,18 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                 mostrandoFavoritos = true;
 
                 btnFavoritos.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), android.R.color.darker_gray)
+                        ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
                 );
+                btnFavoritos.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                btnFavoritos.setIconTint(ContextCompat.getColorStateList(getContext(), android.R.color.white));
 
                 // Resetear promociones
                 mostrandoPromociones = false;
                 btnOfertas.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), R.color.color_verde)
+                        ContextCompat.getColorStateList(getContext(), android.R.color.white)
                 );
+                btnOfertas.setTextColor(ContextCompat.getColor(getContext(), R.color.color_verde));
+                btnOfertas.setIconTint(ContextCompat.getColorStateList(getContext(), R.color.color_verde));
 
                 etBusqueda.setText("");
             }
@@ -869,8 +893,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                 mostrandoPromociones = false;
 
                 btnOfertas.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), R.color.color_verde) // Cambiar de color al boton
+                        ContextCompat.getColorStateList(getContext(), android.R.color.white)
                 );
+                btnOfertas.setTextColor(ContextCompat.getColor(getContext(), R.color.color_verde));
+                btnOfertas.setIconTint(ContextCompat.getColorStateList(getContext(), R.color.color_verde));
+
             } else {
                 // 🔹 Resetear selección de spinners sin recargar productos
                 spCategorias.setOnItemSelectedListener(null);
@@ -888,14 +915,18 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                 mostrandoPromociones = true;
 
                 btnOfertas.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), android.R.color.darker_gray)
+                        ContextCompat.getColorStateList(getContext(), R.color.color_verde)
                 );
+                btnOfertas.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                btnOfertas.setIconTint(ContextCompat.getColorStateList(getContext(), android.R.color.white));
 
-                // Resetear favoritos
+                // 🔹 Resetear favoritos (inactivo)
                 mostrandoFavoritos = false;
                 btnFavoritos.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
+                        ContextCompat.getColorStateList(getContext(), android.R.color.white)
                 );
+                btnFavoritos.setTextColor(ContextCompat.getColor(getContext(), R.color.color_rojo));
+                btnFavoritos.setIconTint(ContextCompat.getColorStateList(getContext(), R.color.color_rojo));
 
                 etBusqueda.setText("");
             }
