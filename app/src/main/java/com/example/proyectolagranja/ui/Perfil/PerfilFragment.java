@@ -1,10 +1,13 @@
 package com.example.proyectolagranja.ui.Perfil;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -204,7 +207,10 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
         client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                String respuesta = new String(responseBody);
+
+                String respuesta = new String(responseBody).trim();
+                Log.d("RESPUESTA_SERVER", "Respuesta recibida: '" + respuesta + "'");
+
                 if (respuesta.equals("ok")) {
                     Toast.makeText(requireContext(), "Datos actualizados correctamente", Toast.LENGTH_SHORT).show();
 
@@ -215,10 +221,13 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
                     direccionOriginal = etDireccionEd.getText().toString().trim();
 
                     // 🔹 Guardar el nombre actualizado en SharedPreferences para el nav header
-                    SharedPreferences prefs = requireActivity().getSharedPreferences("UsuarioPrefs", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString("nom_cliente", nombresOriginal);
-                    editor.apply(); // Esto disparará el listener en MainActivity
+                    SharedPreferences prefs = requireActivity().getSharedPreferences("DatosUsuario", MODE_PRIVATE);
+                    prefs.edit()
+                            .putString("nom_cliente", nombresOriginal)
+                            .putString("tel_cliente", telefonoOriginal) // si aplica
+                            .apply();
+
+                    // Esto disparará el listener en MainActivity
 
                     btnGuardarCambios.setEnabled(false); // 🔹 Lo desactivamos porque ya está igual
                 } else {

@@ -198,11 +198,15 @@ public class MainActivity extends AppCompatActivity {
         TextView tvNombre = headerView.findViewById(R.id.tvNombre);
         TextView tvTelefono = headerView.findViewById(R.id.tvTelefono);
 
-        if (session.isLoggedIn()) {
-            tvNombre.setText(session.getNombre());
-            tvTelefono.setText(session.getTelefono());
-        }
+        SharedPreferences prefs = getSharedPreferences("DatosUsuario", MODE_PRIVATE);
+        String nombre = prefs.getString("nom_cliente", "");
+        String telefono = prefs.getString("tel_cliente", "");
+
+        tvNombre.setText(nombre);
+        tvTelefono.setText(telefono);
     }
+
+
 
     private void ObtenerDatosUsuario(int idCliente){
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_obtener_datos.php?id_cliente=" + idCliente;
