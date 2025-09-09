@@ -12,4 +12,12 @@
         <item name="android:textColor">@color/mi_color_botones</item>
     </style>
 
+    <style name="CircularImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item> <!-- Esto hace que sea completamente circular -->
+        <item name="strokeColor">@color/color_principal</item> <!-- color del borde -->
+        <item name="strokeWidth">4dp</item> <!-- grosor del borde -->
+    </style>
+
+
 </resources>

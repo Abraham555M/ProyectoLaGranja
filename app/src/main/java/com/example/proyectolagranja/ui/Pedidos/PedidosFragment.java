@@ -3,6 +3,7 @@ package com.example.proyectolagranja.ui.Pedidos;
 import android.app.DatePickerDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -161,8 +162,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
         spEstado.setAdapter(adapterSpinner);
     //********
-
-
 
         // Inicializamos adapter vacío
         adapter = new PedidosAdapter(getContext(), listaVenta);
@@ -361,7 +360,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     }
 
                     adapter.notifyDataSetChanged();
-
                     if (listaVenta.isEmpty()) {
                         Toast.makeText(getContext(), "No hay pedidos registrados", Toast.LENGTH_SHORT).show();
                     }
@@ -412,6 +410,8 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         RecyclerView recyclerView = dialogView.findViewById(R.id.recyclerView);
         TextView tvEmpty = dialogView.findViewById(R.id.tvEmptyMessage);
         MaterialButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+        TextView tvMensajeTotal = dialogView.findViewById(R.id.tvMensajeTotal);
+        TextView tvMensajeEstado = dialogView.findViewById(R.id.tvMensajeEstado);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         List<ArticuloDetalle> listaArticulos = new ArrayList<>();
@@ -429,11 +429,12 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         // Llamamos al método que hace la consulta
-        cargarDetallesVenta(venta.getId_venta(), listaArticulos, adapterArticulos, tvEmpty);
+        cargarDetallesVenta(venta.getId_venta(), listaArticulos, adapterArticulos, tvEmpty, tvMensajeTotal, tvMensajeEstado, venta.getAct_venta());
     }
 
     private void cargarDetallesVenta(int idVenta, List<ArticuloDetalle> listaArticulos,
-                                     ArticuloDetalleAdapter adapterArticulos, TextView tvEmpty) {
+                                     ArticuloDetalleAdapter adapterArticulos, TextView tvEmpty, TextView tvMensajeTotal,
+                                     TextView tvMensajeEstado, int actVenta) {
 
         String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_obtener_detalle.php?id_venta=" + idVenta;
         AsyncHttpClient client = new AsyncHttpClient();
@@ -446,7 +447,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     JSONArray jsonArray = new JSONArray(respuesta);
 
                     listaArticulos.clear();
-
+                    double total = 0;
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         String nombre = obj.getString("nom_articulo");
@@ -454,12 +455,36 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                         int cantidad = obj.getInt("cant_venta_detalle");
                         double subTotal = precio * cantidad;
                         String imagenUrl = obj.optString("foto_articulo");
+                        total += subTotal;
 
                         listaArticulos.add(new ArticuloDetalle(nombre, precio, cantidad, subTotal, imagenUrl));
                     }
 
                     adapterArticulos.notifyDataSetChanged();
                     tvEmpty.setVisibility(listaArticulos.isEmpty() ? View.VISIBLE : View.GONE);
+
+                    // 🔹 Actualizar total
+                    tvMensajeTotal.setText("Total: S/ " + String.format("%.2f", total));
+
+                    // 🔹 Actualizar estado
+                    String estadoTexto;
+                    int colorFondo;
+                    switch (actVenta) {
+                        case 0: estadoTexto = "Cancelado"; colorFondo = getResources().getColor(R.color.color_cancelar); break;
+                        case 2: estadoTexto = "Pendiente"; colorFondo = getResources().getColor(R.color.color_pendiente); break;
+                        case 3: estadoTexto = "Despachado"; colorFondo = getResources().getColor(R.color.color_despachado); break;
+                        case 4: estadoTexto = "Entregado"; colorFondo = getResources().getColor(R.color.color_entregado); break;
+                        case 5: estadoTexto = "Pagado"; colorFondo = getResources().getColor(R.color.darker_gray); break;
+                        default: estadoTexto = "Desconocido"; colorFondo = getResources().getColor(android.R.color.darker_gray); break;
+                    }
+                    GradientDrawable drawable = new GradientDrawable();
+                    drawable.setColor(colorFondo);
+                    drawable.setCornerRadius(30f);
+                    tvMensajeEstado.setText(estadoTexto);
+                    tvMensajeEstado.setBackground(drawable);
+                    int padding = 20;
+                    tvMensajeEstado.setPadding(padding, padding/2, padding, padding/2);
+                    tvMensajeEstado.setPadding(padding, padding/2, padding, padding/2);
 
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();

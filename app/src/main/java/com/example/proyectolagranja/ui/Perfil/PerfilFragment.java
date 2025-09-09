@@ -228,8 +228,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
                             .apply();
 
                     // Esto disparará el listener en MainActivity
-
-                    btnGuardarCambios.setEnabled(false); // 🔹 Lo desactivamos porque ya está igual
+                    btnGuardarCambios.setEnabled(false);
                 } else {
                     Toast.makeText(requireContext(), "Error al actualizar", Toast.LENGTH_SHORT).show();
                 }

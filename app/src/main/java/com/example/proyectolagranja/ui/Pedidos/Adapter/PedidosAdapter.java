@@ -133,7 +133,7 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvNumeroVenta, tvFechaVenta, tvTotal, tvEstado, tvMedioPago;
+        TextView tvNumeroVenta, tvFechaVenta, tvTotal, tvEstado, tvMedioPago, tvMensajeTotal, tvMensajeEstado;
         MaterialButton btnCancelarPedido, btnVerMasPedido;
         androidx.cardview.widget.CardView cardView;
 
@@ -143,6 +143,8 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
             tvFechaVenta = itemView.findViewById(R.id.tvFechaVenta);
             tvMedioPago = itemView.findViewById(R.id.tvMedioPago);
             tvTotal = itemView.findViewById(R.id.tvTotal);
+            tvMensajeTotal = itemView.findViewById(R.id.tvMensajeTotal);
+            tvMensajeEstado = itemView.findViewById(R.id.tvMensajeEstado);
             tvEstado = itemView.findViewById(R.id.tvEstado);
             btnCancelarPedido = itemView.findViewById(R.id.btnCancelarPedido);
             btnVerMasPedido = itemView.findViewById(R.id.btnVerMasPedido);

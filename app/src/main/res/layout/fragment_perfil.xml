@@ -12,6 +12,22 @@
         android:background="@color/color_fondo"
         android:padding="16dp">
 
+        <!-- Imagen de usuario centrada -->
+        <ImageView
+            android:id="@+id/imgUsuario"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            app:tint="@color/white"
+            android:src="@drawable/ic_user"
+            android:background="@drawable/circle_avatar"
+            android:scaleType="centerCrop"
+            android:padding="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/cardEditProfile"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
         <!-- Card para Editar Perfil centrado -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardEditProfile"
