@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import com.example.proyectolagranja.ui.Clases.Articulo;
 import com.example.proyectolagranja.ui.Clases.Categoria;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.Producto;
+import com.example.proyectolagranja.ui.Servicios.DecimalDigitsInputFilter;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.example.proyectolagranja.ui.Servicios.SessionManager;
 import com.google.android.material.button.MaterialButton;
@@ -624,7 +626,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
 
         TextView nombreArticulo = dialogView.findViewById(R.id.tvNombreArticulo);
         TextView precioArticulo = dialogView.findViewById(R.id.tvPrecioArticulo);
-        TextInputEditText etCantidad = dialogView.findViewById(R.id.etCantidad);
         TextInputEditText etDetalle = dialogView.findViewById(R.id.etDetalle);
         MaterialButton btnAgregar = dialogView.findViewById(R.id.btnAgregar);
         MaterialButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
@@ -634,6 +635,9 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         MaterialButton etFavoritos = dialogView.findViewById(R.id.etFavoritos);
         LinearLayout contenedorIzquierdo = dialogView.findViewById(R.id.contenedorIzquierdo);
         TextView tvOfertaValida = dialogView.findViewById(R.id.tvOfertaValida);
+        TextInputEditText etCantidad = dialogView.findViewById(R.id.etCantidad);
+        // Limitar a 3 decimales
+        etCantidad.setFilters(new InputFilter[]{ new DecimalDigitsInputFilter(3) });
 
         // Botón Restar
         btnRestar.setOnClickListener(v -> {
@@ -718,7 +722,12 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                 etCantidad.setError("Ingrese una cantidad");
                 return;
             }
-            int cantidad = Integer.parseInt(cantidadStr);
+            double cantidad = Double.parseDouble(cantidadStr);
+
+            if (cantidad <= 0) {
+                etCantidad.setError("La cantidad debe ser mayor a 0");
+                return;
+            }
 
             if (itemExistente[0] == null) {
                 // No existía → agregar

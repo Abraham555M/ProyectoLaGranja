@@ -2,17 +2,17 @@ package com.example.proyectolagranja.ui.Clases;
 
 public class ItemCarrito {
     private Articulo articulo;
-    private int cantidad;
+    private double cantidad;
     private String detalle;
 
-    public ItemCarrito(Articulo articulo, int cantidad, String detalle) {
+    public ItemCarrito(Articulo articulo, double cantidad, String detalle) {
         this.articulo = articulo;
         this.cantidad = cantidad;
         this.detalle = detalle;
     }
 
     public Articulo getArticulo() { return articulo; }
-    public int getCantidad() { return cantidad; }
+    public double getCantidad() { return cantidad; }
     public String getDetalle() { return detalle; }
 
     public void setArticulo(Articulo articulo) {
@@ -23,7 +23,7 @@ public class ItemCarrito {
         this.detalle = detalle;
     }
 
-    public void setCantidad(int cantidad) {
+    public void setCantidad(double cantidad) {
         this.cantidad = cantidad;
     }
 }

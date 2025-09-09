@@ -235,7 +235,6 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
     private void ObtenerDatosUsuario(int idCliente){
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_obtener_datos.php?id_cliente=" + idCliente;
 
