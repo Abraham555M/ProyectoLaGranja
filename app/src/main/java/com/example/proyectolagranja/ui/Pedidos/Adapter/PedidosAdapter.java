@@ -94,7 +94,7 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
                 break;
             case 5:
                 estadoTexto = "Pagado";
-                colorFondo = context.getResources().getColor(R.color.color_pagado);
+                colorFondo = context.getResources().getColor(R.color.darker_gray);
                 break;
             default:
                 estadoTexto = "Desconocido";

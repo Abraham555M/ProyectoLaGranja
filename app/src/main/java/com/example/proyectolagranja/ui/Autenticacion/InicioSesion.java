@@ -186,7 +186,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     }
 
     private void enviarCodigoFirebase(String telefono) {
-        String numeroPrueba = "+51987654321";
+        String numeroPrueba = "+51325475745";
 
         // Desactivar verificación de app para pruebas
         FirebaseAuth.getInstance().getFirebaseAuthSettings().setAppVerificationDisabledForTesting(true);

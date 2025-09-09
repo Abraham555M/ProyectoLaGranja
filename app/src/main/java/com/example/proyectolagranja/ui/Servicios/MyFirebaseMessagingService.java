@@ -25,13 +25,31 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
 
+        String title = null;
+        String body = null;
+
+        // Caso 1: viene en "notification"
         if (remoteMessage.getNotification() != null) {
-            // Notificación con título y mensaje
-            String title = remoteMessage.getNotification().getTitle();
-            String body = remoteMessage.getNotification().getBody();
+            title = remoteMessage.getNotification().getTitle();
+            body = remoteMessage.getNotification().getBody();
+        }
+
+        // Caso 2: viene en "data"
+        if (remoteMessage.getData().size() > 0) {
+            if (title == null) title = remoteMessage.getData().get("title");
+            if (body == null) body = remoteMessage.getData().get("body");
+
+            // También puedes recuperar id_venta, estado, etc.
+            String idVenta = remoteMessage.getData().get("id_venta");
+            String estado = remoteMessage.getData().get("estado");
+            Log.d("FCM_DATA", "Venta: " + idVenta + " Estado: " + estado);
+        }
+
+        if (title != null && body != null) {
             showNotification(title, body);
         }
     }
+
 
     private void showNotification(String title, String message) {
         NotificationCompat.Builder builder =
