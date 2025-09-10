@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,15 +54,20 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     private PedidosAdapter adapter;
     private List<Venta> listaVenta = new ArrayList<>();
     private SessionManager session;
+    private LinearLayout emptyStateLayout;
+    private TextView tvEmptyMessage;
+    private ImageView ivEmptyIcon;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_pedidos, container, false);
 
         session = new SessionManager(requireContext());
-
         recyclerViewPedidos = rootView.findViewById(R.id.recyclerViewPedidos);
         recyclerViewPedidos.setLayoutManager(new LinearLayoutManager(getContext()));
+        emptyStateLayout = rootView.findViewById(R.id.emptyStateLayout);
+        tvEmptyMessage = rootView.findViewById(R.id.tvEmptyMessage);
+        ivEmptyIcon = rootView.findViewById(R.id.ivEmptyIcon);
 
         Spinner spEstado = rootView.findViewById(R.id.sp_estado);
         // Cuando el usuario selecciona un estado
@@ -318,7 +325,9 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     adapter.notifyDataSetChanged();
 
                     if (listaVenta.isEmpty()) {
-                        Toast.makeText(getContext(), "No hay pedidos de ese estado", Toast.LENGTH_SHORT).show();
+                        mostrarEmptyState("No tienes pedidos en este estado", R.drawable.ic_sin_articulos);
+                    } else {
+                        ocultarEmptyState();
                     }
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar los datos", Toast.LENGTH_SHORT).show();
@@ -360,10 +369,12 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     }
 
                     adapter.notifyDataSetChanged();
-                    if (listaVenta.isEmpty()) {
-                        Toast.makeText(getContext(), "No hay pedidos registrados", Toast.LENGTH_SHORT).show();
-                    }
 
+                    if (listaVenta.isEmpty()) {
+                        mostrarEmptyState("No tienes pedidos registrados", R.drawable.ic_sin_articulos);
+                    } else {
+                        ocultarEmptyState();
+                    }
 
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
@@ -376,6 +387,20 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
             }
         });
     }
+
+    private void mostrarEmptyState(String mensaje, int iconRes) {
+        recyclerViewPedidos.setVisibility(View.GONE);
+        emptyStateLayout.setVisibility(View.VISIBLE);
+
+        tvEmptyMessage.setText(mensaje);
+        ivEmptyIcon.setImageResource(iconRes);
+    }
+
+    private void ocultarEmptyState() {
+        recyclerViewPedidos.setVisibility(View.VISIBLE);
+        emptyStateLayout.setVisibility(View.GONE);
+    }
+
 
     private void mostrarDialogCancelarPedido(Venta venta) {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_cancelar_pedido, null);

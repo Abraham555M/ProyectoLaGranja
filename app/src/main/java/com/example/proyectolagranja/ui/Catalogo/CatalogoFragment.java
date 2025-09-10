@@ -885,7 +885,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         emptyStateLayout.setVisibility(View.GONE);
     }
 
-
     @Override
     public void onClick(View view) {
         // toggle exclusivo
