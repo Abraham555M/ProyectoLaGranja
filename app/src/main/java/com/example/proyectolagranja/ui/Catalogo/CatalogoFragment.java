@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -67,6 +68,9 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private boolean mostrandoPromociones = false, mostrandoFavoritos = false;
     private SessionManager session;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private LinearLayout emptyStateLayout;
+    private TextView tvEmptyMessage;
+    private ImageView ivEmptyIcon;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -80,6 +84,9 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         etBusqueda = rootView.findViewById(R.id.etBusqueda);
         btnOfertas = rootView.findViewById(R.id.btnOfertas);
         btnFavoritos = rootView.findViewById(R.id.btnFavoritos);
+        emptyStateLayout = rootView.findViewById(R.id.emptyStateLayout);
+        tvEmptyMessage = rootView.findViewById(R.id.tvEmptyMessage);
+        ivEmptyIcon = rootView.findViewById(R.id.ivEmptyIcon);
 
         recyclerView = rootView.findViewById(R.id.recyclerViewComentarios);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -267,7 +274,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
 
                         listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
                     }
-
+                    if (listaArticulos.isEmpty()) {
+                        mostrarEmptyState("No se encontraron artículos", R.drawable.ic_sin_articulos);
+                    } else {
+                        ocultarEmptyState();
+                    }
                     adapter.notifyDataSetChanged();
 
                 } catch (JSONException e) {
@@ -460,6 +471,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                     }
 
                     adapter.notifyDataSetChanged();
+                    if (listaArticulos.isEmpty()) {
+                        mostrarEmptyState("No se encontraron artículos", R.drawable.ic_sin_articulos);
+                    } else {
+                        ocultarEmptyState();
+                    }
                 } catch (JSONException e) {
                     Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
                 }
@@ -784,8 +800,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                     }
 
                     if (listaArticulos.isEmpty()) {
-                        Toast.makeText(getContext(), "No tienes artículos favoritos aún", Toast.LENGTH_SHORT).show();
+                        mostrarEmptyState("No tienes artículos favoritos aún", R.drawable.ic_favoritos);
+                    } else {
+                        ocultarEmptyState();
                     }
+
                     adapter.notifyDataSetChanged();
 
                 } catch (Exception e) {
@@ -834,8 +853,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                     }
 
                     if (listaArticulos.isEmpty()) {
-                        Toast.makeText(getContext(), "No hay articulos en promoción", Toast.LENGTH_SHORT).show();
+                        mostrarEmptyState("No hay artículos en promoción", R.drawable.ic_promociones);
+                    } else {
+                        ocultarEmptyState();
                     }
+
                     adapter.notifyDataSetChanged();
 
                 } catch (JSONException e) {
@@ -850,12 +872,27 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         });
     }
 
+    private void mostrarEmptyState(String mensaje, int iconRes) {
+        recyclerView.setVisibility(View.GONE);
+        emptyStateLayout.setVisibility(View.VISIBLE);
+
+        tvEmptyMessage.setText(mensaje);
+        ivEmptyIcon.setImageResource(iconRes);
+    }
+
+    private void ocultarEmptyState() {
+        recyclerView.setVisibility(View.VISIBLE);
+        emptyStateLayout.setVisibility(View.GONE);
+    }
+
+
     @Override
     public void onClick(View view) {
         // toggle exclusivo
         if(view == btnFavoritos){
             if (mostrandoFavoritos) {
                 cargarArticulos(); // Lista completa
+                ocultarEmptyState();
                 mostrandoFavoritos = false;
 
                 btnFavoritos.setBackgroundTintList(

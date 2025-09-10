@@ -24,7 +24,9 @@ import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.example.proyectolagranja.ui.Servicios.SessionManager;
 import com.google.firebase.FirebaseException;
+import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
@@ -85,7 +87,9 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
             layoutBienvenida.setVisibility(View.GONE);
             layoutCodigo.setVisibility(View.VISIBLE);
             tvBienvenida.setVisibility(View.GONE);
-            enviarCodigoFirebase(etTelefono.getText().toString().trim());
+            String telefonoFormateado = formatearNumero(etTelefono.getText().toString().trim());
+            enviarCodigoFirebase(telefonoFormateado);
+
             dialog.dismiss();
         });
 
@@ -93,6 +97,15 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    private String formatearNumero(String telefono) {
+        // Si el usuario ingresa: 987654321
+        // Convertir a: +51987654321
+        if (!telefono.startsWith("+51")) {
+            telefono = "+51" + telefono;
+        }
+        return telefono;
     }
 
     private void validarTelefono(String telefono) {
@@ -147,7 +160,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         });
     }
 
-
     private void configurarAutoFocusCodigo(View rootView) {
         EditText[] edits = {
                 rootView.findViewById(R.id.etCodigo1),
@@ -186,13 +198,11 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     }
 
     private void enviarCodigoFirebase(String telefono) {
-        String numeroPrueba = "+51325475745";
 
-        // Desactivar verificación de app para pruebas
-        FirebaseAuth.getInstance().getFirebaseAuthSettings().setAppVerificationDisabledForTesting(true);
+        Log.d("PhoneAuth", "Enviando SMS a: " + telefono);
 
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
-                .setPhoneNumber(numeroPrueba)
+                .setPhoneNumber(telefono)
                 .setTimeout(60L, TimeUnit.SECONDS)
                 .setActivity(requireActivity())
                 .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -203,8 +213,14 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
-                        Log.e("PhoneAuth", "Verificación fallida", e);
-                        Toast.makeText(requireContext(), "Error verificación: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        // Manejar diferentes tipos de errores
+                        if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                            Toast.makeText(requireContext(), "Número de teléfono inválido", Toast.LENGTH_LONG).show();
+                        } else if (e instanceof FirebaseTooManyRequestsException) {
+                            Toast.makeText(requireContext(), "Demasiados intentos. Intenta más tarde", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
                     }
 
                     @Override

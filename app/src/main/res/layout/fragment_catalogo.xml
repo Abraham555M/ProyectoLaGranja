@@ -146,13 +146,65 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewComentarios"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:padding="16dp"
-            tools:listitem="@layout/item_articulo_catalogo" />
+            android:layout_height="match_parent">
+
+            <!-- RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewComentarios"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:padding="16dp"
+                tools:listitem="@layout/item_articulo_catalogo" />
+
+            <!-- Vista de "sin registros" con icono + texto -->
+            <LinearLayout
+                android:id="@+id/emptyStateLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone"
+                android:padding="24dp"
+                android:background="@android:color/transparent">
+
+                <!-- Icono -->
+                <ImageView
+                    android:id="@+id/ivEmptyIcon"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:src="@drawable/ic_favoritos"
+                    app:tint="@color/color_rojo"
+                    android:alpha="0.8" />
+
+                <!-- Mensaje principal -->
+                <TextView
+                    android:id="@+id/tvEmptyMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="No hay registros disponibles"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/color_principal"
+                    android:gravity="center" />
+
+                <!-- Subtítulo -->
+                <TextView
+                    android:id="@+id/tvEmptySubMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Intenta con otros filtros o vuelve más tarde"
+                    android:textSize="14sp"
+                    android:textColor="@color/darker_gray"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+        </FrameLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

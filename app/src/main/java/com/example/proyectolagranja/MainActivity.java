@@ -2,10 +2,12 @@ package com.example.proyectolagranja;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -105,6 +107,15 @@ public class MainActivity extends AppCompatActivity {
 
             if (id == R.id.nav_logout) {
                 mostrarDialogoLogout(navigationView, navController, drawer);
+                return true;
+            } else if (id == R.id.action_settings) {
+
+                Uri gmmIntentUri = Uri.parse("-11.889141551846668, -77.12049870132758");
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mapIntent);
+
+                drawer.closeDrawer(GravityCompat.START); // Cierra el drawer
                 return true;
             }
             // Mantener el comportamiento normal de navegación
