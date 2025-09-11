@@ -6,37 +6,25 @@
     android:fillViewport="true"
     android:background="#0A4D8C">
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <!-- Texto de bienvenida arriba del contenedor -->
-        <TextView
-            android:id="@+id/tvBienvenida"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bienvenido a La Granja"
-            android:textSize="42sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:gravity="center"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="150dp" />
+        android:layout_height="match_parent"
+        android:padding="24dp">
 
         <!-- Contenedor de bienvenida y código -->
         <LinearLayout
             android:id="@+id/contenedor"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_gravity="center"
-            android:layout_margin="32dp"
+            android:gravity="center_horizontal"
             android:padding="24dp"
             android:background="@drawable/bg_dialog_rounded"
             android:elevation="4dp"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="120dp"
-            android:layout_marginBottom="40dp">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <!-- layout_bienvenida -->
             <LinearLayout
@@ -208,9 +196,23 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:layout_marginTop="5dp"/>
-
-
             </LinearLayout>
         </LinearLayout>
-    </FrameLayout>
+
+        <!-- Texto de bienvenida arriba del contenedor -->
+        <TextView
+            android:id="@+id/tvBienvenida"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bienvenido a La Granja"
+            android:textSize="42sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            app:layout_constraintBottom_toTopOf="@id/contenedor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="24dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

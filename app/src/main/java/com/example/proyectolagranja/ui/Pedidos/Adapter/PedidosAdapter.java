@@ -121,6 +121,12 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
             holder.btnCancelarPedido.setAlpha(1.0f);
         }
 
+        if (venta.getAct_venta() == 2) {
+            holder.tvMensajeTotalPendiente.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvMensajeTotalPendiente.setVisibility(View.GONE);
+        }
+
         // Listener de botones
         holder.btnCancelarPedido.setOnClickListener(v -> {
             if (listener != null) listener.onCancelarClick(venta);
@@ -133,7 +139,7 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvNumeroVenta, tvFechaVenta, tvTotal, tvEstado, tvMedioPago, tvMensajeTotal, tvMensajeEstado;
+        TextView tvNumeroVenta, tvFechaVenta, tvTotal, tvEstado, tvMedioPago, tvMensajeTotal, tvMensajeEstado, tvMensajeTotalPendiente;
         MaterialButton btnCancelarPedido, btnVerMasPedido;
         androidx.cardview.widget.CardView cardView;
 
@@ -149,6 +155,7 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
             btnCancelarPedido = itemView.findViewById(R.id.btnCancelarPedido);
             btnVerMasPedido = itemView.findViewById(R.id.btnVerMasPedido);
             cardView = (androidx.cardview.widget.CardView) itemView;
+            tvMensajeTotalPendiente = itemView.findViewById(R.id.tvMensajeTotalPendiente);
         }
     }
 }

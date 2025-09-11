@@ -10,7 +10,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.widget.AdapterView;
@@ -32,6 +34,7 @@ import com.example.proyectolagranja.ui.Servicios.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -53,6 +56,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -107,15 +111,6 @@ public class MainActivity extends AppCompatActivity {
 
             if (id == R.id.nav_logout) {
                 mostrarDialogoLogout(navigationView, navController, drawer);
-                return true;
-            } else if (id == R.id.action_settings) {
-
-                Uri gmmIntentUri = Uri.parse("-11.889141551846668, -77.12049870132758");
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                startActivity(mapIntent);
-
-                drawer.closeDrawer(GravityCompat.START); // Cierra el drawer
                 return true;
             }
             // Mantener el comportamiento normal de navegación
@@ -179,6 +174,40 @@ public class MainActivity extends AppCompatActivity {
                         1001
                 );
             }
+        }
+    }
+
+    // 3. Agrega este método para manejar los clicks del options menu:
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            abrirGoogleMaps();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void abrirGoogleMaps() {
+        double latitud = -11.889141551846668;
+        double longitud = -77.12049870132758;
+
+        try {
+            String url = "https://maps.google.com/?q=" + latitud + "," + longitud;
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(intent);
+            } else {
+                startActivity(Intent.createChooser(intent, "Abrir con:"));
+            }
+
+        } catch (Exception e) {
+            Log.e("MainActivity", "Error al abrir mapa: " + e.getMessage());
+            Toast.makeText(this, "Error al abrir el mapa", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -666,6 +695,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        // Forzar que se muestren los íconos en el menú de overflow usando reflexión
+        try {
+            Method method = menu.getClass().getDeclaredMethod("setOptionalIconsVisible", Boolean.TYPE);
+            method.setAccessible(true);
+            method.invoke(menu, true);
+        } catch (Exception e) {
+            Log.w("MainActivity", "No se pudo mostrar íconos en menú: " + e.getMessage());
+        }
+
         return true;
     }
 
