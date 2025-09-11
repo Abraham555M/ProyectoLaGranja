@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +40,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -238,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
         View view = inflater.inflate(R.layout.alert_dialog_confirmar_salir, null); // tu layout personalizado
         builder.setView(view);
 
+        builder.setCancelable(false);
         AlertDialog dialog = builder.create();
 
         MaterialButton btnSi = view.findViewById(R.id.btnConfirmarSi);
@@ -254,8 +257,19 @@ public class MainActivity extends AppCompatActivity {
             tvNombre.setText("");
             tvTelefono.setText("");
 
-            // Redirigir al inicio de sesión
-            navController.navigate(R.id.nav_inicio_sesion);
+            // 🔹 Método 1: Limpiar completamente el stack de navegación
+            try {
+                NavOptions navOptions = new NavOptions.Builder()
+                        .setPopUpTo(navController.getGraph().getStartDestination(), true)
+                        .build();
+                navController.navigate(R.id.nav_inicio_sesion, null, navOptions);
+            } catch (Exception e) {
+                // 🔹 Método 2: Si falla, recrear la activity completa
+                Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
 
             // Cerrar el drawer
             drawer.closeDrawer(GravityCompat.START);
@@ -271,6 +285,16 @@ public class MainActivity extends AppCompatActivity {
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
+
+        // 🔹 Manejar específicamente el botón de retroceder
+        dialog.setOnKeyListener((dialogInterface, keyCode, keyEvent) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_UP) {
+                // Tratar el botón de retroceder como "No" - mantener la sesión
+                dialog.dismiss();
+                return true; // Consumir el evento
+            }
+            return false;
+        });
 
         dialog.show();
     }

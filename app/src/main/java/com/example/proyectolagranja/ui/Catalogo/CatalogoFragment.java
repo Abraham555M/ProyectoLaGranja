@@ -661,7 +661,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         btnRestar.setOnClickListener(v -> {
             String valorStr = etCantidad.getText().toString().trim();
             if (!valorStr.isEmpty()) {
-                int valor = Integer.parseInt(valorStr);
+                double valor = Double.parseDouble(valorStr);
                 if (valor > 1) {
                     valor--;
                     etCantidad.setText(String.valueOf(valor));
@@ -672,14 +672,15 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         // Botón Sumar
         btnSumar.setOnClickListener(v -> {
             String valorStr = etCantidad.getText().toString().trim();
-            int valor;
+            double valor;
             if (valorStr.isEmpty()) {
                 valor = 1; // Si no hay valor, iniciar en 1
             } else {
-                valor = Integer.parseInt(valorStr) + 1;
+                valor = Double.parseDouble(valorStr) + 1;
             }
             etCantidad.setText(String.valueOf(valor));
         });
+
 
         // Mostrar o ocultar el etPromociones
         if (articulo.getEsPromo() == 1) {
