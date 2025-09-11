@@ -652,6 +652,8 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         LinearLayout contenedorIzquierdo = dialogView.findViewById(R.id.contenedorIzquierdo);
         TextView tvOfertaValida = dialogView.findViewById(R.id.tvOfertaValida);
         TextInputEditText etCantidad = dialogView.findViewById(R.id.etCantidad);
+        TextView labelOfertaCantidad = dialogView.findViewById(R.id.labelOfertaCantidad);
+
         // Limitar a 3 decimales
         etCantidad.setFilters(new InputFilter[]{ new DecimalDigitsInputFilter(3) });
 
@@ -683,12 +685,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         if (articulo.getEsPromo() == 1) {
             etPromociones.setVisibility(View.VISIBLE);
             tvOfertaValida.setVisibility(View.VISIBLE);
+            labelOfertaCantidad.setVisibility(View.VISIBLE);
         } else {
             etPromociones.setVisibility(View.GONE);
             tvOfertaValida.setVisibility(View.GONE);
-
-            contenedorIzquierdo.removeView(etFavoritos);
-            contenedorIzquierdo.addView(etFavoritos, 0);
+            labelOfertaCantidad.setVisibility(View.GONE);
         }
 
         // Mostrar o ocultar el etFavoritos

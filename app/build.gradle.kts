@@ -51,6 +51,8 @@ dependencies {
     // Firebase Cloud Messaging
     implementation("com.google.firebase:firebase-messaging:23.4.1")
 
+
+    implementation("com.google.firebase:firebase-appcheck-playintegrity:17.0.1")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)

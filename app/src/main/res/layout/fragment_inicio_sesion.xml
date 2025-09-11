@@ -113,77 +113,82 @@
 
                     <EditText
                         android:id="@+id/etCodigo1"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
                         android:background="@drawable/bg_input"
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textSize="15sp"
+                        android:textSize="18sp"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:layout_margin="2dp" />
+                        android:layout_margin="4dp" />
 
                     <EditText
                         android:id="@+id/etCodigo2"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
                         android:background="@drawable/bg_input"
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textSize="15sp"
+                        android:textSize="18sp"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:layout_margin="2dp" />
+                        android:layout_margin="4dp" />
 
                     <EditText
                         android:id="@+id/etCodigo3"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
                         android:background="@drawable/bg_input"
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textSize="15sp"
+                        android:textSize="18sp"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:layout_margin="2dp" />
+                        android:layout_margin="4dp" />
 
                     <EditText
                         android:id="@+id/etCodigo4"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
                         android:background="@drawable/bg_input"
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textSize="15sp"
+                        android:textSize="18sp"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:layout_margin="2dp" />
+                        android:layout_margin="4dp" />
 
                     <EditText
                         android:id="@+id/etCodigo5"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
                         android:background="@drawable/bg_input"
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
+                        android:textSize="18sp"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:textSize="15sp"
-                        android:layout_margin="2dp" />
+                        android:layout_margin="4dp" />
 
                     <EditText
                         android:id="@+id/etCodigo6"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
                         android:background="@drawable/bg_input"
                         android:gravity="center"
                         android:inputType="number"
                         android:maxLength="1"
-                        android:textSize="15sp"
+                        android:textSize="18sp"
                         android:textCursorDrawable="@drawable/cursor_color"
-                        android:layout_margin="2dp" />
+                        android:layout_margin="4dp" />
                 </LinearLayout>
-
                 <Button
                     android:id="@+id/btnValidarCodigo"
                     android:layout_width="wrap_content"

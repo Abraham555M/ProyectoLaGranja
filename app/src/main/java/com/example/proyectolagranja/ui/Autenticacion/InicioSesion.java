@@ -23,8 +23,11 @@ import android.widget.Toast;
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.example.proyectolagranja.ui.Servicios.SessionManager;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
+import com.google.firebase.appcheck.FirebaseAppCheck;
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.PhoneAuthCredential;
@@ -67,6 +70,17 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         configurarAutoFocusCodigo(rootView);
 
         mAuth = FirebaseAuth.getInstance();
+        // mAuth.getFirebaseAuthSettings()
+        //   .forceRecaptchaFlowForTesting(true);
+
+        // **********************************************
+        // Agrega esta sección para inicializar App Check
+        // **********************************************
+        FirebaseApp.initializeApp(requireContext());
+        FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
+        firebaseAppCheck.installAppCheckProviderFactory(
+                PlayIntegrityAppCheckProviderFactory.getInstance());
+        // **********************************************
 
         return rootView;
     }
