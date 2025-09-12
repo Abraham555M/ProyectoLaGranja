@@ -187,6 +187,77 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        if (!session.isLoggedIn()) {
+            // Si no hay sesión activa, salir completamente de la app
+            finishAffinity(); // Cierra todas las actividades
+        } else {
+            super.onBackPressed(); // Comportamiento normal
+        }
+    }
+
+
+    private void mostrarDialogoLogout(NavigationView navigationView, NavController navController, DrawerLayout drawer) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.alert_dialog_confirmar_salir, null); // tu layout personalizado
+        builder.setView(view);
+
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+
+        MaterialButton btnSi = view.findViewById(R.id.btnConfirmarSi);
+        MaterialButton btnNo = view.findViewById(R.id.btnConfirmarNo);
+
+        btnSi.setOnClickListener(v -> {
+            // 🔹 Cerrar sesión
+            session.logout();
+
+            // Limpiar manualmente el header
+            View headerView2 = navigationView.getHeaderView(0);
+            TextView tvNombre = headerView2.findViewById(R.id.tvNombre);
+            TextView tvTelefono = headerView2.findViewById(R.id.tvTelefono);
+            tvNombre.setText("");
+            tvTelefono.setText("");
+
+            // 🔹 Limpiar el back stack y navegar al login
+            NavOptions navOptions = new NavOptions.Builder()
+                    .setPopUpTo(R.id.nav_catalogo, true) // limpia hasta el inicio del grafo
+                    .build();
+            navController.navigate(R.id.nav_inicio_sesion, null, navOptions);
+
+            // Cerrar el drawer
+            drawer.closeDrawer(GravityCompat.START);
+
+            dialog.dismiss();
+        });
+
+
+
+        btnNo.setOnClickListener(v -> {
+            dialog.dismiss(); // 🔹 Cierra el diálogo sin cerrar sesión
+        });
+
+        // Para que respete tu fondo redondeado
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // 🔹 Manejar específicamente el botón de retroceder
+        dialog.setOnKeyListener((dialogInterface, keyCode, keyEvent) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_UP) {
+                // Tratar el botón de retroceder como "No" - mantener la sesión
+                dialog.dismiss();
+                return true; // Consumir el evento
+            }
+            return false;
+        });
+
+        dialog.show();
+    }
+
     private void configurarFirebaseYPermisos() {
         // 1. Pedir permiso de notificaciones en Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -332,70 +403,6 @@ public class MainActivity extends AppCompatActivity {
         tvTelefono.setText(telefono);
     }
 
-    private void mostrarDialogoLogout(NavigationView navigationView, NavController navController, DrawerLayout drawer) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View view = inflater.inflate(R.layout.alert_dialog_confirmar_salir, null); // tu layout personalizado
-        builder.setView(view);
-
-        builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-
-        MaterialButton btnSi = view.findViewById(R.id.btnConfirmarSi);
-        MaterialButton btnNo = view.findViewById(R.id.btnConfirmarNo);
-
-        btnSi.setOnClickListener(v -> {
-            // 🔹 Cerrar sesión
-            session.logout();
-
-            // Limpiar manualmente el header
-            View headerView2 = navigationView.getHeaderView(0);
-            TextView tvNombre = headerView2.findViewById(R.id.tvNombre);
-            TextView tvTelefono = headerView2.findViewById(R.id.tvTelefono);
-            tvNombre.setText("");
-            tvTelefono.setText("");
-
-            // 🔹 Método 1: Limpiar completamente el stack de navegación
-            try {
-                NavOptions navOptions = new NavOptions.Builder()
-                        .setPopUpTo(navController.getGraph().getStartDestination(), true)
-                        .build();
-                navController.navigate(R.id.nav_inicio_sesion, null, navOptions);
-            } catch (Exception e) {
-                // 🔹 Método 2: Si falla, recrear la activity completa
-                Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
-            }
-
-            // Cerrar el drawer
-            drawer.closeDrawer(GravityCompat.START);
-
-            dialog.dismiss();
-        });
-
-        btnNo.setOnClickListener(v -> {
-            dialog.dismiss(); // 🔹 Cierra el diálogo sin cerrar sesión
-        });
-
-        // Para que respete tu fondo redondeado
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-
-        // 🔹 Manejar específicamente el botón de retroceder
-        dialog.setOnKeyListener((dialogInterface, keyCode, keyEvent) -> {
-            if (keyCode == KeyEvent.KEYCODE_BACK && keyEvent.getAction() == KeyEvent.ACTION_UP) {
-                // Tratar el botón de retroceder como "No" - mantener la sesión
-                dialog.dismiss();
-                return true; // Consumir el evento
-            }
-            return false;
-        });
-
-        dialog.show();
-    }
 
     private void ObtenerDatosUsuario(int idCliente){
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_obtener_datos.php?id_cliente=" + idCliente;
