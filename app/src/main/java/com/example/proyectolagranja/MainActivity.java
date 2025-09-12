@@ -1,5 +1,7 @@
 package com.example.proyectolagranja;
 
+import static android.content.ContentValues.TAG;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -10,6 +12,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,11 +33,15 @@ import com.bumptech.glide.Glide;
 import com.example.proyectolagranja.ui.Catalogo.Adapter.CarritoAdapter;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
 import com.example.proyectolagranja.ui.Clases.MedioPago;
+import com.example.proyectolagranja.ui.Servicios.MyFirebaseMessagingService;
 import com.example.proyectolagranja.ui.Servidor.ServidorConfig;
 import com.example.proyectolagranja.ui.Servicios.SessionManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -51,6 +58,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.proyectolagranja.databinding.ActivityMainBinding;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -161,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED); // Reactiva swipe
                 binding.appBarMain.fab.setVisibility(View.VISIBLE);
             }
+            configurarFirebaseYPermisos();
         });
 
         // ✅ Pedir permiso de notificaciones en Android 13+
@@ -175,6 +184,95 @@ public class MainActivity extends AppCompatActivity {
                         new String[]{Manifest.permission.POST_NOTIFICATIONS},
                         1001
                 );
+            }
+        }
+    }
+    private void configurarFirebaseYPermisos() {
+        // 1. Pedir permiso de notificaciones en Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED) {
+
+                Log.d(TAG, "Solicitando permisos de notificación...");
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS},
+                        1001
+                );
+            } else {
+                Log.d(TAG, "Permisos de notificación ya concedidos");
+                inicializarFirebaseFCM();
+            }
+        } else {
+            // Para versiones anteriores a Android 13, inicializar FCM directamente
+            inicializarFirebaseFCM();
+        }
+    }
+    private void inicializarFirebaseFCM() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w(TAG, "Error al obtener token FCM", task.getException());
+                            return;
+                        }
+
+                        // Obtener nuevo token FCM
+                        String token = task.getResult();
+                        Log.d(TAG, "Token FCM actual: " + token);
+
+                        // Si el usuario está logueado, enviar token al servidor
+                        if (session.isLoggedIn()) {
+                            int idCliente = session.getIdCliente();
+                            Log.d(TAG, "Usuario logueado, enviando token al servidor para cliente: " + idCliente);
+                            MyFirebaseMessagingService.enviarTokenAlServidor(idCliente, token);
+                        } else {
+                            Log.d(TAG, "Usuario no logueado, token no enviado al servidor");
+                        }
+                    }
+                });
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1001) { // Código para permisos de notificación
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Permisos de notificación concedidos");
+                inicializarFirebaseFCM();
+            } else {
+                Log.w(TAG, "Permisos de notificación denegados");
+                // Opcional: mostrar un diálogo explicando por qué necesitas los permisos
+                mostrarDialogoPermisosDenegados();
+            }
+        }
+    }
+    private void mostrarDialogoPermisosDenegados() {
+        new AlertDialog.Builder(this)
+                .setTitle("Permisos de notificación")
+                .setMessage("Para recibir notificaciones sobre el estado de tus pedidos, necesitamos permisos de notificación. Puedes habilitarlos en Configuración > Aplicaciones > " + getString(R.string.app_name) + " > Notificaciones")
+                .setPositiveButton("Entendido", null)
+                .setNegativeButton("Ir a Configuración", (dialog, which) -> {
+                    // Abrir configuración de la app
+                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                    intent.setData(uri);
+                    startActivity(intent);
+                })
+                .show();
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Si el usuario regresa de configuración, verificar permisos nuevamente
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Permisos verificados en onResume - OK");
             }
         }
     }

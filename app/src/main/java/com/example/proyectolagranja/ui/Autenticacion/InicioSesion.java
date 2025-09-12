@@ -1,5 +1,7 @@
 package com.example.proyectolagranja.ui.Autenticacion;
 
+import static com.example.proyectolagranja.ui.Servicios.MyFirebaseMessagingService.enviarTokenAlServidor;
+
 import android.app.AlertDialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -34,6 +36,7 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
@@ -152,6 +155,21 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                         SessionManager session = new SessionManager(requireContext());
                         session.createLoginSession(idCliente, nombre, telCliente);
 
+                        FirebaseMessaging.getInstance().getToken()
+                                .addOnCompleteListener(task -> {
+                                    if (!task.isSuccessful()) {
+                                        Log.w("FCM_TOKEN", "Error al obtener token", task.getException());
+                                        return;
+                                    }
+
+                                    // Token actual
+                                    String token = task.getResult();
+
+                                    // Llamamos al método que envía token a tu backend
+                                    enviarTokenAlServidor(idCliente, token);
+                                });
+
+
                         limpiarEspacios();
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_catalogo);
                     } else {
@@ -212,7 +230,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     }
 
     private void enviarCodigoFirebase(String telefono) {
-
         Log.d("PhoneAuth", "Enviando SMS a: " + telefono);
 
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
