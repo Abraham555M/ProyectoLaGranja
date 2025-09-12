@@ -325,7 +325,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     adapter.notifyDataSetChanged();
 
                     if (listaVenta.isEmpty()) {
-                        mostrarEmptyState("No tienes pedidos en este estado", R.drawable.ic_sin_articulos);
+                        mostrarEmptyState("No tienes pedidos en este estado", R.drawable.ic_carrito_compras);
                     } else {
                         ocultarEmptyState();
                     }
@@ -371,7 +371,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     adapter.notifyDataSetChanged();
 
                     if (listaVenta.isEmpty()) {
-                        mostrarEmptyState("No tienes pedidos registrados", R.drawable.ic_sin_articulos);
+                        mostrarEmptyState("No tienes pedidos registrados", R.drawable.ic_carrito_compras);
                     } else {
                         ocultarEmptyState();
                     }

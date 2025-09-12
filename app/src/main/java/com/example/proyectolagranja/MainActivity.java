@@ -526,7 +526,13 @@ public class MainActivity extends AppCompatActivity {
         dialog.setCanceledOnTouchOutside(false); // Evita que se cierre tocando afuera
 
         btnCerrar.setOnClickListener(v -> dialog.dismiss());
-        btnAgregarCarrito.setOnClickListener(v -> dialog.dismiss());
+        btnAgregarCarrito.setOnClickListener(v -> {
+            dialog.dismiss(); // Cerramos el diálogo primero
+
+            // Redirigir a un fragment usando NavController
+            NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment_content_main);
+            navController.navigate(R.id.nav_catalogo);
+        });
 
         // Crear el pedido:
         btnEnviarPedido.setOnClickListener(v -> {

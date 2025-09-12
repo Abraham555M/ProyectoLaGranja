@@ -102,7 +102,7 @@
             android:id="@+id/ivEmptyIcon"
             android:layout_width="96dp"
             android:layout_height="96dp"
-            android:src="@drawable/ic_sin_articulos"
+            android:src="@drawable/ic_carrito_compras"
             app:tint="@color/darker_gray" />
 
         <TextView
@@ -115,7 +115,6 @@
             android:layout_marginTop="12dp"
             android:gravity="center"/>
     </LinearLayout>
-
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnNuevoPedido"
