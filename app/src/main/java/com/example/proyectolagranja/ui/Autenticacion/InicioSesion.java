@@ -50,10 +50,12 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private LinearLayout layoutBienvenida, layoutCodigo;
     private EditText etTelefono;
     private Button btnEnviarTelefono, btnValidarCodigo;
-    private TextView tvBienvenida;
+    private TextView tvBienvenida, tvEnlaceReenviar;
     // Firebase
     private String verificationId;
     private FirebaseAuth mAuth;
+    private PhoneAuthProvider.ForceResendingToken resendToken;
+    private String numeroTelefonoActual;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -66,6 +68,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         btnValidarCodigo = rootView.findViewById(R.id.btnValidarCodigo);
         etTelefono = rootView.findViewById(R.id.etTelefono);
         tvBienvenida = rootView.findViewById(R.id.tvBienvenida);
+        tvEnlaceReenviar = rootView.findViewById(R.id.tvEnlaceReenviar);
 
         btnEnviarTelefono.setOnClickListener(this);
         btnValidarCodigo.setOnClickListener(this);
@@ -231,6 +234,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
     private void enviarCodigoFirebase(String telefono) {
         Log.d("PhoneAuth", "Enviando SMS a: " + telefono);
+        numeroTelefonoActual = telefono;
 
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
                 .setPhoneNumber(telefono)
@@ -259,6 +263,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                                            @NonNull PhoneAuthProvider.ForceResendingToken token) {
                         super.onCodeSent(verifId, token);
                         verificationId = verifId;
+                        resendToken = token;
                         Log.d("PhoneAuth", "Código enviado. ID: " + verifId);
                         Toast.makeText(requireContext(), "Código enviado", Toast.LENGTH_SHORT).show();
                     }
@@ -266,6 +271,69 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
+
+    private void reenviarCodigoFirebase() {
+        if (numeroTelefonoActual == null || resendToken == null) {
+            Toast.makeText(requireContext(), "No se puede reenviar el código", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.d("PhoneAuth", "Reenviando SMS a: " + numeroTelefonoActual);
+
+        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
+                .setPhoneNumber(numeroTelefonoActual)
+                .setTimeout(60L, TimeUnit.SECONDS)
+                .setActivity(requireActivity())
+                .setForceResendingToken(resendToken) // ✅ USAR EL TOKEN DE REENVÍO
+                .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                    @Override
+                    public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
+                        signInWithPhoneAuthCredential(credential);
+                    }
+
+                    @Override
+                    public void onVerificationFailed(@NonNull FirebaseException e) {
+                        if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                            Toast.makeText(requireContext(), "Número de teléfono inválido", Toast.LENGTH_LONG).show();
+                        } else if (e instanceof FirebaseTooManyRequestsException) {
+                            Toast.makeText(requireContext(), "Demasiados intentos. Intenta más tarde", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(requireContext(), "Error al reenviar: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCodeSent(@NonNull String verifId,
+                                           @NonNull PhoneAuthProvider.ForceResendingToken token) {
+                        super.onCodeSent(verifId, token);
+                        verificationId = verifId;
+                        resendToken = token; // Actualizar el token
+                        Log.d("PhoneAuth", "Código reenviado. ID: " + verifId);
+                        Toast.makeText(requireContext(), "Código reenviado", Toast.LENGTH_SHORT).show();
+
+                        // Opcional: Limpiar los campos de código
+                        limpiarCamposCodigo();
+                    }
+                }).build();
+
+        PhoneAuthProvider.verifyPhoneNumber(options);
+    }
+
+    private void limpiarCamposCodigo() {
+        if (getView() != null) {
+            EditText et1 = getView().findViewById(R.id.etCodigo1);
+            EditText et2 = getView().findViewById(R.id.etCodigo2);
+            EditText et3 = getView().findViewById(R.id.etCodigo3);
+            EditText et4 = getView().findViewById(R.id.etCodigo4);
+            EditText et5 = getView().findViewById(R.id.etCodigo5);
+            EditText et6 = getView().findViewById(R.id.etCodigo6);
+
+            et1.setText(""); et2.setText(""); et3.setText("");
+            et4.setText(""); et5.setText(""); et6.setText("");
+            et1.requestFocus();
+        }
+    }
+
 
     private void verificarCodigoFirebase(String codigoIngresado) {
         if (verificationId == null) {
@@ -278,7 +346,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
         signInWithPhoneAuthCredential(credential);
     }
-    
+
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(requireActivity(), task -> {
@@ -349,6 +417,10 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     et6.getText().toString();
 
             verificarCodigoFirebase(codigo);
+        }
+
+        if (v == tvEnlaceReenviar) {
+            reenviarCodigoFirebase();
         }
     }
 }
