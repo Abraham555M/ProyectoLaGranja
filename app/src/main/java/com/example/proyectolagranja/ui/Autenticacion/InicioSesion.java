@@ -3,6 +3,8 @@ package com.example.proyectolagranja.ui.Autenticacion;
 import static com.example.proyectolagranja.ui.Servicios.MyFirebaseMessagingService.enviarTokenAlServidor;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -51,11 +53,23 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private EditText etTelefono;
     private Button btnEnviarTelefono, btnValidarCodigo;
     private TextView tvBienvenida, tvEnlaceReenviar;
+
     // Firebase
     private String verificationId;
     private FirebaseAuth mAuth;
     private PhoneAuthProvider.ForceResendingToken resendToken;
     private String numeroTelefonoActual;
+
+    // Control de intentos fallidos
+    private SharedPreferences sharedPreferences;
+    private static final String PREFS_NAME = "BloqueoTelefonos";
+    private static final String KEY_INTENTOS = "_intentos";
+    private static final String KEY_TIEMPO_BLOQUEO = "_tiempo_bloqueo";
+    private static final int MAX_INTENTOS = 3;
+    private static final long TIEMPO_BLOQUEO_HORAS = 24;
+
+    private static final String KEY_INTENTOS_CODIGO = "_intentos_codigo";
+    private static final String KEY_INTENTOS_REENVIO = "_intentos_reenvio";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,23 +86,95 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
         btnEnviarTelefono.setOnClickListener(this);
         btnValidarCodigo.setOnClickListener(this);
+        tvEnlaceReenviar.setOnClickListener(this);
 
         configurarAutoFocusCodigo(rootView);
 
-        mAuth = FirebaseAuth.getInstance();
-        // mAuth.getFirebaseAuthSettings()
-        //   .forceRecaptchaFlowForTesting(true);
+        // Inicializar SharedPreferences para el control de bloqueos
+        sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
-        // **********************************************
-        // Agrega esta sección para inicializar App Check
-        // **********************************************
+        mAuth = FirebaseAuth.getInstance();
+
+        // Inicializar App Check
         FirebaseApp.initializeApp(requireContext());
         FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
         firebaseAppCheck.installAppCheckProviderFactory(
                 PlayIntegrityAppCheckProviderFactory.getInstance());
-        // **********************************************
 
         return rootView;
+    }
+
+    private boolean esTelefonoBloqueado(String telefono) {
+        String telefonoFormateado = formatearNumero(telefono);
+        long tiempoBloqueo = sharedPreferences.getLong(telefonoFormateado + KEY_TIEMPO_BLOQUEO, 0);
+
+        if (tiempoBloqueo == 0) {
+            return false; // No hay bloqueo registrado
+        }
+
+        long tiempoActual = System.currentTimeMillis();
+        long tiempoTranscurrido = tiempoActual - tiempoBloqueo;
+        long tiempoBloqueoMs = TIEMPO_BLOQUEO_HORAS * 60 * 60 * 1000; // 24 horas en millisegundos
+
+        if (tiempoTranscurrido >= tiempoBloqueoMs) {
+            // El bloqueo ya expiró, limpiamos los datos
+            limpiarDatosBloqueo(telefonoFormateado);
+            return false;
+        }
+
+        return true; // Aún está bloqueado
+    }
+
+    private void incrementarIntentosFallidos(String telefono) {
+        String telefonoFormateado = formatearNumero(telefono);
+        int intentosActuales = sharedPreferences.getInt(telefonoFormateado + KEY_INTENTOS_CODIGO, 0);
+        intentosActuales++;
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(telefonoFormateado + KEY_INTENTOS_CODIGO, intentosActuales);
+
+        if (intentosActuales >= MAX_INTENTOS) {
+            long tiempoBloqueo = System.currentTimeMillis();
+            editor.putLong(telefonoFormateado + KEY_TIEMPO_BLOQUEO, tiempoBloqueo);
+            editor.apply();
+
+            Toast.makeText(requireContext(),
+                    "Número bloqueado por 24 horas debido a múltiples códigos incorrectos",
+                    Toast.LENGTH_LONG).show();
+
+            volverAlInicio();
+        } else {
+            editor.apply();
+            int intentosRestantes = MAX_INTENTOS - intentosActuales;
+            Toast.makeText(requireContext(),
+                    "Código incorrecto. Te quedan " + intentosRestantes + " intentos",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void limpiarDatosBloqueo(String telefono) {
+        String telefonoFormateado = formatearNumero(telefono);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(telefonoFormateado + KEY_INTENTOS);
+        editor.remove(telefonoFormateado + KEY_INTENTOS_REENVIO);
+        editor.remove(telefonoFormateado + KEY_TIEMPO_BLOQUEO);
+        editor.apply();
+    }
+
+    private void volverAlInicio() {
+        layoutCodigo.setVisibility(View.GONE);
+        layoutBienvenida.setVisibility(View.VISIBLE);
+        tvBienvenida.setVisibility(View.VISIBLE);
+        limpiarEspacios();
+    }
+
+    private long getTiempoRestanteBloqueo(String telefono) {
+        String telefonoFormateado = formatearNumero(telefono);
+        long tiempoBloqueo = sharedPreferences.getLong(telefonoFormateado + KEY_TIEMPO_BLOQUEO, 0);
+        long tiempoActual = System.currentTimeMillis();
+        long tiempoBloqueoMs = TIEMPO_BLOQUEO_HORAS * 60 * 60 * 1000;
+
+        return (tiempoBloqueo + tiempoBloqueoMs - tiempoActual) / (60 * 60 * 1000); // Retorna horas restantes
     }
 
     private void mostrarDialogoConfirmarNumero() {
@@ -120,8 +206,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     }
 
     private String formatearNumero(String telefono) {
-        // Si el usuario ingresa: 987654321
-        // Convertir a: +51987654321
         if (!telefono.startsWith("+51")) {
             telefono = "+51" + telefono;
         }
@@ -154,7 +238,9 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                         String nombre = json.getString("nom_cliente");
                         String telCliente = json.getString("tel_cliente");
 
-                        // Guardamos sesion con SessionManager
+                        // Limpiar datos de bloqueo al hacer login exitoso
+                        limpiarDatosBloqueo(telefono);
+
                         SessionManager session = new SessionManager(requireContext());
                         session.createLoginSession(idCliente, nombre, telCliente);
 
@@ -165,13 +251,9 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                                         return;
                                     }
 
-                                    // Token actual
                                     String token = task.getResult();
-
-                                    // Llamamos al método que envía token a tu backend
                                     enviarTokenAlServidor(idCliente, token);
                                 });
-
 
                         limpiarEspacios();
                         navController.navigate(R.id.action_nav_inicio_sesion_to_nav_catalogo);
@@ -248,7 +330,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
-                        // Manejar diferentes tipos de errores
                         if (e instanceof FirebaseAuthInvalidCredentialsException) {
                             Toast.makeText(requireContext(), "Número de teléfono inválido", Toast.LENGTH_LONG).show();
                         } else if (e instanceof FirebaseTooManyRequestsException) {
@@ -272,10 +353,42 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
+    private void incrementarIntentosReenvio(String telefono) {
+        String telefonoFormateado = formatearNumero(telefono);
+        int intentosReenvio = sharedPreferences.getInt(telefonoFormateado + KEY_INTENTOS_REENVIO, 0);
+        intentosReenvio++;
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(telefonoFormateado + KEY_INTENTOS_REENVIO, intentosReenvio);
+
+        if (intentosReenvio >= MAX_INTENTOS) {
+            // Bloquear el teléfono por 24 horas
+            long tiempoBloqueo = System.currentTimeMillis();
+            editor.putLong(telefonoFormateado + KEY_TIEMPO_BLOQUEO, tiempoBloqueo);
+            editor.apply();
+
+            Toast.makeText(requireContext(),
+                    "Número bloqueado por 24 horas debido a múltiples reenvíos",
+                    Toast.LENGTH_LONG).show();
+
+            volverAlInicio();
+        } else {
+            editor.apply();
+            int reenviosRestantes = MAX_INTENTOS - intentosReenvio;
+            Toast.makeText(requireContext(),
+                    "Te quedan " + reenviosRestantes + " reenvíos disponibles",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void reenviarCodigoFirebase() {
         if (numeroTelefonoActual == null || resendToken == null) {
             Toast.makeText(requireContext(), "No se puede reenviar el código", Toast.LENGTH_SHORT).show();
             return;
+        }
+        incrementarIntentosReenvio(numeroTelefonoActual);
+        if (esTelefonoBloqueado(numeroTelefonoActual)) {
+            return; // Ya se bloqueó y mostró el toast correspondiente
         }
 
         Log.d("PhoneAuth", "Reenviando SMS a: " + numeroTelefonoActual);
@@ -284,7 +397,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                 .setPhoneNumber(numeroTelefonoActual)
                 .setTimeout(60L, TimeUnit.SECONDS)
                 .setActivity(requireActivity())
-                .setForceResendingToken(resendToken) // ✅ USAR EL TOKEN DE REENVÍO
+                .setForceResendingToken(resendToken)
                 .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     @Override
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
@@ -307,11 +420,9 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                                            @NonNull PhoneAuthProvider.ForceResendingToken token) {
                         super.onCodeSent(verifId, token);
                         verificationId = verifId;
-                        resendToken = token; // Actualizar el token
+                        resendToken = token;
                         Log.d("PhoneAuth", "Código reenviado. ID: " + verifId);
                         Toast.makeText(requireContext(), "Código reenviado", Toast.LENGTH_SHORT).show();
-
-                        // Opcional: Limpiar los campos de código
                         limpiarCamposCodigo();
                     }
                 }).build();
@@ -334,7 +445,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         }
     }
 
-
     private void verificarCodigoFirebase(String codigoIngresado) {
         if (verificationId == null) {
             Toast.makeText(requireContext(), "No se ha enviado el código", Toast.LENGTH_SHORT).show();
@@ -353,11 +463,11 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     if (task.isSuccessful()) {
                         Log.d("PhoneAuth", "Autenticación exitosa");
                         String telefono = etTelefono.getText().toString().trim();
-
                         validarTelefono(telefono);
                     } else {
                         Log.e("PhoneAuth", "Autenticación fallida", task.getException());
-                        Toast.makeText(requireContext(), "Código incorrecto", Toast.LENGTH_SHORT).show();
+                        String telefono = etTelefono.getText().toString().trim();
+                        incrementarIntentosFallidos(telefono);
                     }
                 });
     }
@@ -375,7 +485,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
             et1.setText(""); et2.setText(""); et3.setText("");
             et4.setText(""); et5.setText(""); et6.setText("");
-            et1.requestFocus();
+            if (et1 != null) et1.requestFocus();
         }
     }
 
@@ -387,6 +497,16 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                 Toast.makeText(requireContext(), "Número inválido", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // Verificar si el teléfono está bloqueado
+            if (esTelefonoBloqueado(telefono)) {
+                long horasRestantes = getTiempoRestanteBloqueo(telefono);
+                Toast.makeText(requireContext(),
+                        "Este número está bloqueado. Tiempo restante: " + horasRestantes + " horas",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+
             mostrarDialogoConfirmarNumero();
         }
 
