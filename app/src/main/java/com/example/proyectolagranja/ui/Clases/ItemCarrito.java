@@ -4,7 +4,6 @@ public class ItemCarrito {
     private Articulo articulo;
     private double cantidad;
     private String detalle;
-    private int esPromo;
 
     public ItemCarrito(Articulo articulo, double cantidad, String detalle) {
         this.articulo = articulo;
@@ -15,10 +14,6 @@ public class ItemCarrito {
     public Articulo getArticulo() { return articulo; }
     public double getCantidad() { return cantidad; }
     public String getDetalle() { return detalle; }
-
-    public void setArticulo(Articulo articulo) {
-        this.articulo = articulo;
-    }
 
     public void setDetalle(String detalle) {
         this.detalle = detalle;

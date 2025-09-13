@@ -20,6 +20,7 @@ import com.example.proyectolagranja.ui.Clases.Articulo;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.ArticuloViewHolder>{
     private Context context;
@@ -48,34 +49,47 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         Articulo articulo = listaArticulos.get(position);
 
         String nombre = articulo.getNombre();
-        String codPresentacion = articulo.getCodPresensacion();
+        String codPresentacion = articulo.getCodPresentacion();
 
         // Crear SpannableString: nombre normal + cod_presentacion subrayado
         SpannableString textoSpannable = new SpannableString(nombre + " " + codPresentacion);
         int start = nombre.length() + 1; // +1 por el espacio
         int end = start + codPresentacion.length();
         textoSpannable.setSpan(new UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
         holder.nombre.setText(textoSpannable);
-        holder.precio.setText("S/ " + articulo.getPrecio());
 
-        // Mostrar Promociones
-        if (articulo.getEsPromo() == 1) {
-            holder.etPromociones.setVisibility(View.VISIBLE);
-            holder.labelOferta.setVisibility(View.VISIBLE);
-            holder.labelOferta.setVisibility(View.VISIBLE);
-            holder.tvMensajeKg.setVisibility(View.VISIBLE);
+        try {
+            double precioNormal = Double.parseDouble(articulo.getPrecio());
+            double precioOferta = Double.parseDouble(articulo.getPrecioOferta());
 
-            holder.precioAnteriorArticulo.setText("S/ " + articulo.getPrecio());
-            holder.precioAnteriorArticulo.setPaintFlags(
-                    holder.precioAnteriorArticulo.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
-            );
+            if (articulo.getEsPromo() == 1) {
+                // Mostrar el precio promocional como oficial
+                holder.precio.setText(String.format(Locale.US, "S/ %.2f", precioOferta));
 
-        } else {
-            holder.etPromociones.setVisibility(View.GONE);
-            holder.labelOferta.setVisibility(View.GONE);
-            holder.labelOferta.setVisibility(View.GONE);
-            holder.tvMensajeKg.setVisibility(View.GONE);
+                // Mostrar el precio normal tachado
+                holder.precioAnteriorArticulo.setVisibility(View.VISIBLE);
+                holder.precioAnteriorArticulo.setText(String.format(Locale.US, "S/ %.2f", precioNormal));
+                holder.precioAnteriorArticulo.setPaintFlags(
+                        holder.precioAnteriorArticulo.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
+                );
+
+                // Mostrar etiquetas relacionadas a la promo
+                holder.etPromociones.setVisibility(View.VISIBLE);
+                holder.labelOferta.setVisibility(View.VISIBLE);
+                holder.tvMensajeKg.setVisibility(View.VISIBLE);
+
+            } else {
+                // Solo mostrar precio normal
+                holder.precio.setText(String.format(Locale.US, "S/ %.2f", precioNormal));
+                holder.precioAnteriorArticulo.setVisibility(View.GONE);
+
+                // Ocultar etiquetas de promo
+                holder.etPromociones.setVisibility(View.GONE);
+                holder.labelOferta.setVisibility(View.GONE);
+                holder.tvMensajeKg.setVisibility(View.GONE);
+            }
+        } catch (NumberFormatException e) {
+            holder.precio.setText("S/ 0.00");
             holder.precioAnteriorArticulo.setVisibility(View.GONE);
         }
 
@@ -89,8 +103,8 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         // Cargar imagen
         Glide.with(context)
                 .load(articulo.getImagen())
-                .placeholder(R.drawable.logo_la_granja) // mientras carga
-                .error(R.drawable.logo_la_granja)       // si falla
+                .placeholder(R.drawable.logo_la_granja)
+                .error(R.drawable.logo_la_granja)
                 .into(holder.imagen);
 
         holder.btnAgregar.setOnClickListener(v -> {
@@ -99,6 +113,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
             }
         });
     }
+
 
     @Override
     public int getItemCount() {

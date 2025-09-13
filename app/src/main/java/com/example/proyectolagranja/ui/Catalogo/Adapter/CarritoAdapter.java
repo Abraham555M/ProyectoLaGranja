@@ -53,48 +53,47 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         ItemCarrito item = lista.get(position);
 
         holder.nombreArticulo.setText(item.getArticulo().getNombre());
-        holder.precioArticulo.setText("Precio: S/" + item.getArticulo().getPrecio());
-        String cantidadFormateada = String.format(Locale.US, "%.3f", (double) item.getCantidad());
-        holder.cantidadArticulo.setText("Cantidad: " + cantidadFormateada);
 
-        double precio = Double.parseDouble(item.getArticulo().getPrecio());
-        double subtotal = precio * item.getCantidad();
-        String subtotalFormateado = String.format(Locale.US, "%.2f", subtotal); // Redondear
-        holder.subTotalArticulo.setText("Subtotal: S/" + subtotalFormateado);
+        try {
+            double precio = Double.parseDouble(item.getArticulo().getPrecio());
+            double subtotal = precio * item.getCantidad();
 
-        // URL de imagen
+            holder.precioArticulo.setText(String.format(Locale.US, "Precio: S/ %.2f", precio));
+            String cantidadFormateada = String.format(Locale.US, "%.3f", item.getCantidad());
+            holder.cantidadArticulo.setText("Cantidad: " + cantidadFormateada);
+            holder.subTotalArticulo.setText(String.format(Locale.US, "Subtotal: S/ %.2f", subtotal));
+
+        } catch (NumberFormatException e) {
+            holder.precioArticulo.setText("Precio: S/ 0.00");
+            holder.subTotalArticulo.setText("Subtotal: S/ 0.00");
+        }
+
+        // Imagen
         Glide.with(context)
                 .load(item.getArticulo().getImagen())
                 .placeholder(R.drawable.logo_la_granja)
                 .into(holder.imgArticulo);
 
-        if (item.getArticulo().getEsPromo() == 1) {
-            holder.labelOferta.setVisibility(View.VISIBLE);
-        } else {
-            holder.labelOferta.setVisibility(View.GONE);
-        }
+        holder.labelOferta.setVisibility(item.getArticulo().getEsPromo() == 1 ? View.VISIBLE : View.GONE);
 
-        // Limpiar TextWatcher previo antes de asignar
+        // TextWatcher
         holder.etDetalleArticulo.removeTextChangedListener(holder.textWatcher);
-        // Rellenar si ya tenía valor
         holder.etDetalleArticulo.setText(item.getDetalle());
-        // Crear nuevo watcher
         holder.textWatcher = new SimpleTextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                item.setDetalle(s.toString()); // Guardar en modelo
+                item.setDetalle(s.toString());
             }
         };
         holder.etDetalleArticulo.addTextChangedListener(holder.textWatcher);
 
-        // Botón para eliminar artículo del carrito
+        // Eliminar artículo
         holder.btnEliminarArticulo.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
             if (pos != RecyclerView.NO_POSITION) {
                 MainActivity.carrito.remove(pos);
                 notifyItemRemoved(pos);
                 notifyItemRangeChanged(pos, lista.size());
-
                 if (listener != null) {
                     listener.onCarritoChange(calcularTotal());
                 }
@@ -109,8 +108,12 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
     private double calcularTotal() {
         double total = 0;
         for (ItemCarrito item : lista) {
-            double precio = Double.parseDouble(item.getArticulo().getPrecio());
-            total += precio * item.getCantidad();
+            try {
+                double precio = Double.parseDouble(item.getArticulo().getPrecio());
+                total += precio * item.getCantidad();
+            } catch (NumberFormatException e) {
+                // Ignorar si algún precio no es válido
+            }
         }
         return total;
     }

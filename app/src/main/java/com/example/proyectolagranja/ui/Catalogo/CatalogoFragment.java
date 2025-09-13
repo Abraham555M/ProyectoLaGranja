@@ -575,11 +575,12 @@ public class CatalogoFragment extends Fragment {
         int totalComprado = obj.optInt("total_comprado", 0);
         int esFavorito = obj.optInt("es_favorito", 0);
 
-        String precio = esPromo == 1
-                ? obj.optString("prec_promo_articulo", DEFAULT_PRICE)
-                : obj.optString("prec_vent1_articulo", DEFAULT_PRICE);
+        // Asignamos siempre los dos precios
+        String precio = obj.optString("prec_vent1_articulo", DEFAULT_PRICE);
+        String precioOferta = obj.optString("prec_promo_articulo", DEFAULT_PRICE);
 
-        return new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion);
+        // Pasamos ambos al constructor
+        return new Articulo(id, nombre, precio, precioOferta, imagen, esPromo, totalComprado, esFavorito, codPresentacion);
     }
 
     private void procesarRespuestaCategorias(String responseBody) {
