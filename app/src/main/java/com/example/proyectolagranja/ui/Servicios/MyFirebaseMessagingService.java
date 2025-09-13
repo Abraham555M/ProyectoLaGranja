@@ -25,7 +25,6 @@ import com.loopj.android.http.RequestParams;
 import cz.msebera.android.httpclient.Header;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
-
     private static final String CHANNEL_ID = "canal_default";
     private static final String TAG = "FCM_SERVICE";
 

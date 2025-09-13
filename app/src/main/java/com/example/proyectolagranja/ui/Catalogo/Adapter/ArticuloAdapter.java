@@ -8,7 +8,6 @@ import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,6 +31,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         this.listaArticulos = listaArticulos;
         this.listener = listener;
     }
+
     public interface OnAgregarClickListener {
         void onAgregarClick(Articulo articulo);
     }

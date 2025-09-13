@@ -48,8 +48,8 @@ import cz.msebera.android.httpclient.Header;
 
 public class PedidosFragment extends Fragment implements View.OnClickListener {
     private String fechaInicio = "", fechaFin = "";
-    private EditText et_fecha_ini, et_fecha_fin;
-    private Button btnNuevoPedido, btnCancelarPedido, btnVerMasPedido;
+    private EditText etFechaIni, etFechaFin;
+    private Button btnNuevoPedido;
     private RecyclerView recyclerViewPedidos;
     private PedidosAdapter adapter;
     private List<Venta> listaVenta = new ArrayList<>();
@@ -111,7 +111,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
             public void onNothingSelected(AdapterView<?> parent) { }
         });
 
-        //********
         String[] estados = getResources().getStringArray(R.array.listado_estado);
 
         ArrayAdapter<String> adapterSpinner = new ArrayAdapter<String>(
@@ -155,11 +154,8 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                         color = ContextCompat.getColor(requireContext(), android.R.color.white);
                         break;
                 }
-
-                // Fondo del item
                 view.setBackgroundColor(color);
 
-                // Texto siempre en negro para que sea legible
                 TextView tv = view.findViewById(R.id.tvEstado);
                 if (tv != null) {
                     tv.setTextColor(Color.BLACK);
@@ -168,7 +164,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         };
 
         spEstado.setAdapter(adapterSpinner);
-    //********
 
         // Inicializamos adapter vacío
         adapter = new PedidosAdapter(getContext(), listaVenta);
@@ -187,10 +182,10 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        et_fecha_ini = rootView.findViewById(R.id.et_fecha_ini);
-        et_fecha_fin = rootView.findViewById(R.id.et_fecha_fin);
-        et_fecha_ini.setOnClickListener(v -> mostrarDatePicker(true));
-        et_fecha_fin.setOnClickListener(v -> mostrarDatePicker(false));
+        etFechaIni = rootView.findViewById(R.id.etFechaIni);
+        etFechaFin = rootView.findViewById(R.id.etFechaFin);
+        etFechaIni.setOnClickListener(v -> mostrarDatePicker(true));
+        etFechaFin.setOnClickListener(v -> mostrarDatePicker(false));
 
         btnNuevoPedido = (Button) rootView.findViewById(R.id.btnNuevoPedido);
         btnNuevoPedido.setOnClickListener(this);
@@ -204,8 +199,8 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         super.onDestroyView();
         fechaInicio = "";
         fechaFin = "";
-        if (et_fecha_ini != null) et_fecha_ini.setText("");
-        if (et_fecha_fin != null) et_fecha_fin.setText("");
+        if (etFechaIni != null) etFechaIni.setText("");
+        if (etFechaFin != null) etFechaFin.setText("");
     }
 
     private void mostrarDatePicker(boolean esInicio) {
@@ -227,7 +222,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     return;
                 }
                 fechaInicio = fecha;
-                et_fecha_ini.setText(fecha);
+                etFechaIni.setText(fecha);
             } else {
                 // Validar que no sea menor que la fecha inicio
                 if (!fechaInicio.isEmpty() && fecha.compareTo(fechaInicio) < 0) {
@@ -235,7 +230,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     return;
                 }
                 fechaFin = fecha;
-                et_fecha_fin.setText(fecha);
+                etFechaFin.setText(fecha);
             }
             if (!fechaInicio.isEmpty() && !fechaFin.isEmpty()) {
                 filtrarPorFechas(fechaInicio, fechaFin);
@@ -307,7 +302,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     String response = new String(responseBody, "UTF-8");
                     JSONArray jsonArray = new JSONArray(response);
 
-                    listaVenta.clear(); // Limpiamos la lista existente
+                    listaVenta.clear();
 
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
@@ -401,7 +396,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         emptyStateLayout.setVisibility(View.GONE);
     }
 
-
     private void mostrarDialogCancelarPedido(Venta venta) {
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.alert_dialog_cancelar_pedido, null);
 
@@ -450,10 +444,8 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
         btnCerrar.setOnClickListener(v -> dialog.dismiss());
 
-        // Mostramos el Dialog
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        // Llamamos al método que hace la consulta
         cargarDetallesVenta(venta.getId_venta(), listaArticulos, adapterArticulos, tvEmpty, tvMensajeTotal, tvMensajeEstado, venta.getAct_venta());
     }
 
@@ -488,10 +480,10 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     adapterArticulos.notifyDataSetChanged();
                     tvEmpty.setVisibility(listaArticulos.isEmpty() ? View.VISIBLE : View.GONE);
 
-                    // 🔹 Actualizar total
+                    // Actualizar total
                     tvMensajeTotal.setText("Total: S/ " + String.format("%.2f", total));
 
-                    // 🔹 Actualizar estado
+                    // Actualizar estado
                     String estadoTexto;
                     int colorFondo;
                     switch (actVenta) {
@@ -539,7 +531,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
 
                     if (status.equals("ok")) {
-                        // Actualizamos la lista y el RecyclerView
                         cargarPedidosCliente();
                     }
 

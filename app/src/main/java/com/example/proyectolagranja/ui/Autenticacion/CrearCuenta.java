@@ -63,7 +63,6 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
                         Toast.makeText(getActivity(), "No se pudo obtener token de notificación", Toast.LENGTH_SHORT).show();
                         return;
                     }
-
                     String fcmToken = task.getResult(); // Token del dispositivo
 
                     RequestParams params = new RequestParams();

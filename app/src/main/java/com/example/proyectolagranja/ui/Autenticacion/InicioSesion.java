@@ -67,7 +67,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private static final String KEY_TIEMPO_BLOQUEO = "_tiempo_bloqueo";
     private static final int MAX_INTENTOS = 3;
     private static final long TIEMPO_BLOQUEO_HORAS = 24;
-
     private static final String KEY_INTENTOS_CODIGO = "_intentos_codigo";
     private static final String KEY_INTENTOS_REENVIO = "_intentos_reenvio";
 
@@ -90,12 +89,12 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
         configurarAutoFocusCodigo(rootView);
 
-        // Inicializar SharedPreferences para el control de bloqueos
+        // SharedPreferences para el control de bloqueos
         sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         mAuth = FirebaseAuth.getInstance();
 
-        // Inicializar App Check
+        // Inicializar App Check - Envio de sms
         FirebaseApp.initializeApp(requireContext());
         FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
         firebaseAppCheck.installAppCheckProviderFactory(
@@ -279,12 +278,12 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
     private void configurarAutoFocusCodigo(View rootView) {
         EditText[] edits = {
-                rootView.findViewById(R.id.etCodigo1),
-                rootView.findViewById(R.id.etCodigo2),
-                rootView.findViewById(R.id.etCodigo3),
-                rootView.findViewById(R.id.etCodigo4),
-                rootView.findViewById(R.id.etCodigo5),
-                rootView.findViewById(R.id.etCodigo6)
+            rootView.findViewById(R.id.etCodigo1),
+            rootView.findViewById(R.id.etCodigo2),
+            rootView.findViewById(R.id.etCodigo3),
+            rootView.findViewById(R.id.etCodigo4),
+            rootView.findViewById(R.id.etCodigo5),
+            rootView.findViewById(R.id.etCodigo6)
         };
 
         for (int i = 0; i < edits.length; i++) {

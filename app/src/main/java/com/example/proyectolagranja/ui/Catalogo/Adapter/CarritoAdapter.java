@@ -68,11 +68,8 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(holder.imgArticulo);
 
-        //*********
-
-        // IMPORTANTE: limpiar TextWatcher previo antes de asignar
+        // Limpiar TextWatcher previo antes de asignar
         holder.etDetalleArticulo.removeTextChangedListener(holder.textWatcher);
-
         // Rellenar si ya tenía valor
         holder.etDetalleArticulo.setText(item.getDetalle());
         // Crear nuevo watcher
@@ -84,7 +81,6 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         };
         holder.etDetalleArticulo.addTextChangedListener(holder.textWatcher);
 
-        //*********
         // Botón para eliminar artículo del carrito
         holder.btnEliminarArticulo.setOnClickListener(v -> {
             int pos = holder.getAdapterPosition();
@@ -98,7 +94,6 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
                 }
             }
         });
-
     }
 
     public interface OnCarritoChangeListener {

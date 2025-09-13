@@ -62,8 +62,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     private List<Articulo> listaArticulos = new ArrayList<>();
     private List<Categoria> listaCategorias = new ArrayList<>();
     private List<Producto> listaProductos = new ArrayList<>();
-    private Integer categoriaSeleccionada = null;
-    private Integer productoSeleccionado = null;
+    private Integer productoSeleccionado = null, categoriaSeleccionada = null;
     private MaterialButton btnOfertas, btnFavoritos;
     private boolean mostrandoPromociones = false, mostrandoFavoritos = false;
     private SessionManager session;
@@ -76,7 +75,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                              ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_catalogo, container, false);
 
-        //  Inicializas SessionManager aquí
+        //  Inicializamos SessionManager
         session = new SessionManager(requireContext());
 
         spCategorias = rootView.findViewById(R.id.spCategorias);
@@ -95,12 +94,12 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
 
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            // Cuando el usuario haga swipe hacia abajo, recargas datos
+            // Swipe abajo - recargas datos
             recargarCatalogo();
         });
 
-        cargarCategorias(); // Cargar Categorias en el spinner
-        cargarArticulos(); // Cargar Articulos
+        cargarCategorias();
+        cargarArticulos();
 
         configurarSpinnerCategorias(); // Configuracion categorias
         configurarSpinnerProductos(); // Configuracion productos
@@ -117,11 +116,10 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         categoriaSeleccionada = null;
         productoSeleccionado = null;
 
-        // Recargar artículos (Sin filtros aplicados)
         cargarArticulos();
         resetFiltrosPromocionesYFavoritos();
 
-        // Resetear Spinners correctamente
+        // Resetear Spinners
         spCategorias.setOnItemSelectedListener(null); // Desvincular listener temporal
         spCategorias.setSelection(0);
         spCategorias.post(() -> configurarSpinnerCategorias()); // Volver a poner listener después
@@ -131,7 +129,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         spProductos.setSelection(0);
         spProductos.post(() -> configurarSpinnerProductos());
 
-        // Limpiar campo de búsqueda
         etBusqueda.setText("");
 
         swipeRefreshLayout.setRefreshing(false);
@@ -148,9 +145,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                     filtrarArticulosPorCategoria(categoriaSeleccionada);
                     cargarProductosPorCategoria(categoriaSeleccionada);
                 } else {
-                    categoriaSeleccionada = null; // Ninguna categoría
-                    //cargarArticulos(); // Mostrar todo si no se selecciona ninguna categoría válida
-                    //cargarProductos();
+                    categoriaSeleccionada = null;
                     aplicarFiltros();
                 }
             }
@@ -406,7 +401,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                             precio = obj.optString("prec_vent1_articulo", "0");
                         }
 
-                        // Usar constructor extendido con favorito incluido
                         listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
                     }
 
@@ -649,7 +643,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         MaterialButton btnSumar = dialogView.findViewById(R.id.btnSumar);
         MaterialButton etPromociones = dialogView.findViewById(R.id.etPromociones);
         MaterialButton etFavoritos = dialogView.findViewById(R.id.etFavoritos);
-        LinearLayout contenedorIzquierdo = dialogView.findViewById(R.id.contenedorIzquierdo);
         TextView tvOfertaValida = dialogView.findViewById(R.id.tvOfertaValida);
         TextInputEditText etCantidad = dialogView.findViewById(R.id.etCantidad);
         TextView labelOfertaCantidad = dialogView.findViewById(R.id.labelOfertaCantidad);
@@ -705,8 +698,8 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         nombreArticulo.setText(articulo.getNombre());
         precioArticulo.setText("S/ " + articulo.getPrecio());
 
-        // --- Buscar si el artículo ya está en el carrito ---
-        // Se guarda la referencia y posición
+        // Buscar si el artículo ya está en el carrito
+        // --- Se guarda la referencia y posición ---
         final ItemCarrito[] itemExistente = {null};
         final int[] indexExistente = {-1};
 
@@ -729,8 +722,8 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                 .setView(dialogView)
                 .create();
 
-        dialog.setCanceledOnTouchOutside(false); // 🔹 No cerrar al tocar fuera
-        dialog.setCancelable(false); // 🔹 No cerrar con botón atrás
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCancelable(false);
 
         btnAgregar.setOnClickListener(v -> {
             String cantidadStr = etCantidad.getText().toString().trim();
@@ -790,7 +783,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         int esFavorito = obj.optInt("es_favorito", 0);
                         int totalComprado = obj.optInt("total_comprado", 0);
 
-                        // Validación: si es promo usar precio de promo, caso contrario precio normal
                         String precio;
                         if (esPromo == 1) {
                             precio = obj.optString("prec_promo_articulo", "0");
@@ -843,7 +835,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                         int totalComprado = obj.optInt("total_comprado", 0);
                         int estFavorito = obj.optInt("es_favorito", 0);
 
-                        // Validación: si es promo usar precio de promo, caso contrario precio normal
                         String precio;
                         if (esPromo == 1) {
                             precio = obj.optString("prec_promo_articulo", "0");
@@ -888,8 +879,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onClick(View view) {
-        // toggle exclusivo
+    public void onClick(View view) { // toggle exclusivo
         if(view == btnFavoritos){
             if (mostrandoFavoritos) {
                 cargarArticulos(); // Lista completa
@@ -902,7 +892,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                 btnFavoritos.setTextColor(ContextCompat.getColor(getContext(), R.color.color_rojo));
                 btnFavoritos.setIconTint(ContextCompat.getColorStateList(getContext(), R.color.color_rojo));
             } else {
-                // 🔹 Primero resetear selección para que no dispare filtro después
+                // Primero resetear selección para que no dispare filtro después
                 spCategorias.setOnItemSelectedListener(null); // Desvincular listener temporal
                 spCategorias.setSelection(0);
                 spCategorias.post(() -> configurarSpinnerCategorias()); // volver a poner listener después
@@ -946,18 +936,15 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                 btnOfertas.setIconTint(ContextCompat.getColorStateList(getContext(), R.color.color_verde));
 
             } else {
-                // 🔹 Resetear selección de spinners sin recargar productos
                 spCategorias.setOnItemSelectedListener(null);
                 spCategorias.setSelection(0);
                 spCategorias.post(() -> configurarSpinnerCategorias());
 
-                // Resetear productos
                 spProductos.setOnItemSelectedListener(null);
-                cargarProductos(false); // 👈 false = carga general, no filtrada
+                cargarProductos(false);
                 spProductos.setSelection(0);
                 spProductos.post(() -> configurarSpinnerProductos());
 
-                // 🔹 Mostrar solo promociones
                 listarPromociones();
                 mostrandoPromociones = true;
 
@@ -967,7 +954,6 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
                 btnOfertas.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
                 btnOfertas.setIconTint(ContextCompat.getColorStateList(getContext(), android.R.color.white));
 
-                // 🔹 Resetear favoritos (inactivo)
                 mostrandoFavoritos = false;
                 btnFavoritos.setBackgroundTintList(
                         ContextCompat.getColorStateList(getContext(), android.R.color.white)

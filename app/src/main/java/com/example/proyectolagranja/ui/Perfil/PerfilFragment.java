@@ -39,9 +39,9 @@ import cz.msebera.android.httpclient.Header;
 public class PerfilFragment extends Fragment implements View.OnClickListener {
     private Button btnGuardarCambios;
     private EditText etNombresEd, etDocumentoEd, etTelefonoEd, etDireccionEd;
-    private TextInputLayout tilTelefono, tilEditName, tilDireccion;
+    private TextInputLayout tilTelefono;
 
-    // 🔹 Variables para guardar los valores originales
+    // Variables para guardar los valores originales
     private String nombresOriginal = "";
     private String documentoOriginal = "";
     private String telefonoOriginal = "";
@@ -51,7 +51,6 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_perfil, container, false);
-
         session = new SessionManager(requireContext());
 
         etNombresEd = rootView.findViewById(R.id.etNombresEd);
@@ -59,12 +58,10 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
         etTelefonoEd = rootView.findViewById(R.id.etTelefonoEd);
         etDireccionEd = rootView.findViewById(R.id.etDireccionEd);
         tilTelefono = rootView.findViewById(R.id.tilTelefono);
-        tilEditName = rootView.findViewById(R.id.tilEditName);
         etDireccionEd = rootView.findViewById(R.id.etDireccionEd);
 
         // OnClick para cambiar el telefono
         tilTelefono.setEndIconOnClickListener(v -> onClick(tilTelefono));
-
         btnGuardarCambios = rootView.findViewById(R.id.btnGuardarCambios);
         btnGuardarCambios.setOnClickListener(this);
 
@@ -87,7 +84,6 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // Si cualquiera de los EditText tiene algo escrito, activamos el botón
                 verificarCampos();
             }
 
@@ -106,10 +102,10 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
         btnGuardarCambios.setEnabled(hayCambios);
 
         if (hayCambios) {
-            // Cambiar a color activo (por ejemplo, azul)
+            // Cambiar a color activo
             btnGuardarCambios.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.color_principal));
         } else {
-            // Cambiar a color deshabilitado (gris claro)
+            // Cambiar a color deshabilitado
             btnGuardarCambios.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.darker_gray));
         }
     }
