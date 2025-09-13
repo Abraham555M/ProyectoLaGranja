@@ -65,8 +65,14 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         // URL de imagen
         Glide.with(context)
                 .load(item.getArticulo().getImagen())
-                .placeholder(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.logo_la_granja)
                 .into(holder.imgArticulo);
+
+        if (item.getArticulo().getEsPromo() == 1) {
+            holder.labelOferta.setVisibility(View.VISIBLE);
+        } else {
+            holder.labelOferta.setVisibility(View.GONE);
+        }
 
         // Limpiar TextWatcher previo antes de asignar
         holder.etDetalleArticulo.removeTextChangedListener(holder.textWatcher);
@@ -116,7 +122,7 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgArticulo;
-        TextView nombreArticulo, precioArticulo, cantidadArticulo, subTotalArticulo;
+        TextView nombreArticulo, precioArticulo, cantidadArticulo, subTotalArticulo, labelOferta;
         View btnEliminarArticulo;
         TextInputEditText etDetalleArticulo;
         TextWatcher textWatcher;
@@ -130,6 +136,7 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
             subTotalArticulo = itemView.findViewById(R.id.subTotalArticulo);
             btnEliminarArticulo = itemView.findViewById(R.id.btnEliminarArticulo);
             etDetalleArticulo = itemView.findViewById(R.id.etDetalleArticulo);
+            labelOferta = itemView.findViewById(R.id.labelOferta);
         }
     }
 }

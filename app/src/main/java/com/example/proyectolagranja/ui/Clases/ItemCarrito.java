@@ -4,6 +4,7 @@ public class ItemCarrito {
     private Articulo articulo;
     private double cantidad;
     private String detalle;
+    private int esPromo;
 
     public ItemCarrito(Articulo articulo, double cantidad, String detalle) {
         this.articulo = articulo;

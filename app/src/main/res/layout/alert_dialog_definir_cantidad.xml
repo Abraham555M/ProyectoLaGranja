@@ -41,7 +41,6 @@
                 android:textColor="@color/color_rojo"
                 android:textSize="13sp"
                 android:textStyle="bold"
-                android:elevation="8dp"
                 android:layout_marginBottom="8dp" />
 
         <LinearLayout

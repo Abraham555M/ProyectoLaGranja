@@ -108,7 +108,6 @@
                             android:layout_height="30dp"
                             android:layout_gravity="center"
                             android:backgroundTint="@color/color_verde"
-                            android:elevation="4dp"
                             android:insetLeft="0dp"
                             android:insetTop="0dp"
                             android:insetRight="0dp"
@@ -119,6 +118,7 @@
                             app:icon="@drawable/ic_promociones"
                             app:iconGravity="textStart"
                             app:iconPadding="0dp"
+                            android:elevation="0dp"
                             app:iconSize="15dp"
                             app:iconTint="@android:color/white"
                             app:strokeWidth="0dp" />
@@ -131,13 +131,13 @@
                             android:layout_gravity="center"
                             android:backgroundTint="@color/color_rojo"
                             android:layout_marginLeft="10dp"
-                            android:elevation="4dp"
                             android:insetLeft="0dp"
                             android:insetTop="0dp"
                             android:insetRight="0dp"
                             android:insetBottom="0dp"
                             android:padding="0dp"
                             android:text=""
+                            android:elevation="0dp"
                             app:cornerRadius="18dp"
                             app:icon="@drawable/ic_favoritos"
                             app:iconGravity="textStart"
@@ -199,7 +199,6 @@
             android:textColor="@color/color_rojo"
             android:textSize="13sp"
             android:textStyle="bold"
-            android:elevation="8dp"
             android:layout_margin="8dp" />
     </FrameLayout>
 </androidx.cardview.widget.CardView>
