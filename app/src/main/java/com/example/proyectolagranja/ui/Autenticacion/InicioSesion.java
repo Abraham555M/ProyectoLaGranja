@@ -463,6 +463,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     if (task.isSuccessful()) {
                         Log.d("PhoneAuth", "Autenticación exitosa");
                         String telefono = etTelefono.getText().toString().trim();
+                        resetearIntentosFallidos(telefono);
+
                         validarTelefono(telefono);
                     } else {
                         Log.e("PhoneAuth", "Autenticación fallida", task.getException());
@@ -470,6 +472,17 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                         incrementarIntentosFallidos(telefono);
                     }
                 });
+    }
+
+    private void resetearIntentosFallidos(String telefono) {
+        String telefonoFormateado = formatearNumero(telefono);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Solo resetear los intentos de código, mantener los de reenvío
+        editor.remove(telefonoFormateado + KEY_INTENTOS_CODIGO);
+        editor.apply();
+
+        Log.d("BloqueoControl", "Intentos de código reseteados para: " + telefonoFormateado);
     }
 
     public void limpiarEspacios() {
