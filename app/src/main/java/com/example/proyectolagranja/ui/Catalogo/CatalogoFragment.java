@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,6 +29,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.proyectolagranja.MainActivity;
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Catalogo.Adapter.ArticuloAdapter;
+import com.example.proyectolagranja.ui.Catalogo.Helper.DialogoAgregarHelper;
 import com.example.proyectolagranja.ui.Clases.Articulo;
 import com.example.proyectolagranja.ui.Clases.Categoria;
 import com.example.proyectolagranja.ui.Clases.ItemCarrito;
@@ -54,28 +54,52 @@ import java.util.TimerTask;
 
 import cz.msebera.android.httpclient.Header;
 
-public class CatalogoFragment extends Fragment implements View.OnClickListener {
+public class CatalogoFragment extends Fragment {
+    // Constants
+    private static final long SEARCH_DELAY = 500L;
+    private static final int MIN_QUANTITY = 1;
+    private static final String DEFAULT_PRICE = "0";
+
+    // UI Components
     private Spinner spCategorias, spProductos;
     private RecyclerView recyclerView;
     private ArticuloAdapter adapter;
     private EditText etBusqueda;
-    private List<Articulo> listaArticulos = new ArrayList<>();
-    private List<Categoria> listaCategorias = new ArrayList<>();
-    private List<Producto> listaProductos = new ArrayList<>();
-    private Integer productoSeleccionado = null, categoriaSeleccionada = null;
     private MaterialButton btnOfertas, btnFavoritos;
-    private boolean mostrandoPromociones = false, mostrandoFavoritos = false;
-    private SessionManager session;
     private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayout emptyStateLayout;
     private TextView tvEmptyMessage;
     private ImageView ivEmptyIcon;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    // Data
+    private final List<Articulo> listaArticulos = new ArrayList<>();
+    private final List<Categoria> listaCategorias = new ArrayList<>();
+    private final List<Producto> listaProductos = new ArrayList<>();
+
+    // State
+    private Integer productoSeleccionado = null;
+    private Integer categoriaSeleccionada = null;
+    private boolean mostrandoPromociones = false;
+    private boolean mostrandoFavoritos = false;
+
+    // Services
+    private SessionManager session;
+    private Timer searchTimer = new Timer();
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_catalogo, container, false);
 
-        //  Inicializamos SessionManager
+        initializeComponents(rootView);
+        setupRecyclerView();
+        setupSwipeRefresh();
+        setupEventListeners();
+        loadInitialData();
+
+        return rootView;
+    }
+
+    private void initializeComponents(View rootView) {
         session = new SessionManager(requireContext());
 
         spCategorias = rootView.findViewById(R.id.spCategorias);
@@ -86,63 +110,92 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         emptyStateLayout = rootView.findViewById(R.id.emptyStateLayout);
         tvEmptyMessage = rootView.findViewById(R.id.tvEmptyMessage);
         ivEmptyIcon = rootView.findViewById(R.id.ivEmptyIcon);
-
         recyclerView = rootView.findViewById(R.id.recyclerViewComentarios);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ArticuloAdapter(getContext(), listaArticulos, articulo -> mostrarDialogoAgregar(articulo));
-        recyclerView.setAdapter(adapter);
-
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            // Swipe abajo - recargas datos
-            recargarCatalogo();
-        });
-
-        cargarCategorias();
-        cargarArticulos();
-
-        configurarSpinnerCategorias(); // Configuracion categorias
-        configurarSpinnerProductos(); // Configuracion productos
-        configurarBusquedaPorNombre(); // Configuracion nombre
-
-        btnOfertas.setOnClickListener(this);
-        btnFavoritos.setOnClickListener(this);
-
-        return rootView;
     }
+
+    private void setupRecyclerView() {
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new ArticuloAdapter(getContext(), listaArticulos, this::mostrarDialogoAgregar);
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void setupSwipeRefresh() {
+        swipeRefreshLayout.setOnRefreshListener(this::recargarCatalogo);
+    }
+
+    private void setupEventListeners() {
+        configurarSpinnerCategorias();
+        configurarSpinnerProductos();
+        configurarBusquedaPorNombre();
+
+        btnOfertas.setOnClickListener(v -> toggleOfertas());
+        btnFavoritos.setOnClickListener(v -> toggleFavoritos());
+    }
+
+    private void loadInitialData() {
+        cargarCategorias();
+        cargarProductos(true);
+        cargarArticulos();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        cargarProductos(true);
+    }
+
+    // =================== FILTER METHODS ===================
 
     private void recargarCatalogo() {
-        // Limpiar filtros seleccionados
-        categoriaSeleccionada = null;
-        productoSeleccionado = null;
-
+        resetearFiltros();
         cargarArticulos();
-        resetFiltrosPromocionesYFavoritos();
-
-        // Resetear Spinners
-        spCategorias.setOnItemSelectedListener(null); // Desvincular listener temporal
-        spCategorias.setSelection(0);
-        spCategorias.post(() -> configurarSpinnerCategorias()); // Volver a poner listener después
-
-        spProductos.setOnItemSelectedListener(null); // Desvincular temporal
-        cargarProductos(false); // Recargar todos los productos
-        spProductos.setSelection(0);
-        spProductos.post(() -> configurarSpinnerProductos());
-
+        resetearBotones();
+        resetearSpinners();
         etBusqueda.setText("");
-
         swipeRefreshLayout.setRefreshing(false);
     }
+
+    private void resetearFiltros() {
+        categoriaSeleccionada = null;
+        productoSeleccionado = null;
+    }
+
+    private void resetearBotones() {
+        mostrandoPromociones = false;
+        mostrandoFavoritos = false;
+        aplicarEstiloBotonInactivo(btnOfertas, R.color.color_verde);
+        aplicarEstiloBotonInactivo(btnFavoritos, R.color.color_rojo);
+    }
+
+    private void resetearSpinners() {
+        deshabilitarListeners();
+        spCategorias.setSelection(0);
+        spProductos.setSelection(0);
+        cargarProductos(false);
+        habilitarListeners();
+    }
+
+    private void deshabilitarListeners() {
+        spCategorias.setOnItemSelectedListener(null);
+        spProductos.setOnItemSelectedListener(null);
+    }
+
+    private void habilitarListeners() {
+        spCategorias.post(this::configurarSpinnerCategorias);
+        spProductos.post(this::configurarSpinnerProductos);
+    }
+
+    // =================== SPINNER CONFIGURATION ===================
 
     private void configurarSpinnerCategorias() {
         spCategorias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0 && position < listaCategorias.size()) {
-                    Categoria seleccionada = listaCategorias.get(position);
-                    categoriaSeleccionada = seleccionada.getId_categoria();
-
-                    filtrarArticulosPorCategoria(categoriaSeleccionada);
+                if (esSeleccionValida(position, listaCategorias.size())) {
+                    Categoria categoria = listaCategorias.get(position);
+                    categoriaSeleccionada = categoria.getId_categoria();
+                    filtrarPorCategoria(categoriaSeleccionada);
                     cargarProductosPorCategoria(categoriaSeleccionada);
                 } else {
                     categoriaSeleccionada = null;
@@ -151,8 +204,7 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
@@ -160,25 +212,11 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         spProductos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0 && position < listaProductos.size()) {
-                    Producto seleccionado = listaProductos.get(position);
-                    productoSeleccionado = seleccionado.getId_producto();
-
-                    // Si estaba en promociones, salir del modo promociones
-                    if (mostrandoPromociones) {
-                        mostrandoPromociones = false;
-                        btnOfertas.setBackgroundTintList(
-                                ContextCompat.getColorStateList(getContext(), R.color.color_verde)
-                        );
-                    }
-                    if (mostrandoFavoritos) {
-                        mostrandoFavoritos = false;
-                        btnFavoritos.setBackgroundTintList(
-                                ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
-                        );
-                    }
-
-                    filtrarArticulosPorProducto(productoSeleccionado);
+                if (esSeleccionValida(position, listaProductos.size())) {
+                    Producto producto = listaProductos.get(position);
+                    productoSeleccionado = producto.getId_producto();
+                    resetearBotones();
+                    filtrarPorProducto(productoSeleccionado);
                 } else {
                     productoSeleccionado = null;
                     aplicarFiltros();
@@ -186,689 +224,467 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private boolean esSeleccionValida(int position, int listSize) {
+        return position > 0 && position < listSize;
+    }
+
+    private void limpiarSpinnerProductos() {
+        spProductos.setOnItemSelectedListener(null);
+        // Siempre cargar todos los productos cuando se limpia el spinner
+        cargarProductos(true);
+        spProductos.setSelection(0);
+        spProductos.post(this::configurarSpinnerProductos);
+    }
+
+    private void limpiarSpinnerCategorias() {
+        spCategorias.setOnItemSelectedListener(null);
+        spCategorias.setSelection(0);
+        spCategorias.post(this::configurarSpinnerCategorias);
+    }
+
+    private void recargarTodosLosProductos() {
+        // Desconectar listener temporalmente
+        spProductos.setOnItemSelectedListener(null);
+
+        // Forzar recarga completa de productos
+        String url = ServidorConfig.URL_SERVIDOR + "producto/producto_listar.php";
+        new AsyncHttpClient().get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                procesarRespuestaProductos(new String(responseBody));
+                // Resetear a posición 0 y reconectar listener
+                spProductos.setSelection(0);
+                spProductos.post(() -> configurarSpinnerProductos());
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                mostrarError("Error al recargar productos");
+                // Reconectar listener aunque falle
+                spProductos.post(() -> configurarSpinnerProductos());
             }
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        cargarProductos(true); // Forzamos la carga SIEMPRE al volver
-        configurarSpinnerProductos();
-    }
+    // =================== SEARCH CONFIGURATION ===================
 
     private void configurarBusquedaPorNombre() {
         etBusqueda.addTextChangedListener(new TextWatcher() {
-            private Timer timer = new Timer();
-            private static final long DELAY = 500;
-
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                timer.cancel();
-                timer = new Timer();
+                searchTimer.cancel();
+                searchTimer = new Timer();
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                timer.schedule(new TimerTask() {
+                searchTimer.schedule(new TimerTask() {
                     @Override
                     public void run() {
                         requireActivity().runOnUiThread(() -> {
                             String texto = s.toString().trim();
                             if (!texto.isEmpty()) {
-                                buscarArticulosPorNombre(texto);
+                                buscarPorNombre(texto);
                             } else {
                                 aplicarFiltros();
                             }
                         });
                     }
-                }, DELAY);
+                }, SEARCH_DELAY);
             }
         });
     }
 
-    private void filtrarArticulosPorProducto(int idProducto) {
-        resetFiltrosPromocionesYFavoritos();
-
-        int idCliente = session.getIdCliente();
-
-        String url = ServidorConfig.URL_SERVIDOR
-                + "articulo/articulo_filtrar_producto.php?id_producto="
-                + idProducto
-                + "&id_cliente=" + idCliente;
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                listaArticulos.clear();
-
-                try {
-                    for (int i = 0; i < response.length(); i++) {
-                        JSONObject obj = response.getJSONObject(i);
-                        String id = obj.getString("id_articulo");
-                        String nombre = obj.getString("nom_articulo");
-                        String codPresentacion = obj.getString("cod_presentacion");
-                        String imagen = obj.getString("foto_articulo");
-                        int esPromo = obj.optInt("est_promo_articulo", 0);
-                        int esFavorito = obj.optInt("es_favorito", 0);
-                        int totalComprado = obj.optInt("total_comprado", 0);
-
-                        // Validar qué precio usar
-                        String precio;
-                        if (esPromo == 1) {
-                            precio = obj.optString("prec_promo_articulo", "0");
-                        } else {
-                            precio = obj.optString("prec_vent1_articulo", "0");
-                        }
-
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
-                    }
-                    if (listaArticulos.isEmpty()) {
-                        mostrarEmptyState("No se encontraron artículos", R.drawable.ic_sin_articulos);
-                    } else {
-                        ocultarEmptyState();
-                    }
-                    adapter.notifyDataSetChanged();
-
-                } catch (JSONException e) {
-                    Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Toast.makeText(getContext(), "Error al filtrar artículos por producto", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void cargarProductosPorCategoria(int idCategoria) {
-        String url = ServidorConfig.URL_SERVIDOR + "producto/producto_listar_categoria.php?id_categoria=" + idCategoria;
-        AsyncHttpClient client = new AsyncHttpClient();
-
-        client.get(url, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    JSONArray jsonArray = new JSONArray(new String(responseBody));
-                    List<String> nombresProductos = new ArrayList<>();
-                    nombresProductos.add("Productos");
-
-                    listaProductos.clear();
-                    listaProductos.add(null);
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        int id = obj.getInt("id_producto");
-                        String nombre = obj.getString("nom_producto");
-
-                        listaProductos.add(new Producto(id, nombre));
-                        nombresProductos.add(nombre);
-                    }
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                            getContext(),
-                            android.R.layout.simple_spinner_item,
-                            nombresProductos
-                    );
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spProductos.setAdapter(adapter);
-
-                } catch (JSONException e) {
-                    Toast.makeText(getContext(), "Error al procesar productos", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error al cargar productos", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void resetFiltrosPromocionesYFavoritos() {
-        // Resetear bandera
-        mostrandoPromociones = false;
-        mostrandoFavoritos = false;
-
-        // Restaurar Ofertas al estado inicial
-        btnOfertas.setBackgroundTintList(
-                ContextCompat.getColorStateList(getContext(), R.color.color_blanco)
-        );
-        btnOfertas.setTextColor(
-                ContextCompat.getColor(getContext(), R.color.color_verde)
-        );
-        btnOfertas.setIconTint(
-                ContextCompat.getColorStateList(getContext(), R.color.color_verde)
-        );
-        btnOfertas.setStrokeColor(
-                ContextCompat.getColorStateList(getContext(), R.color.color_verde)
-        );
-        btnOfertas.setStrokeWidth(2);
-
-        // Restaurar Favoritos al estado inicial
-        btnFavoritos.setBackgroundTintList(
-                ContextCompat.getColorStateList(getContext(), R.color.color_blanco)
-        );
-        btnFavoritos.setTextColor(
-                ContextCompat.getColor(getContext(), R.color.color_rojo)
-        );
-        btnFavoritos.setIconTint(
-                ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
-        );
-        btnFavoritos.setStrokeColor(
-                ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
-        );
-        btnFavoritos.setStrokeWidth(2);
-    }
-
-    private void filtrarArticulosPorCategoria(int idCategoria) {
-        resetFiltrosPromocionesYFavoritos();
-        int idCliente = session.getIdCliente();
-
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_categoria.php?id_categoria="
-                + idCategoria + "&id_cliente=" + idCliente;
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                listaArticulos.clear();
-
-                try {
-                    for (int i = 0; i < response.length(); i++) {
-                        JSONObject obj = response.getJSONObject(i);
-
-                        String id = obj.getString("id_articulo");
-                        String nombre = obj.getString("nom_articulo");
-                        String codPresentacion = obj.getString("cod_presentacion");
-                        String imagen = obj.getString("foto_articulo");
-                        int esPromo = obj.optInt("est_promo_articulo", 0);
-                        int totalComprado = obj.optInt("total_comprado", 0);
-                        int esFavorito = obj.optInt("es_favorito", 0);
-
-                        // Validar qué precio usar
-                        String precio;
-                        if (esPromo == 1) {
-                            precio = obj.optString("prec_promo_articulo", "0");
-                        } else {
-                            precio = obj.optString("prec_vent1_articulo", "0");
-                        }
-
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
-                    }
-
-                    adapter.notifyDataSetChanged();
-
-                } catch (JSONException e) {
-                    Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Toast.makeText(getContext(), "Error al filtrar artículos por categoría", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void buscarArticulosPorNombre(String nombre) {
-        resetFiltrosPromocionesYFavoritos();
-
-        int idCliente = session.getIdCliente();
-
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_buscar_filtro.php?"
-                + "nom_articulo=" + nombre
-                + "&id_cliente=" + idCliente;
-
-        if (categoriaSeleccionada != null) {
-            url += "&id_categoria=" + categoriaSeleccionada;
-        }
-
-        if (productoSeleccionado != null) {
-            url += "&id_producto=" + productoSeleccionado;
-        }
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                listaArticulos.clear();
-
-                try {
-                    for (int i = 0; i < response.length(); i++) {
-                        JSONObject obj = response.getJSONObject(i);
-
-                        String id = obj.getString("id_articulo");
-                        String nombre = obj.getString("nom_articulo");
-                        String codPresentacion = obj.getString("cod_presentacion");
-                        String imagen = obj.getString("foto_articulo");
-                        int esPromo = obj.optInt("est_promo_articulo", 0);
-                        int esFavorito = obj.optInt("es_favorito", 0);
-                        int totalComprado = obj.optInt("total_comprado", 0);
-
-                        // Elegir precio según promoción
-                        String precio;
-                        if (esPromo == 1) {
-                            precio = obj.optString("prec_promo_articulo", "0");
-                        } else {
-                            precio = obj.optString("prec_vent1_articulo", "0");
-                        }
-
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
-                    }
-
-                    adapter.notifyDataSetChanged();
-                    if (listaArticulos.isEmpty()) {
-                        mostrarEmptyState("No se encontraron artículos", R.drawable.ic_sin_articulos);
-                    } else {
-                        ocultarEmptyState();
-                    }
-                } catch (JSONException e) {
-                    Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                Toast.makeText(getContext(), "Error al buscar artículos", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+    // =================== FILTER OPERATIONS ===================
 
     private void aplicarFiltros() {
-        // Si estoy en promociones, no aplicar filtros
-        if (mostrandoPromociones|| mostrandoFavoritos) return;
+        if (mostrandoPromociones || mostrandoFavoritos) return;
 
-        if (categoriaSeleccionada != null || productoSeleccionado != null) {
-            buscarArticulosPorNombre("");
+        if (tieneFiltrosaActivos()) {
+            buscarPorNombre("");
         } else {
             cargarArticulos();
         }
     }
 
+    private boolean tieneFiltrosaActivos() {
+        return categoriaSeleccionada != null || productoSeleccionado != null;
+    }
+
+    private void filtrarPorCategoria(int idCategoria) {
+        resetearBotones();
+        ejecutarConsultaFiltro(
+                ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_categoria.php?id_categoria="
+                        + idCategoria + "&id_cliente=" + session.getIdCliente(),
+                "Error al filtrar artículos por categoría"
+        );
+    }
+
+    private void filtrarPorProducto(int idProducto) {
+        resetearBotones();
+        ejecutarConsultaFiltro(
+                ServidorConfig.URL_SERVIDOR + "articulo/articulo_filtrar_producto.php?id_producto="
+                        + idProducto + "&id_cliente=" + session.getIdCliente(),
+                "Error al filtrar artículos por producto"
+        );
+    }
+
+    private void buscarPorNombre(String nombre) {
+        resetearBotones();
+
+        StringBuilder urlBuilder = new StringBuilder()
+                .append(ServidorConfig.URL_SERVIDOR)
+                .append("articulo/articulo_buscar_filtro.php?nom_articulo=")
+                .append(nombre)
+                .append("&id_cliente=")
+                .append(session.getIdCliente());
+
+        if (categoriaSeleccionada != null) {
+            urlBuilder.append("&id_categoria=").append(categoriaSeleccionada);
+        }
+        if (productoSeleccionado != null) {
+            urlBuilder.append("&id_producto=").append(productoSeleccionado);
+        }
+
+        ejecutarConsultaFiltro(urlBuilder.toString(), "Error al buscar artículos");
+    }
+
+    // =================== BUTTON HANDLERS ===================
+
+    private void toggleOfertas() {
+        if (mostrandoPromociones) {
+            mostrarTodosLosArticulos();
+            aplicarEstiloBotonInactivo(btnOfertas, R.color.color_verde);
+        } else {
+            resetearSpinners();
+            listarPromociones();
+            aplicarEstiloBotonActivo(btnOfertas, R.color.color_verde);
+            aplicarEstiloBotonInactivo(btnFavoritos, R.color.color_rojo);
+            etBusqueda.setText("");
+        }
+        mostrandoPromociones = !mostrandoPromociones;
+        mostrandoFavoritos = false;
+    }
+
+    private void toggleFavoritos() {
+        if (mostrandoFavoritos) {
+            mostrarTodosLosArticulos();
+            aplicarEstiloBotonInactivo(btnFavoritos, R.color.color_rojo);
+        } else {
+            resetearSpinners();
+            listarFavoritos();
+            aplicarEstiloBotonActivo(btnFavoritos, R.color.color_rojo);
+            aplicarEstiloBotonInactivo(btnOfertas, R.color.color_verde);
+            etBusqueda.setText("");
+        }
+        mostrandoFavoritos = !mostrandoFavoritos;
+        mostrandoPromociones = false;
+    }
+
+    private void mostrarTodosLosArticulos() {
+        cargarArticulos();
+        ocultarEmptyState();
+    }
+
+    // =================== STYLING METHODS ===================
+
+    private void aplicarEstiloBotonActivo(MaterialButton boton, int colorRes) {
+        boton.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), colorRes));
+        boton.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+        boton.setIconTint(ContextCompat.getColorStateList(getContext(), android.R.color.white));
+    }
+
+    private void aplicarEstiloBotonInactivo(MaterialButton boton, int colorRes) {
+        boton.setBackgroundTintList(ContextCompat.getColorStateList(getContext(), android.R.color.white));
+        boton.setTextColor(ContextCompat.getColor(getContext(), colorRes));
+        boton.setIconTint(ContextCompat.getColorStateList(getContext(), colorRes));
+        boton.setStrokeColor(ContextCompat.getColorStateList(getContext(), colorRes));
+        boton.setStrokeWidth(2);
+    }
+
+    // =================== DATA LOADING METHODS ===================
+
     private void cargarArticulos() {
-        int idCliente = session.getIdCliente();
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_catalogo.php?id_cliente="
+                + session.getIdCliente();
 
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_catalogo.php?id_cliente=" + idCliente;
-        AsyncHttpClient client = new AsyncHttpClient();
-
-        client.get(url, new AsyncHttpResponseHandler() {
+        new AsyncHttpClient().get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    JSONArray jsonArray = new JSONArray(new String(responseBody));
-                    listaArticulos.clear();
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        String id = obj.getString("id_articulo");
-                        String nombre = obj.getString("nom_articulo");
-                        String codPresentacion = obj.optString("cod_presentacion", "");
-                        String imagen = obj.getString("foto_articulo");
-                        int esPromo = obj.optInt("est_promo_articulo", 0);
-                        int totalComprado = obj.optInt("total_comprado", 0);
-                        int esFavorito = obj.optInt("es_favorito", 0);
-
-                        String precio;
-                        if (esPromo == 1) {
-                            precio = obj.optString("prec_promo_articulo", "0");
-                        } else {
-                            precio = obj.optString("prec_vent1_articulo", "0");
-                        }
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
-                    }
-
-                    adapter.notifyDataSetChanged();
-
-                } catch (JSONException e) {
-                    Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
-                }
+                procesarRespuestaArticulos(new String(responseBody));
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
+                mostrarError("Error de conexión con el servidor");
             }
         });
     }
 
     private void cargarCategorias() {
         String url = ServidorConfig.URL_SERVIDOR + "categoria/categoria_listar.php";
-        AsyncHttpClient client = new AsyncHttpClient();
 
-        client.get(url, new AsyncHttpResponseHandler() {
+        new AsyncHttpClient().get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    JSONArray jsonArray = new JSONArray(new String(responseBody));
-                    List<String> nombresCategorias = new ArrayList<>();
-                    nombresCategorias.add("Categoría");
-
-                    listaCategorias.clear();
-                    listaCategorias.add(null);
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        int id = obj.getInt("id_categoria");
-                        String nombre = obj.getString("nom_categoria");
-
-                        listaCategorias.add(new Categoria(id, nombre));
-                        nombresCategorias.add(nombre);
-                    }
-
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                            getContext(),
-                            android.R.layout.simple_spinner_item,
-                            nombresCategorias
-                    );
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spCategorias.setAdapter(adapter);
-                } catch (JSONException e) {
-                    Toast.makeText(getContext(), "Error al procesar los datos", Toast.LENGTH_SHORT).show();
-                }
+                procesarRespuestaCategorias(new String(responseBody));
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+                mostrarError("Error al conectar con el servidor");
             }
         });
     }
 
-    private void cargarProductos(boolean forzarTodos) {
-        if (!forzarTodos && (mostrandoPromociones || mostrandoFavoritos)) {
-            // Si estoy mostrando promociones, no recargar productos
-            return;
-        }
+    private void cargarProductos(boolean forzar) {
+        if (!forzar && (mostrandoPromociones || mostrandoFavoritos)) return;
 
         String url = ServidorConfig.URL_SERVIDOR + "producto/producto_listar.php";
-        AsyncHttpClient client = new AsyncHttpClient();
 
-        client.get(url, new AsyncHttpResponseHandler() {
+        new AsyncHttpClient().get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    JSONArray jsonArray = new JSONArray(new String(responseBody));
-                    List<String> nombresProductos = new ArrayList<>();
-                    nombresProductos.add("Productos");
+                procesarRespuestaProductos(new String(responseBody));
+            }
 
-                    listaProductos.clear();
-                    listaProductos.add(null);
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                mostrarError("Error al conectar con el servidor");
+            }
+        });
+    }
 
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        int id = obj.getInt("id_producto");
-                        String nombre = obj.getString("nom_producto");
+    private void cargarProductosPorCategoria(int idCategoria) {
+        String url = ServidorConfig.URL_SERVIDOR + "producto/producto_listar_categoria.php?id_categoria=" + idCategoria;
 
-                        listaProductos.add(new Producto(id, nombre));
-                        nombresProductos.add(nombre);
-                    }
+        new AsyncHttpClient().get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                procesarRespuestaProductos(new String(responseBody));
+            }
 
-                    ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                            getContext(),
-                            android.R.layout.simple_spinner_item,
-                            nombresProductos
-                    );
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spProductos.setAdapter(adapter);
-                } catch (JSONException e) {
-                    Toast.makeText(getContext(), "Error al procesar los datos", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                mostrarError("Error al cargar productos");
+            }
+        });
+    }
+
+    private void listarPromociones() {
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_ofertas.php?id_cliente="
+                + session.getIdCliente();
+
+        new AsyncHttpClient().get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                procesarRespuestaArticulos(new String(responseBody));
+                if (listaArticulos.isEmpty()) {
+                    mostrarEmptyState("No hay artículos en promoción", R.drawable.ic_promociones);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+                mostrarError("Error de conexión con el servidor");
             }
         });
     }
+
+    private void listarFavoritos() {
+        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_favoritos.php?id_cliente="
+                + session.getIdCliente();
+
+        new AsyncHttpClient().get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                procesarRespuestaArticulos(new String(responseBody));
+                if (listaArticulos.isEmpty()) {
+                    mostrarEmptyState("No tienes artículos favoritos aún", R.drawable.ic_favoritos);
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                mostrarError("Error al conectar con el servidor");
+            }
+        });
+    }
+
+    private void ejecutarConsultaFiltro(String url, String mensajeError) {
+        new AsyncHttpClient().get(url, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+                procesarJsonArticulos(response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                mostrarError(mensajeError);
+            }
+        });
+    }
+
+    // =================== RESPONSE PROCESSING ===================
+
+    private void procesarRespuestaArticulos(String responseBody) {
+        try {
+            JSONArray jsonArray = new JSONArray(responseBody);
+            procesarJsonArticulos(jsonArray);
+        } catch (JSONException e) {
+            mostrarError("Error al procesar los artículos");
+        }
+    }
+
+    private void procesarJsonArticulos(JSONArray jsonArray) {
+        listaArticulos.clear();
+
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                Articulo articulo = crearArticuloDesdeJson(obj);
+                listaArticulos.add(articulo);
+            }
+
+            if (listaArticulos.isEmpty() && !mostrandoPromociones && !mostrandoFavoritos) {
+                mostrarEmptyState("No se encontraron artículos", R.drawable.ic_sin_articulos);
+            } else {
+                ocultarEmptyState();
+            }
+
+            adapter.notifyDataSetChanged();
+
+        } catch (JSONException e) {
+            mostrarError("Error al procesar los artículos");
+        }
+    }
+
+    private Articulo crearArticuloDesdeJson(JSONObject obj) throws JSONException {
+        String id = obj.getString("id_articulo");
+        String nombre = obj.getString("nom_articulo");
+        String codPresentacion = obj.optString("cod_presentacion", "");
+        String imagen = obj.getString("foto_articulo");
+        int esPromo = obj.optInt("est_promo_articulo", 0);
+        int totalComprado = obj.optInt("total_comprado", 0);
+        int esFavorito = obj.optInt("es_favorito", 0);
+
+        String precio = esPromo == 1
+                ? obj.optString("prec_promo_articulo", DEFAULT_PRICE)
+                : obj.optString("prec_vent1_articulo", DEFAULT_PRICE);
+
+        return new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion);
+    }
+
+    private void procesarRespuestaCategorias(String responseBody) {
+        try {
+            JSONArray jsonArray = new JSONArray(responseBody);
+            List<String> nombres = new ArrayList<>();
+            nombres.add("Categoría");
+
+            listaCategorias.clear();
+            listaCategorias.add(null);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                int id = obj.getInt("id_categoria");
+                String nombre = obj.getString("nom_categoria");
+
+                listaCategorias.add(new Categoria(id, nombre));
+                nombres.add(nombre);
+            }
+
+            configurarSpinnerAdapter(spCategorias, nombres);
+
+        } catch (JSONException e) {
+            mostrarError("Error al procesar los datos");
+        }
+    }
+
+    private void procesarRespuestaProductos(String responseBody) {
+        try {
+            JSONArray jsonArray = new JSONArray(responseBody);
+            List<String> nombres = new ArrayList<>();
+            nombres.add("Productos");
+
+            listaProductos.clear();
+            listaProductos.add(null);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                int id = obj.getInt("id_producto");
+                String nombre = obj.getString("nom_producto");
+
+                listaProductos.add(new Producto(id, nombre));
+                nombres.add(nombre);
+            }
+
+            configurarSpinnerAdapter(spProductos, nombres);
+
+        } catch (JSONException e) {
+            mostrarError("Error al procesar los datos");
+        }
+    }
+
+    private void configurarSpinnerAdapter(Spinner spinner, List<String> nombres) {
+        List<String> nombresFormateados = new ArrayList<>(); // Primera letra mayuscula el resto minuscula
+        for (String nombre : nombres) {
+            if (nombre != null && !nombre.isEmpty()) {
+                String lower = nombre.toLowerCase();
+                String capitalizado = lower.substring(0, 1).toUpperCase() + lower.substring(1);
+                nombresFormateados.add(capitalizado);
+            } else {
+                nombresFormateados.add(nombre);
+            }
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                getContext(),
+                android.R.layout.simple_spinner_item,
+                nombresFormateados
+        ) {
+            @Override
+            public boolean isEnabled(int position) {
+                // Bloquear la primera opción
+                return position != 0;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView tv = (TextView) view;
+                if (position == 0) {
+                    tv.setTextColor(Color.GRAY); // Opción inválida en gris
+                } else {
+                    tv.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
+
+    // =================== DIALOG METHODS ===================
 
     private void mostrarDialogoAgregar(Articulo articulo) {
-        View dialogView = LayoutInflater.from(getContext())
-                .inflate(R.layout.alert_dialog_definir_cantidad, null);
-
-        TextView nombreArticulo = dialogView.findViewById(R.id.tvNombreArticulo);
-        TextView precioArticulo = dialogView.findViewById(R.id.tvPrecioArticulo);
-        TextInputEditText etDetalle = dialogView.findViewById(R.id.etDetalle);
-        MaterialButton btnAgregar = dialogView.findViewById(R.id.btnAgregar);
-        MaterialButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
-        MaterialButton btnRestar = dialogView.findViewById(R.id.btnRestar);
-        MaterialButton btnSumar = dialogView.findViewById(R.id.btnSumar);
-        MaterialButton etPromociones = dialogView.findViewById(R.id.etPromociones);
-        MaterialButton etFavoritos = dialogView.findViewById(R.id.etFavoritos);
-        TextView tvOfertaValida = dialogView.findViewById(R.id.tvOfertaValida);
-        TextInputEditText etCantidad = dialogView.findViewById(R.id.etCantidad);
-        TextView labelOfertaCantidad = dialogView.findViewById(R.id.labelOfertaCantidad);
-
-        // Limitar a 3 decimales
-        etCantidad.setFilters(new InputFilter[]{ new DecimalDigitsInputFilter(3) });
-
-        // Botón Restar
-        btnRestar.setOnClickListener(v -> {
-            String valorStr = etCantidad.getText().toString().trim();
-            if (!valorStr.isEmpty()) {
-                double valor = Double.parseDouble(valorStr);
-                if (valor > 1) {
-                    valor--;
-                    etCantidad.setText(String.valueOf(valor));
-                }
-            }
-        });
-
-        // Botón Sumar
-        btnSumar.setOnClickListener(v -> {
-            String valorStr = etCantidad.getText().toString().trim();
-            double valor;
-            if (valorStr.isEmpty()) {
-                valor = 1; // Si no hay valor, iniciar en 1
-            } else {
-                valor = Double.parseDouble(valorStr) + 1;
-            }
-            etCantidad.setText(String.valueOf(valor));
-        });
-
-
-        // Mostrar o ocultar el etPromociones
-        if (articulo.getEsPromo() == 1) {
-            etPromociones.setVisibility(View.VISIBLE);
-            tvOfertaValida.setVisibility(View.VISIBLE);
-            labelOfertaCantidad.setVisibility(View.VISIBLE);
-        } else {
-            etPromociones.setVisibility(View.GONE);
-            tvOfertaValida.setVisibility(View.GONE);
-            labelOfertaCantidad.setVisibility(View.GONE);
-        }
-
-        // Mostrar o ocultar el etFavoritos
-        if (articulo.getEsFavorito() == 1) {
-            etFavoritos.setVisibility(View.VISIBLE);
-        } else {
-            etFavoritos.setVisibility(View.GONE);
-        }
-
-
-        // Imprimir el encabezado del articulo
-        nombreArticulo.setText(articulo.getNombre());
-        precioArticulo.setText("S/ " + articulo.getPrecio());
-
-        // Buscar si el artículo ya está en el carrito
-        // --- Se guarda la referencia y posición ---
-        final ItemCarrito[] itemExistente = {null};
-        final int[] indexExistente = {-1};
-
-        for (int i = 0; i < MainActivity.carrito.size(); i++) {
-            if (MainActivity.carrito.get(i).getArticulo().getId().equals(articulo.getId())) {
-                itemExistente[0] = MainActivity.carrito.get(i);
-                indexExistente[0] = i;
-                break;
-            }
-        }
-
-        // --- Si ya existe, precargar datos ---
-        if (itemExistente[0] != null) {
-            etCantidad.setText(String.valueOf(itemExistente[0].getCantidad()));
-            etDetalle.setText(itemExistente[0].getDetalle());
-            btnAgregar.setText("Actualizar");
-        }
-
-        AlertDialog dialog = new AlertDialog.Builder(getContext())
-                .setView(dialogView)
-                .create();
-
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(false);
-
-        btnAgregar.setOnClickListener(v -> {
-            String cantidadStr = etCantidad.getText().toString().trim();
-            String detalle = etDetalle.getText().toString().trim();
-
-            if (cantidadStr.isEmpty()) {
-                etCantidad.setError("Ingrese una cantidad");
-                return;
-            }
-            double cantidad = Double.parseDouble(cantidadStr);
-
-            if (cantidad <= 0) {
-                etCantidad.setError("La cantidad debe ser mayor a 0");
-                return;
-            }
-
-            if (itemExistente[0] == null) {
-                // No existía → agregar
-                MainActivity.carrito.add(new ItemCarrito(articulo, cantidad, detalle));
-                Toast.makeText(getContext(), "Artículo agregado al carrito", Toast.LENGTH_SHORT).show();
-            } else {
-                // Ya existía → actualizar
-                itemExistente[0].setCantidad(cantidad);
-                itemExistente[0].setDetalle(detalle);
-                MainActivity.carrito.set(indexExistente[0], itemExistente[0]);
-                Toast.makeText(getContext(), "Artículo actualizado en el carrito", Toast.LENGTH_SHORT).show();
-            }
-
-            ((MainActivity) requireActivity()).actualizarBadge();
-            dialog.dismiss();
-        });
-
-        btnCerrar.setOnClickListener(v -> dialog.dismiss());
-
-        dialog.show();
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        // Usar la nueva clase externa
+        new DialogoAgregarHelper(getContext(), articulo);
     }
 
-    private void listarFavoritos(){
-        int idCliente = session.getIdCliente();
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_favoritos.php?id_cliente=" + idCliente;
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-                try {
-                    JSONArray jsonArray = new JSONArray(new String(responseBody));
-                    listaArticulos.clear();
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        String id = obj.getString("id_articulo");
-                        String nombre = obj.getString("nom_articulo");
-                        String codPresentacion = obj.getString("cod_presentacion");
-                        String imagen = obj.getString("foto_articulo");
-                        int esPromo = obj.optInt("est_promo_articulo", 0);
-                        int esFavorito = obj.optInt("es_favorito", 0);
-                        int totalComprado = obj.optInt("total_comprado", 0);
-
-                        String precio;
-                        if (esPromo == 1) {
-                            precio = obj.optString("prec_promo_articulo", "0");
-                        } else {
-                            precio = obj.optString("prec_vent1_articulo", "0");
-                        }
-
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, esFavorito, codPresentacion));
-                    }
-
-                    if (listaArticulos.isEmpty()) {
-                        mostrarEmptyState("No tienes artículos favoritos aún", R.drawable.ic_favoritos);
-                    } else {
-                        ocultarEmptyState();
-                    }
-
-                    adapter.notifyDataSetChanged();
-
-                } catch (Exception e) {
-                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private  void listarPromociones(){
-        int idCliente = session.getIdCliente();
-        String url = ServidorConfig.URL_SERVIDOR + "articulo/articulo_listar_ofertas.php?id_cliente=" + idCliente;
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get(url, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    JSONArray jsonArray = new JSONArray(new String(responseBody));
-                    listaArticulos.clear();
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        String id = obj.getString("id_articulo");
-                        String nombre = obj.getString("nom_articulo");
-                        String codPresentacion = obj.getString("cod_presentacion");
-                        String imagen = obj.getString("foto_articulo");
-                        int esPromo = obj.optInt("est_promo_articulo", 0);
-                        int totalComprado = obj.optInt("total_comprado", 0);
-                        int estFavorito = obj.optInt("es_favorito", 0);
-
-                        String precio;
-                        if (esPromo == 1) {
-                            precio = obj.optString("prec_promo_articulo", "0");
-                        } else {
-                            precio = obj.optString("prec_vent1_articulo", "0");
-                        }
-
-                        listaArticulos.add(new Articulo(id, nombre, precio, imagen, esPromo, totalComprado, estFavorito, codPresentacion));
-                    }
-
-                    if (listaArticulos.isEmpty()) {
-                        mostrarEmptyState("No hay artículos en promoción", R.drawable.ic_promociones);
-                    } else {
-                        ocultarEmptyState();
-                    }
-
-                    adapter.notifyDataSetChanged();
-
-                } catch (JSONException e) {
-                    Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                Toast.makeText(getContext(), "Error de conexión con el servidor", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+    // =================== UI STATE METHODS ===================
 
     private void mostrarEmptyState(String mensaje, int iconRes) {
         recyclerView.setVisibility(View.GONE);
         emptyStateLayout.setVisibility(View.VISIBLE);
-
         tvEmptyMessage.setText(mensaje);
         ivEmptyIcon.setImageResource(iconRes);
     }
@@ -878,91 +694,15 @@ public class CatalogoFragment extends Fragment implements View.OnClickListener {
         emptyStateLayout.setVisibility(View.GONE);
     }
 
+    private void mostrarError(String mensaje) {
+        Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
-    public void onClick(View view) { // toggle exclusivo
-        if(view == btnFavoritos){
-            if (mostrandoFavoritos) {
-                cargarArticulos(); // Lista completa
-                ocultarEmptyState();
-                mostrandoFavoritos = false;
-
-                btnFavoritos.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), android.R.color.white)
-                );
-                btnFavoritos.setTextColor(ContextCompat.getColor(getContext(), R.color.color_rojo));
-                btnFavoritos.setIconTint(ContextCompat.getColorStateList(getContext(), R.color.color_rojo));
-            } else {
-                // Primero resetear selección para que no dispare filtro después
-                spCategorias.setOnItemSelectedListener(null); // Desvincular listener temporal
-                spCategorias.setSelection(0);
-                spCategorias.post(() -> configurarSpinnerCategorias()); // volver a poner listener después
-
-                spProductos.setOnItemSelectedListener(null); // desvincular temporal
-                cargarProductos(false); // Recargar todos los productos
-                spProductos.setSelection(0);
-                spProductos.post(() -> configurarSpinnerProductos());
-
-                // Mostrar favoritos
-                listarFavoritos();
-                mostrandoFavoritos = true;
-
-                btnFavoritos.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), R.color.color_rojo)
-                );
-                btnFavoritos.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
-                btnFavoritos.setIconTint(ContextCompat.getColorStateList(getContext(), android.R.color.white));
-
-                // Resetear promociones
-                mostrandoPromociones = false;
-                btnOfertas.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), android.R.color.white)
-                );
-                btnOfertas.setTextColor(ContextCompat.getColor(getContext(), R.color.color_verde));
-                btnOfertas.setIconTint(ContextCompat.getColorStateList(getContext(), R.color.color_verde));
-
-                etBusqueda.setText("");
-            }
-        }
-
-        if(view == btnOfertas){
-            if (mostrandoPromociones) {
-                cargarArticulos(); // Lista completa
-                mostrandoPromociones = false;
-
-                btnOfertas.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), android.R.color.white)
-                );
-                btnOfertas.setTextColor(ContextCompat.getColor(getContext(), R.color.color_verde));
-                btnOfertas.setIconTint(ContextCompat.getColorStateList(getContext(), R.color.color_verde));
-
-            } else {
-                spCategorias.setOnItemSelectedListener(null);
-                spCategorias.setSelection(0);
-                spCategorias.post(() -> configurarSpinnerCategorias());
-
-                spProductos.setOnItemSelectedListener(null);
-                cargarProductos(false);
-                spProductos.setSelection(0);
-                spProductos.post(() -> configurarSpinnerProductos());
-
-                listarPromociones();
-                mostrandoPromociones = true;
-
-                btnOfertas.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), R.color.color_verde)
-                );
-                btnOfertas.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
-                btnOfertas.setIconTint(ContextCompat.getColorStateList(getContext(), android.R.color.white));
-
-                mostrandoFavoritos = false;
-                btnFavoritos.setBackgroundTintList(
-                        ContextCompat.getColorStateList(getContext(), android.R.color.white)
-                );
-                btnFavoritos.setTextColor(ContextCompat.getColor(getContext(), R.color.color_rojo));
-                btnFavoritos.setIconTint(ContextCompat.getColorStateList(getContext(), R.color.color_rojo));
-
-                etBusqueda.setText("");
-            }
+    public void onDestroy() {
+        super.onDestroy();
+        if (searchTimer != null) {
+            searchTimer.cancel();
         }
     }
 }
