@@ -469,7 +469,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         String nombre = obj.getString("nom_articulo");
                         double precio = obj.getDouble("prec_venta_detalle");
-                        int cantidad = obj.getInt("cant_venta_detalle");
+                        double cantidad = obj.getDouble("cant_venta_detalle");
                         double subTotal = precio * cantidad;
                         String imagenUrl = obj.optString("foto_articulo");
                         total += subTotal;

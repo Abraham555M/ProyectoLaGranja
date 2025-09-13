@@ -125,7 +125,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="12dp"
                     android:text="Precio referencial, puede variar de acuerdo al peso y/o cantidad"
-                    android:textStyle="bold"
+                    android:textStyle="bold|italic"
                     android:textColor="@color/darker_gray"
                     android:layout_marginEnd="4dp"/>
             </LinearLayout>

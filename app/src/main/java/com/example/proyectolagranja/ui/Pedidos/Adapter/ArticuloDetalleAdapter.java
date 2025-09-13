@@ -40,7 +40,7 @@ public class ArticuloDetalleAdapter extends RecyclerView.Adapter<ArticuloDetalle
         holder.nombre.setText(articulo.getNombre());
         String precioFormateado = String.format("%.2f", articulo.getPrecio());
         String subTotalFormateado = String.format("%.2f", articulo.getSubTotal());
-        String cantidadFormateada = String.format(Locale.US, "%.3f", (double) articulo.getCantidad());
+        String cantidadFormateada = String.format(Locale.US, "%.3f", articulo.getCantidad());
 
         holder.precio.setText("S/. " + precioFormateado);
         holder.cantidad.setText("Cantidad: " + cantidadFormateada);
