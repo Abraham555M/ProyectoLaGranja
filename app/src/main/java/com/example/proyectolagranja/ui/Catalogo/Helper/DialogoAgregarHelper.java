@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.text.DecimalFormat;
 
 import com.example.proyectolagranja.MainActivity;
 import com.example.proyectolagranja.R;
@@ -92,7 +93,6 @@ public class DialogoAgregarHelper {
     }
 
     private void configurarDatosArticulo() {
-        // Nombre + codPresentación subrayado
         String nombre = articulo.getNombre();
         String codPresentacion = articulo.getCodPresentacion();
 
@@ -105,10 +105,16 @@ public class DialogoAgregarHelper {
         if (codPresentacion.length() > 0) {
             textoSpannable.setSpan(new UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-
         nombreArticulo.setText(textoSpannable);
 
-        precioArticulo.setText("S/ " + articulo.getPrecio());
+        DecimalFormat df = new DecimalFormat("#0.00");
+        if (articulo.getEsPromo() == 1) {
+            double precioOferta = Double.parseDouble(articulo.getPrecioOferta());
+            precioArticulo.setText("S/ " + df.format(precioOferta));
+        } else {
+            double precio = Double.parseDouble(articulo.getPrecio());
+            precioArticulo.setText("S/ " + df.format(precio));
+        }
     }
 
     private void buscarItemExistente() {
