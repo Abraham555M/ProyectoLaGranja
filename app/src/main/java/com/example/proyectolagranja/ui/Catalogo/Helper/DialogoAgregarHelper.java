@@ -79,7 +79,7 @@ public class DialogoAgregarHelper {
 
     private void configurarVisibilidadPromociones() {
         int visibility = articulo.getEsPromo() == 1 ? View.VISIBLE : View.GONE;
-        etPromociones.setVisibility(visibility);
+        //etPromociones.setVisibility(visibility);
         tvOfertaValida.setVisibility(visibility);
         labelOfertaCantidad.setVisibility(visibility);
     }

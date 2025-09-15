@@ -74,7 +74,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
                 );
 
                 // Mostrar etiquetas relacionadas a la promo
-                holder.etPromociones.setVisibility(View.VISIBLE);
+                //holder.etPromociones.setVisibility(View.VISIBLE);
                 holder.labelOferta.setVisibility(View.VISIBLE);
                 holder.tvMensajeKg.setVisibility(View.VISIBLE);
 
@@ -84,7 +84,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
                 holder.precioAnteriorArticulo.setVisibility(View.GONE);
 
                 // Ocultar etiquetas de promo
-                holder.etPromociones.setVisibility(View.GONE);
+               //holder.etPromociones.setVisibility(View.GONE);
                 holder.labelOferta.setVisibility(View.GONE);
                 holder.tvMensajeKg.setVisibility(View.GONE);
             }

@@ -68,7 +68,7 @@ public class CatalogoFragment extends Fragment {
     private MaterialButton btnOfertas, btnFavoritos;
     private SwipeRefreshLayout swipeRefreshLayout;
     private LinearLayout emptyStateLayout;
-    private TextView tvEmptyMessage;
+    private TextView tvEmptyMessage, tvEmptySubMessage;
     private ImageView ivEmptyIcon;
 
     // Data
@@ -109,6 +109,7 @@ public class CatalogoFragment extends Fragment {
         btnFavoritos = rootView.findViewById(R.id.btnFavoritos);
         emptyStateLayout = rootView.findViewById(R.id.emptyStateLayout);
         tvEmptyMessage = rootView.findViewById(R.id.tvEmptyMessage);
+        tvEmptySubMessage = rootView.findViewById(R.id.tvEmptySubMessage);
         ivEmptyIcon = rootView.findViewById(R.id.ivEmptyIcon);
         recyclerView = rootView.findViewById(R.id.recyclerViewComentarios);
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
@@ -487,7 +488,7 @@ public class CatalogoFragment extends Fragment {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 procesarRespuestaArticulos(new String(responseBody));
                 if (listaArticulos.isEmpty()) {
-                    mostrarEmptyState("No hay artículos en promoción", R.drawable.ic_promociones);
+                    mostrarEmptyState("No hay artículos en promoción","Intenta con otros filtros o vuelve mas tarde", R.drawable.ic_promociones);
                 }
             }
 
@@ -507,7 +508,7 @@ public class CatalogoFragment extends Fragment {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 procesarRespuestaArticulos(new String(responseBody));
                 if (listaArticulos.isEmpty()) {
-                    mostrarEmptyState("No tienes artículos favoritos aún", R.drawable.ic_favoritos);
+                    mostrarEmptyState("No tienes artículos favoritos aún", "Realiza pedidos y te mostraremos tus productos favoritos.", R.drawable.ic_favoritos);
                 }
             }
 
@@ -554,7 +555,7 @@ public class CatalogoFragment extends Fragment {
             }
 
             if (listaArticulos.isEmpty() && !mostrandoPromociones && !mostrandoFavoritos) {
-                mostrarEmptyState("No se encontraron artículos", R.drawable.ic_sin_articulos);
+                mostrarEmptyState("No se encontraron artículos", "Intenta con otros filtros o vuelve mas tarde", R.drawable.ic_sin_articulos);
             } else {
                 ocultarEmptyState();
             }
@@ -683,10 +684,11 @@ public class CatalogoFragment extends Fragment {
 
     // =================== UI STATE METHODS ===================
 
-    private void mostrarEmptyState(String mensaje, int iconRes) {
+    private void mostrarEmptyState(String mensaje, String subMensaje, int iconRes) {
         recyclerView.setVisibility(View.GONE);
         emptyStateLayout.setVisibility(View.VISIBLE);
         tvEmptyMessage.setText(mensaje);
+        tvEmptySubMessage.setText(subMensaje);
         ivEmptyIcon.setImageResource(iconRes);
     }
 

@@ -7,147 +7,161 @@
     android:layout_margin="8dp"
     android:background="@android:color/darker_gray">
 
-    <!-- Contenedor principal vertical -->
-    <LinearLayout
+    <!-- Contenedor que permite superponer elementos -->
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:padding="12dp">
 
-        <!-- Bloque horizontal (imagen + textos + botón) -->
+        <!-- Contenido principal -->
         <LinearLayout
+            android:id="@+id/contenidoArticulo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:orientation="vertical">
 
-            <!-- Imagen del artículo -->
-            <FrameLayout
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:layout_marginEnd="12dp">
-
-                <ImageView
-                    android:id="@+id/imgArticulo"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:contentDescription="Imagen del artículo"
-                    android:src="@drawable/logo_la_granja"
-                    android:clipToOutline="true"
-                    android:scaleType="centerCrop" />
-
-                <TextView
-                    android:id="@+id/labelOferta"
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom|end"
-                    android:background="@drawable/bg_descuento"
-                    android:gravity="center"
-                    android:padding="3dp"
-                    android:text="OFERTA"
-                    android:textColor="@color/color_rojo"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:elevation="8dp" />
-            </FrameLayout>
-
-            <!-- Nombre y precio del artículo -->
+            <!-- Bloque horizontal (imagen + textos + botón) -->
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/nombreArticulo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Nombre del Artículo"
-                    android:textColor="@android:color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/precioArticulo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Precio"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/cantidadArticulo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Cantidad"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/subTotalArticulo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="SubTotal"
-                    android:textColor="@android:color/black"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Botón eliminar -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_marginStart="16dp"
-                android:gravity="center">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnEliminarArticulo"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="center"
-                    android:backgroundTint="@color/color_rojo"
-                    android:elevation="4dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:insetLeft="0dp"
-                    android:insetRight="0dp"
-                    android:text=""
-                    app:cornerRadius="24dp"
-                    app:icon="@drawable/ic_delete"
-                    app:iconTint="@android:color/white"
-                    app:iconPadding="0dp"
-                    app:strokeWidth="0dp"
-                    style="@style/Widget.MaterialComponents.Button.Icon" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- TextInput debajo, ocupando todo el ancho -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxBackgroundMode="outline"
-            app:boxStrokeColor="@android:color/darker_gray"
-            app:boxStrokeWidth="1dp"
-            app:boxStrokeWidthFocused="2dp"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etDetalleArticulo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Detalle"
-                android:textSize="14sp"
-                android:inputType="text"
-                android:background="@null"
-                android:textCursorDrawable="@drawable/cursor_color" />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Imagen del artículo -->
+                <FrameLayout
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginEnd="12dp">
+
+                    <ImageView
+                        android:id="@+id/imgArticulo"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="Imagen del artículo"
+                        android:src="@drawable/logo_la_granja"
+                        android:clipToOutline="true"
+                        android:scaleType="centerCrop" />
+                </FrameLayout>
+
+                <!-- Nombre y precio del artículo -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/nombreArticulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nombre del Artículo"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/precioArticulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Precio"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/cantidadArticulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Cantidad"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/subTotalArticulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="SubTotal"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Botón eliminar -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp"
+                    android:gravity="center">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEliminarArticulo"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="center"
+                        android:backgroundTint="@color/color_rojo"
+                        android:elevation="4dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:text=""
+                        android:padding="0dp"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        app:cornerRadius="20dp"
+                        app:icon="@drawable/ic_delete"
+                        app:iconTint="@android:color/white"
+                        app:iconPadding="0dp"
+                        app:iconGravity="textStart"
+                        app:iconSize="20dp"
+                        app:strokeWidth="0dp"
+                        style="@style/Widget.MaterialComponents.Button.Icon" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- TextInput debajo -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxBackgroundMode="outline"
+                app:boxStrokeColor="@android:color/darker_gray"
+                app:boxStrokeWidth="1dp"
+                app:boxStrokeWidthFocused="2dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusBottomEnd="12dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDetalleArticulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Detalle"
+                    android:textSize="14sp"
+                    android:inputType="text"
+                    android:background="@null"
+                    android:textCursorDrawable="@drawable/cursor_color" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Etiqueta OFERTA arriba a la derecha -->
+        <TextView
+            android:id="@+id/labelOferta"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/bg_descuento"
+            android:gravity="center"
+            android:padding="3dp"
+            android:text="OFERTA"
+            android:textColor="@color/color_rojo"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:elevation="8dp" />
+    </RelativeLayout>
 </androidx.cardview.widget.CardView>

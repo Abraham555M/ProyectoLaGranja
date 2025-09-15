@@ -108,11 +108,11 @@
                 android:layout_marginEnd="6dp"
                 android:text="Ofertas"
                 android:textAllCaps="false"
-                android:textColor="@color/color_verde"
+                android:textColor="@color/color_rojo"
                 android:backgroundTint="@color/color_blanco"
                 app:icon="@drawable/ic_promociones"
-                app:iconTint="@color/color_verde"
-                app:strokeColor="@color/color_verde"
+                app:iconTint="@color/color_rojo"
+                app:strokeColor="@color/color_amarillo"
                 app:strokeWidth="2dp"
                 app:cornerRadius="8dp"
                 android:padding="8dp"/>
@@ -197,14 +197,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Intenta con otros filtros o vuelve más tarde"
+                    android:text="Realiza pedidos y te mostraremos tus productos favoritos."
                     android:textSize="14sp"
                     android:textColor="@color/darker_gray"
                     android:gravity="center" />
-
             </LinearLayout>
-
         </FrameLayout>
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
