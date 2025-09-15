@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="16dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="6dp"
-    android:backgroundTint="@android:color/white">
+    app:cardCornerRadius="24dp"
+    app:cardElevation="8dp"
+    android:backgroundTint="@android:color/white"
+    app:strokeColor="@color/color_principal"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp">
 
         <!-- Encabezado -->
         <LinearLayout
@@ -28,7 +30,7 @@
                 android:layout_weight="1"
                 android:text="Carrito"
                 android:textColor="@color/black"
-                android:textSize="20sp"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
             <com.google.android.material.button.MaterialButton
@@ -59,25 +61,28 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="220dp"
             android:overScrollMode="ifContentScrolls"
-            android:padding="8dp"
+            android:padding="4dp"
+            android:clipToPadding="false"
             android:scrollbars="vertical"
             tools:listitem="@layout/item_articulo_carrito" />
 
+        <!-- Mensaje vacío -->
         <TextView
             android:id="@+id/tvEmptyMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:drawableTop="@drawable/ic_carrito_compras"
             android:drawablePadding="8dp"
             android:gravity="center"
             android:text="No hay productos en el carrito"
-            android:textColor="@color/black"
+            android:textColor="@color/darker_gray"
             android:textSize="14sp"
             android:visibility="gone" />
 
+        <!-- Botón agregar -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAgregarCarrito"
             android:layout_width="wrap_content"
@@ -88,131 +93,130 @@
             android:textColor="@android:color/white"
             android:backgroundTint="@color/color_verde"
             app:cornerRadius="20dp"
+            app:icon="@drawable/ic_add"
+            app:iconTint="@android:color/white"
+            app:iconPadding="8dp"
             android:visibility="gone" />
 
-        <!-- Contenedor de detalles -->
-        <LinearLayout
+        <!-- SECCIÓN DATOS DE PEDIDO -->
+        <androidx.cardview.widget.CardView
             android:id="@+id/layoutDetallesCarrito"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="vertical">
-
-            <!-- Dirección -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilDireccion"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="Ingrese su dirección"
-                android:textCursorDrawable="@drawable/cursor_color"
-                app:boxBackgroundColor="@color/white"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="@color/darker_gray"
-                app:hintTextColor="@color/darker_gray">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etDireccion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="text"
-                    android:textColor="@color/black" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Medio de pago -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilMedioPago"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="Medio de Pago"
-                android:textCursorDrawable="@drawable/cursor_color"
-                app:boxBackgroundColor="@color/white"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="@color/color_principal"
-                app:hintTextColor="@color/color_principal">
-
-                <Spinner
-                    android:id="@+id/spMedioPago"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/transparent"
-                    android:padding="12dp" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <!-- EditText adaptado al estilo de tu modelo -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilReferenciaPago"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="Paga con"
-                android:textCursorDrawable="@drawable/cursor_color"
-                app:boxBackgroundColor="@color/white"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:boxStrokeColor="@color/color_principal"
-                app:hintTextColor="@color/color_principal">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etReferenciaPago"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:textColor="@color/black" />
-            </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginTop="20dp"
+            android:layout_margin="8dp"
+            android:background="@android:color/darker_gray"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/tvTotal"
-                    android:layout_width="wrap_content"
+                <!-- Dirección -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilDireccion"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Total: S/ 0.00"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:hint="📍 Ingrese su dirección"
+                    app:boxBackgroundColor="@color/white"
+                    app:hintTextColor="@color/darker_gray"
+                    android:layout_marginBottom="12dp">
 
-                <TextView
-                    android:id="@+id/tvMensajeTotal"
-                    android:layout_width="wrap_content"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etDireccion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:textColor="@color/black" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Medio de pago -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardview_productos"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="(Monto referencial, puede variar según el peso y cantidad)"
-                    android:textColor="@color/cardview_dark_background"
-                    android:textSize="12sp" />
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="4dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardview_categorias"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <Spinner
+                        android:id="@+id/spMedioPago"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="3dp"
+                        android:padding="16dp" />
+                </androidx.cardview.widget.CardView>
+
+                <!-- Referencia de Pago -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilReferenciaPago"
+                    android:layout_marginTop="10dp"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="💳 Paga con"
+                    app:boxBackgroundColor="@color/white"
+                    app:hintTextColor="@color/color_principal">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etReferenciaPago"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:textColor="@color/black" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Totales -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total: S/ 0.00"
+                        android:textColor="@color/color_principal"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvMensajeTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="(Monto referencial, puede variar según el peso y cantidad)"
+                        android:textColor="@color/darker_gray"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Botón enviar -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEnviarPedido"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:backgroundTint="@color/color_verde"
+                    android:text="Enviar Pedido"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="30dp"
+                    app:icon="@drawable/ic_moto_pedido"
+                    app:iconTint="@android:color/white"
+                    app:iconPadding="12dp" />
+
             </LinearLayout>
-
-            <!-- Botón enviar -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEnviarPedido"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:backgroundTint="@color/color_verde"
-                android:text="Enviar Pedido"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:cornerRadius="28dp" />
-        </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

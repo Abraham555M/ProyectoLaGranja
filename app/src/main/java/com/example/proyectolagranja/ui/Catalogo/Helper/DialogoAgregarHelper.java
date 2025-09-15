@@ -6,6 +6,9 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.text.InputFilter;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -89,7 +92,22 @@ public class DialogoAgregarHelper {
     }
 
     private void configurarDatosArticulo() {
-        nombreArticulo.setText(articulo.getNombre());
+        // Nombre + codPresentación subrayado
+        String nombre = articulo.getNombre();
+        String codPresentacion = articulo.getCodPresentacion();
+
+        // Evitar nulls
+        if (codPresentacion == null) codPresentacion = "";
+
+        SpannableString textoSpannable = new SpannableString(nombre + " " + codPresentacion);
+        int start = nombre.length() + 1; // +1 por el espacio
+        int end = start + codPresentacion.length();
+        if (codPresentacion.length() > 0) {
+            textoSpannable.setSpan(new UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+
+        nombreArticulo.setText(textoSpannable);
+
         precioArticulo.setText("S/ " + articulo.getPrecio());
     }
 

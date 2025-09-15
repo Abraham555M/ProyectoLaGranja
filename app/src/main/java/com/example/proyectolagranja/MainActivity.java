@@ -43,6 +43,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -457,7 +458,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView tvEmptyMessage = dialogView.findViewById(R.id.tvEmptyMessage);
         TextView tvTotal = dialogView.findViewById(R.id.tvTotal);
-        LinearLayout layoutDetallesCarrito = dialogView.findViewById(R.id.layoutDetallesCarrito);
+        CardView layoutDetallesCarrito = dialogView.findViewById(R.id.layoutDetallesCarrito);
         MaterialButton btnAgregarCarrito = dialogView.findViewById(R.id.btnAgregarCarrito);
 
         TextInputLayout tilReferenciaPago = dialogView.findViewById(R.id.tilReferenciaPago);
@@ -801,6 +802,10 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         int id = obj.getInt("id_pago_medio");
                         String nombre = obj.getString("nom_pago_medio");
+
+                        if (nombre != null && !nombre.isEmpty()) {
+                            nombre = nombre.substring(0, 1).toUpperCase() + nombre.substring(1).toLowerCase();
+                        }
 
                         listaMedioPago.add(new MedioPago(id, nombre));
                         nombresProductos.add(nombre);
