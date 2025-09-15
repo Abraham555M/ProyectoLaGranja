@@ -586,16 +586,15 @@ public class MainActivity extends AppCompatActivity {
             }
 
             StringBuilder detallesArticulos = new StringBuilder();
-            for (int i = 0; i < carrito.size(); i++) {
-                ItemCarrito item = carrito.get(i);
+            boolean primero = true;
 
+            for (ItemCarrito item : carrito) {
                 if (item.getDetalle() != null && !item.getDetalle().trim().isEmpty()) {
-                    detallesArticulos.append(item.getDetalle());
-                }
-
-                // Solo agregamos el separador "|" si no es el último elemento
-                if (i < carrito.size() - 1) {
-                    detallesArticulos.append(" | ");
+                    if (!primero) {
+                        detallesArticulos.append(" | "); // solo agrega si no es el primero válido
+                    }
+                    detallesArticulos.append(item.getDetalle().trim());
+                    primero = false;
                 }
             }
 
@@ -717,7 +716,16 @@ public class MainActivity extends AppCompatActivity {
                     detalle,
                     dialogCarrito
             );
-            dialogConfirmacion.dismiss(); // cierro el de confirmación
+            dialogConfirmacion.dismiss();
+
+            // Usar NavigationUI para que Drawer se sincronice
+            DrawerLayout drawer = binding.drawerLayout;
+            NavigationView navigationView = binding.navView;
+            NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment_content_main);
+
+            MenuItem menuItem = navigationView.getMenu().findItem(R.id.nav_pedidos);
+            NavigationUI.onNavDestinationSelected(menuItem, navController);
+            drawer.closeDrawer(GravityCompat.START);
         });
 
         // Botón No

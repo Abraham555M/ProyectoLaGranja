@@ -25,6 +25,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.proyectolagranja.R;
 import com.example.proyectolagranja.ui.Clases.ArticuloDetalle;
@@ -57,6 +58,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     private LinearLayout emptyStateLayout;
     private TextView tvEmptyMessage;
     private ImageView ivEmptyIcon;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -68,6 +70,12 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         emptyStateLayout = rootView.findViewById(R.id.emptyStateLayout);
         tvEmptyMessage = rootView.findViewById(R.id.tvEmptyMessage);
         ivEmptyIcon = rootView.findViewById(R.id.ivEmptyIcon);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+
+        // Configurar el SwipeRefreshLayout
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            cargarPedidosCliente(); // recargar pedidos
+        });
 
         Spinner spEstado = rootView.findViewById(R.id.sp_estado);
         // Cuando el usuario selecciona un estado
@@ -373,12 +381,15 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                } finally {
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }

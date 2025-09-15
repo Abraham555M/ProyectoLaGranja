@@ -71,50 +71,57 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- RecyclerView para mostrar los pedidos -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewPedidos"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:padding="16dp"
-        app:layout_constraintBottom_toTopOf="@id/btnNuevoPedido"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardview_fechas"
-        tools:listitem="@layout/item_pedido" />
-
-    <LinearLayout
-        android:id="@+id/emptyStateLayout"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone"
-        android:padding="24dp"
         app:layout_constraintTop_toBottomOf="@id/cardview_fechas"
         app:layout_constraintBottom_toTopOf="@id/btnNuevoPedido"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:id="@+id/ivEmptyIcon"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:src="@drawable/ic_carrito_compras"
-            app:tint="@color/darker_gray" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tvEmptyMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="No hay registros disponibles"
-            android:textColor="@color/darker_gray"
-            android:textSize="16sp"
-            android:layout_marginTop="12dp"
-            android:gravity="center"/>
-    </LinearLayout>
+            <!-- RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewPedidos"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:padding="16dp"
+                tools:listitem="@layout/item_pedido" />
+
+            <!-- Empty State -->
+            <LinearLayout
+                android:id="@+id/emptyStateLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:visibility="gone"
+                android:padding="24dp">
+
+                <ImageView
+                    android:id="@+id/ivEmptyIcon"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:src="@drawable/ic_carrito_compras"
+                    app:tint="@color/darker_gray" />
+
+                <TextView
+                    android:id="@+id/tvEmptyMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No hay registros disponibles"
+                    android:textColor="@color/darker_gray"
+                    android:textSize="16sp"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"/>
+            </LinearLayout>
+        </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnNuevoPedido"
