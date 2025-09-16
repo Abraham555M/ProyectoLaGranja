@@ -87,7 +87,7 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
 
                                     int idCliente = json.getInt("id_cliente"); // El metodo, devuelve el id
                                     SessionManager session = new SessionManager(requireContext());
-                                    session.createLoginSession(idCliente, nom_cliente, telefono);
+                                    session.createLoginSession(idCliente, nom_cliente, telefono, true);
 
                                     limpiarCampos();
 

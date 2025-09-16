@@ -14,11 +14,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -83,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner spMedioPago;
     private Button btnCerrar, btnEnviarPedido;
     private TextView tvBadge;
-    private EditText etDireccion, etDetalleVenta, etReferenciaPago;
+    private EditText etDireccion, etReferenciaPago;
     public static List<ItemCarrito> carrito = new ArrayList<>();
     private SharedPreferences prefs;
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
@@ -160,6 +163,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Para que no sea visible el encabezado
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            if (destination.getId() == R.id.nav_catalogo && session.isFirstTime()) {
+                mostrarModalBienvenida(session.getNombre());
+                session.setFirstTime(false); // se guarda en SharedPreferences
+            }
+
             if (destination.getId() == R.id.nav_crear_cuenta || destination.getId() == R.id.nav_inicio_sesion || destination.getId() == R.id.nav_actualizar_telefono) {
                 binding.appBarMain.toolbar.setVisibility(View.GONE); // Quitar el encabezado
                 binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // Desactiva swipe
@@ -186,6 +194,35 @@ public class MainActivity extends AppCompatActivity {
                         1001
                 );
             }
+        }
+    }
+
+    private void mostrarModalBienvenida(String nombre) {
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_bienvenida, null);
+        TextView tvBienvenida = view.findViewById(R.id.tvBienvenida);
+        Button btnContinuar = view.findViewById(R.id.btnContinuar);
+
+        tvBienvenida.setText("¡Bienvenido " + nombre + "! 🎉");
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(view)
+                .setCancelable(false)
+                .create();
+
+        btnContinuar.setOnClickListener(v -> {
+            session.setFirstTime(false);
+            dialog.dismiss();
+        });
+        dialog.show();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        // 🔹 Mover el diálogo hacia arriba
+        Window window = dialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.gravity = Gravity.TOP;   // Lo manda arriba
+            params.y = 100;                 // margen desde arriba (en px)
+            window.setAttributes(params);
         }
     }
 
@@ -428,7 +465,7 @@ public class MainActivity extends AppCompatActivity {
                         tvTelefono.setText(telefono);
 
                         // Actualizar sesión
-                        session.createLoginSession(idCliente, nombre, telefono);
+                        session.updateDatosUsuario(nombre, telefono);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

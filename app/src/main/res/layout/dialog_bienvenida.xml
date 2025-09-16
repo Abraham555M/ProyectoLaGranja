@@ -1,0 +1,52 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="@drawable/bg_dialog_rounded"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Logo -->
+    <ImageView
+        android:src="@drawable/ic_store"
+    android:layout_width="100dp"
+    android:layout_height="100dp"
+    android:layout_marginBottom="20dp"
+    android:background="@drawable/bg_circle_white"
+    android:elevation="6dp"
+    android:padding="12dp" />
+
+    <!-- Título de bienvenida -->
+    <TextView
+        android:id="@+id/tvBienvenida"
+        android:text="¡Bienvenido!"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_marginBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Subtítulo opcional -->
+    <TextView
+        android:text="Gracias por unirte a nuestra comunidad 🎉"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Botón -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnContinuar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Comenzar"
+        android:textColor="@android:color/white"
+        app:backgroundTint="@color/color_principal"
+        app:cornerRadius="24dp" />
+</LinearLayout>

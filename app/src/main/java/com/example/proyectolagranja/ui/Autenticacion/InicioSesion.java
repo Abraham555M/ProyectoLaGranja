@@ -243,7 +243,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                         limpiarDatosBloqueo(telefono);
 
                         SessionManager session = new SessionManager(requireContext());
-                        session.createLoginSession(idCliente, nombre, telCliente);
+                        session.createLoginSession(idCliente, nombre, telCliente, false);
 
                         FirebaseMessaging.getInstance().getToken()
                                 .addOnCompleteListener(task -> {
