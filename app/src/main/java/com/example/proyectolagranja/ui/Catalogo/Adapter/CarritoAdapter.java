@@ -59,7 +59,13 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         holder.nombreArticulo.setText(nombreCompleto);
 
         try {
-            double precio = Double.parseDouble(item.getArticulo().getPrecio());
+            String precioStr = (item.getArticulo().getEsPromo() == 1 &&
+                    item.getArticulo().getPrecioOferta() != null &&
+                    !item.getArticulo().getPrecioOferta().isEmpty())
+                    ? item.getArticulo().getPrecioOferta()
+                    : item.getArticulo().getPrecio();
+
+            double precio = Double.parseDouble(precioStr);
             double subtotal = precio * item.getCantidad();
 
             holder.precioArticulo.setText(String.format(Locale.US, "Precio: S/ %.2f", precio));
@@ -113,7 +119,13 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         double total = 0;
         for (ItemCarrito item : lista) {
             try {
-                double precio = Double.parseDouble(item.getArticulo().getPrecio());
+                String precioStr = (item.getArticulo().getEsPromo() == 1 &&
+                        item.getArticulo().getPrecioOferta() != null &&
+                        !item.getArticulo().getPrecioOferta().isEmpty())
+                        ? item.getArticulo().getPrecioOferta()
+                        : item.getArticulo().getPrecio();
+
+                double precio = Double.parseDouble(precioStr);
                 total += precio * item.getCantidad();
             } catch (NumberFormatException e) {
                 // Ignorar si algún precio no es válido

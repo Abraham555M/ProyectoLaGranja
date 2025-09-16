@@ -516,7 +516,18 @@ public class MainActivity extends AppCompatActivity {
 
             double totalInicial = 0;
             for (ItemCarrito item : carrito) {
-                double precio = Double.parseDouble(item.getArticulo().getPrecio());
+                String precioStr = (item.getArticulo().getEsPromo() == 1 &&
+                        item.getArticulo().getPrecioOferta() != null &&
+                        !item.getArticulo().getPrecioOferta().isEmpty())
+                        ? item.getArticulo().getPrecioOferta()
+                        : item.getArticulo().getPrecio();
+
+                double precio = 0;
+                try {
+                    precio = Double.parseDouble(precioStr);
+                } catch (NumberFormatException e) {
+                    precio = 0;
+                }
                 totalInicial += precio * item.getCantidad();
             }
             tvTotal.setText("Total: S/" + redondearTotal(totalInicial));
@@ -583,7 +594,18 @@ public class MainActivity extends AppCompatActivity {
         btnEnviarPedido.setOnClickListener(v -> {
             double total = 0;
             for (ItemCarrito item : carrito) {
-                double precio = Double.parseDouble(item.getArticulo().getPrecio());
+                String precioStr = (item.getArticulo().getEsPromo() == 1 &&
+                        item.getArticulo().getPrecioOferta() != null &&
+                        !item.getArticulo().getPrecioOferta().isEmpty())
+                        ? item.getArticulo().getPrecioOferta()
+                        : item.getArticulo().getPrecio();
+
+                double precio = 0;
+                try {
+                    precio = Double.parseDouble(precioStr);
+                } catch (NumberFormatException e) {
+                    precio = 0;
+                }
                 total += precio * item.getCantidad();
             }
 
