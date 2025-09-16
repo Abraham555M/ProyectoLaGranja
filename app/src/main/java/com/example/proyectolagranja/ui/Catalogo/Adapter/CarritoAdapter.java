@@ -52,7 +52,11 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ItemCarrito item = lista.get(position);
 
-        holder.nombreArticulo.setText(item.getArticulo().getNombre());
+        String nombreCompleto = item.getArticulo().getNombre();
+        if (item.getArticulo().getCodPresentacion() != null && !item.getArticulo().getCodPresentacion().isEmpty()) {
+            nombreCompleto += " " + item.getArticulo().getCodPresentacion();
+        }
+        holder.nombreArticulo.setText(nombreCompleto);
 
         try {
             double precio = Double.parseDouble(item.getArticulo().getPrecio());
