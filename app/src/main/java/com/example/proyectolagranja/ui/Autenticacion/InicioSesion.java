@@ -3,6 +3,7 @@ package com.example.proyectolagranja.ui.Autenticacion;
 import static com.example.proyectolagranja.ui.Servicios.MyFirebaseMessagingService.enviarTokenAlServidor;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -53,6 +54,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private EditText etTelefono;
     private Button btnEnviarTelefono, btnValidarCodigo;
     private TextView tvBienvenida, tvEnlaceReenviar;
+    private Dialog loadingDialog;
 
     // Firebase
     private String verificationId;
@@ -317,6 +319,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         Log.d("PhoneAuth", "Enviando SMS a: " + telefono);
         numeroTelefonoActual = telefono;
 
+        mostrarLoading();
+
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
                 .setPhoneNumber(telefono)
                 .setTimeout(60L, TimeUnit.SECONDS)
@@ -324,11 +328,13 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                 .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     @Override
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
+                        ocultarLoading();
                         signInWithPhoneAuthCredential(credential);
                     }
 
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
+                        ocultarLoading();
                         if (e instanceof FirebaseAuthInvalidCredentialsException) {
                             Toast.makeText(requireContext(), "Número de teléfono inválido", Toast.LENGTH_LONG).show();
                         } else if (e instanceof FirebaseTooManyRequestsException) {
@@ -342,6 +348,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     public void onCodeSent(@NonNull String verifId,
                                            @NonNull PhoneAuthProvider.ForceResendingToken token) {
                         super.onCodeSent(verifId, token);
+                        ocultarLoading();
                         verificationId = verifId;
                         resendToken = token;
                         Log.d("PhoneAuth", "Código enviado. ID: " + verifId);
@@ -429,6 +436,39 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
+    private void mostrarLoadingConMensaje(String mensaje) {
+        if (loadingDialog == null) {
+            loadingDialog = new Dialog(requireContext());
+            loadingDialog.setContentView(R.layout.dialog_loading);
+            loadingDialog.setCancelable(false);
+            if (loadingDialog.getWindow() != null) {
+                loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            }
+        }
+        TextView textView = loadingDialog.findViewById(R.id.textMensaje);
+        if (textView != null) {
+            textView.setText(mensaje);
+        }
+        loadingDialog.show();
+    }
+    private void mostrarLoading() {
+        if (loadingDialog == null) {
+            loadingDialog = new Dialog(requireContext());
+            loadingDialog.setContentView(R.layout.dialog_loading);
+            loadingDialog.setCancelable(false);
+            if (loadingDialog.getWindow() != null) {
+                loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            }
+        }
+        loadingDialog.show();
+    }
+
+    private void ocultarLoading() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
+    }
+
     private void limpiarCamposCodigo() {
         if (getView() != null) {
             EditText et1 = getView().findViewById(R.id.etCodigo1);
@@ -457,8 +497,12 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     }
 
     private void signInWithPhoneAuthCredential(PhoneAuthCredential credential) {
+        mostrarLoadingConMensaje("Verificando código...");
+
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(requireActivity(), task -> {
+                    ocultarLoading();
+
                     if (task.isSuccessful()) {
                         Log.d("PhoneAuth", "Autenticación exitosa");
                         String telefono = etTelefono.getText().toString().trim();
