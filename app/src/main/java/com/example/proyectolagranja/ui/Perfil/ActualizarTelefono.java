@@ -1,6 +1,7 @@
 package com.example.proyectolagranja.ui.Perfil;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -46,6 +47,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
     private Button btnEnviarTelefonoEd, btnValidarCodigoEd;
     private TextView tvReenviarCodigo;
     private SessionManager session;
+    private Dialog loadingDialog;
 
     private String verificationId;
     private FirebaseAuth mAuth;
@@ -112,12 +114,14 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
 
     /** ==================== VALIDAR EN BACKEND ==================== **/
     private void validarTelefono(String telefono, AlertDialog dialog) {
+        mostrarLoadingConMensaje("Validando número...");
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_validar_telefono.php?tel_cliente=" + telefono;
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                ocultarLoading();
                 try {
                     String response = new String(responseBody);
                     JSONObject json = new JSONObject(response);
@@ -141,6 +145,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                ocultarLoading();
                 Toast.makeText(requireContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -183,6 +188,40 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                 }).build();
 
         PhoneAuthProvider.verifyPhoneNumber(options);
+    }
+
+    private void mostrarLoadingConMensaje(String mensaje) {
+        if (loadingDialog == null) {
+            loadingDialog = new Dialog(requireContext());
+            loadingDialog.setContentView(R.layout.dialog_loading);
+            loadingDialog.setCancelable(false);
+            if (loadingDialog.getWindow() != null) {
+                loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            }
+        }
+        TextView textView = loadingDialog.findViewById(R.id.textMensaje);
+        if (textView != null) {
+            textView.setText(mensaje);
+        }
+        loadingDialog.show();
+    }
+
+    private void mostrarLoading() {
+        if (loadingDialog == null) {
+            loadingDialog = new Dialog(requireContext());
+            loadingDialog.setContentView(R.layout.dialog_loading);
+            loadingDialog.setCancelable(false);
+            if (loadingDialog.getWindow() != null) {
+                loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            }
+        }
+        loadingDialog.show();
+    }
+
+    private void ocultarLoading() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
     }
 
     private void reenviarCodigoFirebase() {
@@ -274,6 +313,8 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
 
     /** ==================== ACTUALIZAR EN SERVIDOR ==================== **/
     private void actualizarTelefono(String telefono) {
+        mostrarLoadingConMensaje("Actualizando teléfono...");
+
         int idCliente = session.getIdCliente();
         String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_actualizar_telefono.php";
 
@@ -285,6 +326,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
         client.post(url, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                ocultarLoading();
                 String response = new String(responseBody).trim();
                 if (response.contains("Teléfono actualizado correctamente")) {
                     session.updateTelefono(telefono);
@@ -298,6 +340,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
             }
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                ocultarLoading();
                 Toast.makeText(requireContext(), "Error de conexión: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

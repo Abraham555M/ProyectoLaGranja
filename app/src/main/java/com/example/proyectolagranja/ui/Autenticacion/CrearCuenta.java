@@ -83,7 +83,7 @@ public class CrearCuenta extends Fragment implements View.OnClickListener{
                                 JSONObject json = new JSONObject(response);
 
                                 if (json.getBoolean("success")) {
-                                    Toast.makeText(getActivity(), "Cliente creado correctamente", Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(getActivity(), "Cliente creado corrCreectamente", Toast.LENGTH_SHORT).show();
 
                                     int idCliente = json.getInt("id_cliente"); // El metodo, devuelve el id
                                     SessionManager session = new SessionManager(requireContext());

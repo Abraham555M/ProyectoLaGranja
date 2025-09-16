@@ -47,9 +47,10 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Venta venta = listaVenta.get(position);
+
         holder.tvNumeroVenta.setText(venta.getNum_venta());
         holder.tvFechaVenta.setText(venta.getFec_venta());
-        holder.tvTotal.setText("S/ " + venta.getTot_venta());
+        holder.tvTotal.setText("S/ " + String.format("%.2f", venta.getTot_venta()));
 
         // Listener de botones
         holder.btnCancelarPedido.setOnClickListener(v -> {

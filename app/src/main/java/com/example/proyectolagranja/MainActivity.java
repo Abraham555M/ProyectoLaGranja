@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         TextView tvBienvenida = view.findViewById(R.id.tvBienvenida);
         Button btnContinuar = view.findViewById(R.id.btnContinuar);
 
-        tvBienvenida.setText("¡Bienvenido " + nombre + "! 🎉");
+        tvBienvenida.setText("¡Bienvenido " + nombre + "!");
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setView(view)
