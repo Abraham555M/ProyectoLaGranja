@@ -37,7 +37,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Para continuar, necesitamos verificar tu número de celular.\nPor favor ingrésalo a continuación."
+                    android:text="Para continuar, necesitamos verificar su número de celular.\nPor favor ingrésalo a continuación."
                     android:textSize="15sp"
                     android:textAlignment="textStart"
                     android:layout_marginBottom="10dp" />

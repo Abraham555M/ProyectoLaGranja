@@ -31,7 +31,7 @@
 
     <!-- Subtítulo opcional -->
     <TextView
-        android:text="Gracias por unirte a nuestra comunidad 🎉"
+        android:text="Ahora podrá comprar en nuestra tienda desde donde se encuentre. 🎉"
         android:textSize="16sp"
         android:textColor="#666666"
         android:gravity="center"

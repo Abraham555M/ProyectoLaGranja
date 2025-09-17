@@ -130,7 +130,9 @@
                     android:layout_height="wrap_content"
                     android:hint="📍 Ingrese su dirección"
                     app:boxBackgroundColor="@color/white"
+                    app:boxStrokeColor="@color/color_verde"
                     app:hintTextColor="@color/darker_gray"
+                    android:background="@android:color/transparent"
                     android:layout_marginBottom="12dp">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -138,8 +140,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"
-                        android:textColor="@color/black" />
+                        android:textColor="@color/black"
+                        android:textCursorDrawable="@drawable/cursor_color" />
                 </com.google.android.material.textfield.TextInputLayout>
+
 
                 <!-- Medio de pago -->
                 <androidx.cardview.widget.CardView
@@ -167,9 +171,10 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="💳 Paga con"
+                    android:hint="💳 Usted paga con"
+                    app:boxStrokeColor="@color/color_verde"
                     app:boxBackgroundColor="@color/white"
-                    app:hintTextColor="@color/color_principal">
+                    app:hintTextColor="@color/darker_gray">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etReferenciaPago"

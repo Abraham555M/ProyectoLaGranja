@@ -22,7 +22,7 @@
         android:id="@+id/tvMensaje"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="¿Está seguro que este es su número?"
+        android:text="¿Está seguro de que este es su número de teléfono?"
         android:textSize="15sp"
         android:textColor="#444"
         android:gravity="center"

@@ -19,7 +19,7 @@
             android:id="@+id/tvMensajeCancelar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="¿Deseas cambiar tu número?"
+            android:text="¿Desea usted cambiar su número de teléfono?"
             android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
             android:textColor="?android:textColorPrimary"
             android:textAlignment="center"

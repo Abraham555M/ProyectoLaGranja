@@ -114,28 +114,28 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
         boolean valido = true;
 
         if (etNombresEd.getText().toString().trim().isEmpty()) {
-            etNombresEd.setError("El nombre no puede estar vacío");
+            etNombresEd.setError("Su nombre no puede estar vacío");
             valido = false;
         } else {
             etNombresEd.setError(null);
         }
 
         if (etDocumentoEd.getText().toString().trim().isEmpty()) {
-            etDocumentoEd.setError("El documento no puede estar vacío");
+            etDocumentoEd.setError("Su documento no puede estar vacío");
             valido = false;
         } else {
             etDocumentoEd.setError(null);
         }
 
         if (etTelefonoEd.getText().toString().trim().isEmpty()) {
-            etTelefonoEd.setError("El teléfono no puede estar vacío");
+            etTelefonoEd.setError("Su teléfono no puede estar vacío");
             valido = false;
         } else {
             etTelefonoEd.setError(null);
         }
 
         if (etDireccionEd.getText().toString().trim().isEmpty()) {
-            etDireccionEd.setError("La dirección no puede estar vacía");
+            etDireccionEd.setError("Su dirección no puede estar vacía");
             valido = false;
         } else {
             etDireccionEd.setError(null);
@@ -208,7 +208,7 @@ public class PerfilFragment extends Fragment implements View.OnClickListener {
                 Log.d("RESPUESTA_SERVER", "Respuesta recibida: '" + respuesta + "'");
 
                 if (respuesta.equals("ok")) {
-                    Toast.makeText(requireContext(), "Datos actualizados correctamente", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Sus datos se han actualizado correctamente.", Toast.LENGTH_LONG).show();
 
                     // 🔹 Actualizamos los valores originales con los nuevos
                     nombresOriginal = etNombresEd.getText().toString().trim();

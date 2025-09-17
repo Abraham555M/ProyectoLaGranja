@@ -206,13 +206,13 @@ public class DialogoAgregarHelper {
 
     private void agregarNuevoItem(double cantidad, String detalle) {
         MainActivity.carrito.add(new ItemCarrito(articulo, cantidad, detalle));
-        Toast.makeText(context, "Artículo agregado al carrito", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Su artículo fue agregado al carrito", Toast.LENGTH_SHORT).show();
     }
 
     private void actualizarItemExistente(double cantidad, String detalle) {
         itemExistente.setCantidad(cantidad);
         itemExistente.setDetalle(detalle);
         MainActivity.carrito.set(indexExistente, itemExistente);
-        Toast.makeText(context, "Artículo actualizado en el carrito", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Su artículo fue actualizado en el carrito", Toast.LENGTH_SHORT).show();
     }
 }

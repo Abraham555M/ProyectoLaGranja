@@ -488,7 +488,11 @@ public class CatalogoFragment extends Fragment {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 procesarRespuestaArticulos(new String(responseBody));
                 if (listaArticulos.isEmpty()) {
-                    mostrarEmptyState("No hay artículos en promoción","Intenta con otros filtros o vuelve mas tarde", R.drawable.ic_promociones);
+                    mostrarEmptyState(
+                            "No hay artículos en promoción",
+                            "Por favor, intente con otros filtros o vuelva más tarde.",
+                            R.drawable.ic_promociones
+                    );
                 }
             }
 
@@ -508,7 +512,11 @@ public class CatalogoFragment extends Fragment {
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 procesarRespuestaArticulos(new String(responseBody));
                 if (listaArticulos.isEmpty()) {
-                    mostrarEmptyState("No tienes artículos favoritos aún", "Realiza pedidos y te mostraremos tus productos favoritos.", R.drawable.ic_favoritos);
+                    mostrarEmptyState(
+                            "Aún no tienes artículos favoritos",
+                            "Realiza algunos pedidos y aquí aparecerán sus productos favoritos.",
+                            R.drawable.ic_favoritos
+                    );
                 }
             }
 
@@ -555,7 +563,11 @@ public class CatalogoFragment extends Fragment {
             }
 
             if (listaArticulos.isEmpty() && !mostrandoPromociones && !mostrandoFavoritos) {
-                mostrarEmptyState("No se encontraron artículos", "Intenta con otros filtros o vuelve mas tarde", R.drawable.ic_sin_articulos);
+                mostrarEmptyState(
+                        "No se encontraron artículos",
+                        "Por favor, intente con otros filtros o vuelva más tarde.",
+                        R.drawable.ic_sin_articulos
+                );
             } else {
                 ocultarEmptyState();
             }

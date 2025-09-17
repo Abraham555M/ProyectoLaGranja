@@ -108,6 +108,12 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                         break;
                 }
 
+                // --- Limpiar fechas cada vez que se selecciona un estado ---
+                fechaInicio = "";
+                fechaFin = "";
+                if (etFechaIni != null) etFechaIni.setText("");
+                if (etFechaFin != null) etFechaFin.setText("");
+
                 if (act_venta == -1) {
                     cargarPedidosCliente(); // todos los pedidos
                 } else {
@@ -172,6 +178,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         };
 
         spEstado.setAdapter(adapterSpinner);
+        spEstado.setSelection(0);
 
         // Inicializamos adapter vacío
         adapter = new PedidosAdapter(getContext(), listaVenta);
@@ -200,6 +207,16 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
         cargarPedidosCliente();
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Spinner spEstado = getView().findViewById(R.id.sp_estado);
+        if (spEstado != null) {
+            spEstado.setSelection(0, false); // false para NO disparar onItemSelected
+        }
+        cargarPedidosCliente(); // opcional si quieres recargar todos los pedidos
     }
 
     @Override
@@ -247,6 +264,12 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     }
 
     private void filtrarPorFechas(String fecha_ini, String fecha_fin) {
+        // Limpiar spinner
+        Spinner spEstado = getView().findViewById(R.id.sp_estado);
+        if (spEstado != null) {
+            spEstado.setSelection(0, false); // false para que no dispare onItemSelected
+        }
+
         int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR +
@@ -278,7 +301,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     adapter.notifyDataSetChanged();
 
                     if (listaVenta.isEmpty()) {
-                        Toast.makeText(getContext(), "No hay pedidos en ese rango de fechas", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Usted, no cuenta con pedidos en ese rango de fechas.", Toast.LENGTH_LONG).show();
                     }
 
                 } catch (Exception e) {
@@ -328,7 +351,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     adapter.notifyDataSetChanged();
 
                     if (listaVenta.isEmpty()) {
-                        mostrarEmptyState("No tienes pedidos en este estado", R.drawable.ic_carrito_compras);
+                        mostrarEmptyState("Usted aún no tienes pedidos en este estado", R.drawable.ic_carrito_compras);
                     } else {
                         ocultarEmptyState();
                     }
@@ -374,7 +397,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     adapter.notifyDataSetChanged();
 
                     if (listaVenta.isEmpty()) {
-                        mostrarEmptyState("No tienes pedidos registrados", R.drawable.ic_carrito_compras);
+                        mostrarEmptyState("Usted aún no tiene pedidos registrados", R.drawable.ic_carrito_compras);
                     } else {
                         ocultarEmptyState();
                     }

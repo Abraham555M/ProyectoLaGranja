@@ -128,7 +128,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                     boolean existe = json.getBoolean("existe");
 
                     if (existe) {
-                        Toast.makeText(requireContext(), "El número ya está registrado", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Este número ya se encuentra registrado. Por favor, verifique sus datos.", Toast.LENGTH_LONG).show();
                         dialog.dismiss();
                     } else {
                         // OK: ocultar bienvenida, mostrar código y enviar SMS
@@ -183,7 +183,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                         super.onCodeSent(verifId, token);
                         verificationId = verifId;
                         resendToken = token;
-                        Toast.makeText(requireContext(), "Código enviado", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "El código ha sido enviado correctamente.", Toast.LENGTH_LONG).show();
                     }
                 }).build();
 
@@ -253,7 +253,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                         super.onCodeSent(verifId, token);
                         verificationId = verifId;
                         resendToken = token;
-                        Toast.makeText(requireContext(), "Código reenviado", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "El código ha sido reenviado correctamente.", Toast.LENGTH_LONG).show();
                         limpiarCamposCodigo();
                     }
                 }).build();
@@ -264,7 +264,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
     /** ==================== VERIFICAR CODIGO ==================== **/
     private void verificarCodigoFirebase(String codigoIngresado) {
         if (verificationId == null) {
-            Toast.makeText(requireContext(), "No se ha enviado el código", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "El código ingresado es incorrecto, por favor verifíquelo.", Toast.LENGTH_LONG).show();
             return;
         }
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, codigoIngresado);
@@ -294,7 +294,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
 
         if (intentos >= MAX_INTENTOS) {
             editor.putLong(telefono + KEY_TIEMPO_BLOQUEO, System.currentTimeMillis()).apply();
-            Toast.makeText(requireContext(), "Número bloqueado por 24h por códigos erróneos", Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), "Su número ha sido temporalmente bloqueado durante 24 horas debido a intentos de código incorrectos.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -307,7 +307,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
 
         if (intentos >= MAX_INTENTOS) {
             editor.putLong(telefono + KEY_TIEMPO_BLOQUEO, System.currentTimeMillis()).apply();
-            Toast.makeText(requireContext(), "Número bloqueado por 24h por reenvíos", Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), "Su número ha sido temporalmente bloqueado durante 24 horas debido a múltiples reenvíos.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -330,7 +330,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
                 String response = new String(responseBody).trim();
                 if (response.contains("Teléfono actualizado correctamente")) {
                     session.updateTelefono(telefono);
-                    Toast.makeText(requireContext(), "Teléfono actualizado correctamente", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Su teléfono fue actualizado correctamente", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_content_main)
                             .navigate(R.id.action_nav_actualizar_telefono_to_nav_perfil);
                     limpiarCamposCodigo();
@@ -398,7 +398,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
         if (v == btnEnviarTelefonoEd) {
             String telefono = etTelefonoEd.getText().toString().trim();
             if (telefono.isEmpty() || telefono.length() < 9 || !telefono.startsWith("9")) {
-                Toast.makeText(requireContext(), "Número inválido", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Su número es inválido", Toast.LENGTH_SHORT).show();
                 return;
             }
             mostrarDialogoConfirmarNumero(); // 👈 aquí ahora sí usamos el flujo completo
@@ -410,7 +410,7 @@ public class ActualizarTelefono extends Fragment implements View.OnClickListener
             for (int id : ids) {
                 EditText et = getView().findViewById(id);
                 if (et.getText().toString().isEmpty()) {
-                    Toast.makeText(requireContext(), "Completa todos los dígitos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Por favor, ingrese todos los dígitos requeridos", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 codigo.append(et.getText().toString());
