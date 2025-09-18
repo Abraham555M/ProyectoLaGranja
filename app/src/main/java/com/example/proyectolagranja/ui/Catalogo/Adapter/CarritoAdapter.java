@@ -139,8 +139,6 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.ViewHold
         return lista.size();
     }
 
-
-
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgArticulo;
         TextView nombreArticulo, precioArticulo, cantidadArticulo, subTotalArticulo, labelOferta;

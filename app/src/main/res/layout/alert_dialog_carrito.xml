@@ -130,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:hint="📍 Ingrese su dirección"
                     app:boxBackgroundColor="@color/white"
-                    app:boxStrokeColor="@color/color_verde"
+                    app:boxStrokeColor="@color/darker_gray"
                     app:hintTextColor="@color/darker_gray"
                     android:background="@android:color/transparent"
                     android:layout_marginBottom="12dp">
@@ -151,7 +151,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="8dp"
-                    app:cardElevation="4dp"
+                    app:cardElevation="2dp"
                     app:layout_constraintTop_toBottomOf="@id/cardview_categorias"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent">
@@ -171,8 +171,8 @@
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="💳 Usted paga con"
-                    app:boxStrokeColor="@color/color_verde"
+                    android:hint="💶 Usted paga con"
+                    app:boxStrokeColor="@color/darker_gray"
                     app:boxBackgroundColor="@color/white"
                     app:hintTextColor="@color/darker_gray">
 
@@ -211,12 +211,23 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/tvMinimoCompra"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:text="El monto mínimo para realizar un pedido es de S/15.00"
+                    android:textColor="@color/color_rojo"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
                 <!-- Botón enviar -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEnviarPedido"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="10dp"
                     android:backgroundTint="@color/color_verde"
                     android:text="Enviar Pedido"
                     android:textColor="@android:color/white"
@@ -226,6 +237,8 @@
                     app:icon="@drawable/ic_moto_pedido"
                     app:iconTint="@android:color/white"
                     app:iconPadding="12dp" />
+
+
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

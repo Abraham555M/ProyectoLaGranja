@@ -7,14 +7,24 @@ public class Venta {
     private int id_pago_medio;
     private int act_venta;
     private double tot_venta;
+    private double efec_venta;
 
-    public Venta(int id_venta, String num_venta, String fec_venta, int id_pago_medio, int act_venta, double tot_venta) {
+    public Venta(int id_venta, String num_venta, String fec_venta, int id_pago_medio, int act_venta, double tot_venta, double efec_venta) {
         this.id_venta = id_venta;
         this.num_venta = num_venta;
         this.fec_venta = fec_venta;
         this.id_pago_medio = id_pago_medio;
         this.act_venta = act_venta;
         this.tot_venta = tot_venta;
+        this.efec_venta = efec_venta;
+    }
+
+    public double getEfec_venta() {
+        return efec_venta;
+    }
+
+    public void setEfec_venta(double efec_venta) {
+        this.efec_venta = efec_venta;
     }
 
     public int getId_venta() {

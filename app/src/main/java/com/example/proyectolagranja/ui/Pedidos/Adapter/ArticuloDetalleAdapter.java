@@ -1,6 +1,10 @@
 package com.example.proyectolagranja.ui.Pedidos.Adapter;
 
 import android.content.Context;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.StrikethroughSpan;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,26 +41,52 @@ public class ArticuloDetalleAdapter extends RecyclerView.Adapter<ArticuloDetalle
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ArticuloDetalle articulo = listaArticulos.get(position);
 
-        holder.nombre.setText(articulo.getNombre());
-        String precioFormateado = String.format("%.2f", articulo.getPrecio());
-        String subTotalFormateado = String.format("%.2f", articulo.getSubTotal());
-        String cantidadFormateada = String.format(Locale.US, "%.3f", articulo.getCantidad());
+        // 🔹 Nombre + código presentación subrayado
+        String nombreConPresentacion = articulo.getNombre() + " " + articulo.getCodPresentacion();
+        SpannableString spannableNombre = new SpannableString(nombreConPresentacion);
+        int start = nombreConPresentacion.lastIndexOf(articulo.getCodPresentacion());
+        int end = nombreConPresentacion.length();
+        if (start >= 0) {
+            spannableNombre.setSpan(new UnderlineSpan(), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        holder.nombre.setText(spannableNombre);
 
-        holder.precio.setText("S/. " + precioFormateado);
+        // 🔹 Manejo de precios con promoción
+        double precioNormal = articulo.getPrecio();
+        double precioOferta = articulo.getPrecioOferta();
+        int esPromo = articulo.getEsPromo();
+
+        double precioFinal;
+
+// Si está en promo y el precio de oferta es válido, usar ese
+        if (esPromo == 1 && precioOferta > 0) {
+            precioFinal = precioOferta;
+        } else {
+            precioFinal = precioNormal;
+        }
+
+        String precioFormateado = "S/. " + String.format("%.2f", precioFinal);
+        holder.precio.setText(precioFormateado);
+
+        // 🔹 Cantidad y subtotal
+        String cantidadFormateada = String.format(Locale.US, "%.3f", articulo.getCantidad());
+        String subTotalFormateado = String.format("%.2f", articulo.getSubTotal());
+
         holder.cantidad.setText("Cantidad: " + cantidadFormateada);
         holder.subTotal.setText("SubTotal: S/. " + subTotalFormateado);
 
-        // Cargar imagen con Glide
+        // 🔹 Imagen con Glide
         if (articulo.getImagenUrl() != null && !articulo.getImagenUrl().isEmpty()) {
             Glide.with(context)
                     .load(articulo.getImagenUrl())
-                    .placeholder(R.drawable.logo_la_granja) // mientras carga
-                    .error(R.drawable.logo_la_granja)       // si falla
+                    .placeholder(R.drawable.logo_la_granja)
+                    .error(R.drawable.logo_la_granja)
                     .into(holder.imagen);
         } else {
             holder.imagen.setImageResource(R.drawable.logo_la_granja);
         }
     }
+
 
     @Override
     public int getItemCount() {

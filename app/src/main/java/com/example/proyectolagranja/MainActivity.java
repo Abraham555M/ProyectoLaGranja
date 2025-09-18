@@ -220,8 +220,7 @@ public class MainActivity extends AppCompatActivity {
         Window window = dialog.getWindow();
         if (window != null) {
             WindowManager.LayoutParams params = window.getAttributes();
-            params.gravity = Gravity.TOP;   // Lo manda arriba
-            params.y = 100;                 // margen desde arriba (en px)
+            params.gravity = Gravity.CENTER;
             window.setAttributes(params);
         }
     }
@@ -235,7 +234,6 @@ public class MainActivity extends AppCompatActivity {
             super.onBackPressed(); // Comportamiento normal
         }
     }
-
 
     private void mostrarDialogoLogout(NavigationView navigationView, NavController navController, DrawerLayout drawer) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -610,7 +608,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (total < 15) {
-                Toast.makeText(MainActivity.this, "El monto mínimo del pedido es S/15", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "El monto mínimo de su pedido debe ser mayor a S/15", Toast.LENGTH_LONG).show();
                 return;
             }
             if (spMedioPago.getSelectedItemPosition() == 0) {

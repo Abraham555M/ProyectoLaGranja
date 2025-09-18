@@ -74,6 +74,18 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
         // Configurar el SwipeRefreshLayout
         swipeRefreshLayout.setOnRefreshListener(() -> {
+            // Limpiar filtros de fechas
+            fechaInicio = "";
+            fechaFin = "";
+            if (etFechaIni != null) etFechaIni.setText("");
+            if (etFechaFin != null) etFechaFin.setText("");
+
+            // Reiniciar spinner de estado a "Todos"
+            Spinner spEstado = getView().findViewById(R.id.sp_estado);
+            if (spEstado != null) {
+                spEstado.setSelection(0, false); // false para que NO dispare onItemSelected
+            }
+
             cargarPedidosCliente(); // recargar pedidos
         });
 
@@ -294,8 +306,9 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                         int id_pago_medio = obj.getInt("id_pago_medio");
                         int act_venta = obj.getInt("act_venta");
                         double tot_venta = obj.getDouble("tot_venta");
+                        double efec_venta = obj.getDouble("efec_venta");
 
-                        listaVenta.add(new Venta(id_venta, num_venta, fec_venta, id_pago_medio, act_venta, tot_venta));
+                        listaVenta.add(new Venta(id_venta, num_venta, fec_venta, id_pago_medio, act_venta, tot_venta, efec_venta));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -344,8 +357,9 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                         int id_pago_medio = obj.getInt("id_pago_medio");
                         int estado = obj.getInt("act_venta");
                         double tot_venta = obj.getDouble("tot_venta");
+                        double efec_venta = obj.getDouble("efec_venta");
 
-                        listaVenta.add(new Venta(id_venta, num_venta, fec_venta, id_pago_medio, estado, tot_venta));
+                        listaVenta.add(new Venta(id_venta, num_venta, fec_venta, id_pago_medio, act_venta, tot_venta, efec_venta));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -390,8 +404,9 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                         int id_pago_medio = obj.getInt("id_pago_medio");
                         int act_venta = obj.getInt("act_venta");
                         double tot_venta = obj.getDouble("tot_venta");
+                        double efec_venta = obj.getDouble("efec_venta");
 
-                        listaVenta.add(new Venta(id_venta, num_venta, fec_venta, id_pago_medio, act_venta, tot_venta));
+                        listaVenta.add(new Venta(id_venta, num_venta, fec_venta, id_pago_medio, act_venta, tot_venta, efec_venta));
                     }
 
                     adapter.notifyDataSetChanged();
@@ -501,14 +516,21 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     double total = 0;
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
+
                         String nombre = obj.getString("nom_articulo");
-                        double precio = obj.getDouble("prec_venta_detalle");
+                        double precio = obj.getDouble("prec_vent1_articulo");
                         double cantidad = obj.getDouble("cant_venta_detalle");
-                        double subTotal = precio * cantidad;
                         String imagenUrl = obj.optString("foto_articulo");
+                        Integer esPromo = obj.optInt("est_promo_articulo");
+                        String codPresentacion = obj.optString("cod_presentacion");
+                        double precioOferta = obj.optDouble("prec_promo_articulo");
+
+                        double precioAplicado = (esPromo == 1 && precioOferta > 0) ? precioOferta : precio;
+                        double subTotal = precioAplicado * cantidad;
+
                         total += subTotal;
 
-                        listaArticulos.add(new ArticuloDetalle(nombre, precio, cantidad, subTotal, imagenUrl));
+                        listaArticulos.add(new ArticuloDetalle(nombre, precio, cantidad, subTotal, imagenUrl, esPromo, codPresentacion, precioOferta));
                     }
 
                     adapterArticulos.notifyDataSetChanged();

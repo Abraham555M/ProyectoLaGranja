@@ -64,7 +64,9 @@ public class PedidosAdapter extends RecyclerView.Adapter<PedidosAdapter.ViewHold
         // Medio de pago
         String medioPagoTexto;
         switch (venta.getId_pago_medio()) {
-            case 1: medioPagoTexto = "Efectivo"; break;
+            case 1: // Efectivo
+                medioPagoTexto = "Efectivo - S/ " + String.format("%.2f", venta.getEfec_venta());
+                break;
             case 2: medioPagoTexto = "Tarjeta"; break;
             case 3: medioPagoTexto = "App"; break;
             case 4: medioPagoTexto = "Transferencia"; break;
