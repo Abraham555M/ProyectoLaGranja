@@ -669,7 +669,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String redondearTotal(double v) {
-        return String.format(Locale.US, "%.2f", v); // redondea a 2 decimales
+        // Multiplico por 10 para trabajar con el primer decimal
+        double valor = Math.round(v * 100.0) / 100.0; // primero asegurar 2 decimales estándar
+        double redondeado = Math.round(valor * 10.0) / 10.0; // redondear al múltiplo de 0.10 más cercano
+
+        return String.format(Locale.US, "%.2f", redondeado);
     }
 
     public void EnviarPedido(double total, double montoEntregado, String direccion, String detalle_venta, androidx.appcompat.app.AlertDialog dialog){

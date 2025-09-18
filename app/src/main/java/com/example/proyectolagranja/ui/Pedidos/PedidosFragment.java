@@ -510,10 +510,17 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
                 try {
                     String respuesta = new String(responseBody, "UTF-8");
-                    JSONArray jsonArray = new JSONArray(respuesta);
+
+                    // Obtener el objeto principal
+                    JSONObject jsonObject = new JSONObject(respuesta);
+
+                    // Total ya calculado en PHP
+                    double total = jsonObject.getDouble("tot_venta");
+
+                    // Lista de detalles
+                    JSONArray jsonArray = jsonObject.getJSONArray("detalles");
 
                     listaArticulos.clear();
-                    double total = 0;
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
 
@@ -525,21 +532,22 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                         String codPresentacion = obj.optString("cod_presentacion");
                         double precioOferta = obj.optDouble("prec_promo_articulo");
 
+                        // Ya no calculamos el total aquí (subTotal lo puedes usar solo para mostrar)
                         double precioAplicado = (esPromo == 1 && precioOferta > 0) ? precioOferta : precio;
                         double subTotal = precioAplicado * cantidad;
 
-                        total += subTotal;
-
-                        listaArticulos.add(new ArticuloDetalle(nombre, precio, cantidad, subTotal, imagenUrl, esPromo, codPresentacion, precioOferta));
+                        listaArticulos.add(new ArticuloDetalle(
+                                nombre, precio, cantidad, subTotal, imagenUrl, esPromo, codPresentacion, precioOferta
+                        ));
                     }
 
                     adapterArticulos.notifyDataSetChanged();
                     tvEmpty.setVisibility(listaArticulos.isEmpty() ? View.VISIBLE : View.GONE);
 
-                    // Actualizar total
+                    // 👇 Mostrar el total que viene del servidor
                     tvMensajeTotal.setText("Total: S/ " + String.format("%.2f", total));
 
-                    // Actualizar estado
+                    // Estado de la venta
                     String estadoTexto;
                     int colorFondo;
                     switch (actVenta) {
@@ -557,12 +565,12 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     tvMensajeEstado.setBackground(drawable);
                     int padding = 20;
                     tvMensajeEstado.setPadding(padding, padding/2, padding, padding/2);
-                    tvMensajeEstado.setPadding(padding, padding/2, padding, padding/2);
 
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
                 }
             }
+
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
