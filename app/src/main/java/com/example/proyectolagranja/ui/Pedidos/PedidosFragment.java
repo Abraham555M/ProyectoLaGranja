@@ -61,9 +61,12 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     private LinearLayout emptyStateLayout;
     private TextView tvEmptyMessage;
     private ImageView ivEmptyIcon;
-    // nuevo campo
     private boolean ignoreSpinnerCallback = false;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private Spinner spEstado;
+
+    // Variable para controlar el tipo de filtro actual
+    private boolean filtrandoPorEstado = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -76,29 +79,53 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         tvEmptyMessage = rootView.findViewById(R.id.tvEmptyMessage);
         ivEmptyIcon = rootView.findViewById(R.id.ivEmptyIcon);
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        spEstado = rootView.findViewById(R.id.sp_estado);
 
         // Configurar el SwipeRefreshLayout
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            Spinner spEstado = getView().findViewById(R.id.sp_estado);
-            if (spEstado != null) {
-                // evitamos que onItemSelected se ejecute por este setSelection
-                ignoreSpinnerCallback = true;
-                spEstado.setSelection(0); // no necesitamos el false porque controlamos el callback con el flag
-            }
-
-            // Restaurar fechas por defecto y filtrar
-            setFechasPorDefecto();
-            filtrarPorFechas(fechaInicio, fechaFin);
-
-            // <-- ya no llamamos setRefreshing(false) aquí: lo haremos cuando termine la petición en filtrarPorFechas()
+            // Resetear todo al estado inicial
+            resetearFiltros();
         });
 
-        Spinner spEstado = rootView.findViewById(R.id.sp_estado);
-        // Cuando el usuario selecciona un estado
+        // Configurar spinner de estados
+        configurarSpinnerEstados();
+
+        // Inicializar campos de fecha
+        etFechaIni = rootView.findViewById(R.id.etFechaIni);
+        etFechaFin = rootView.findViewById(R.id.etFechaFin);
+        etFechaIni.setOnClickListener(v -> mostrarDatePicker(true));
+        etFechaFin.setOnClickListener(v -> mostrarDatePicker(false));
+
+        btnNuevoPedido = rootView.findViewById(R.id.btnNuevoPedido);
+        btnNuevoPedido.setOnClickListener(this);
+
+        // Inicializar adapter
+        adapter = new PedidosAdapter(getContext(), listaVenta);
+        recyclerViewPedidos.setAdapter(adapter);
+
+        // Configurar listeners del adapter
+        adapter.setOnPedidoClickListener(new PedidosAdapter.OnPedidoClickListener() {
+            @Override
+            public void onCancelarClick(Venta venta) {
+                mostrarDialogCancelarPedido(venta);
+            }
+
+            @Override
+            public void onVerMasClick(Venta venta) {
+                mostrarDialogVerMas(venta);
+            }
+        });
+
+        // Cargar datos iniciales
+        cargarPedidosCliente();
+        return rootView;
+    }
+
+    private void configurarSpinnerEstados() {
         spEstado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // si estamos ignorando callbacks (cambio programático), salimos y reseteamos el flag
+                // Si estamos ignorando callbacks (cambio programático), salimos
                 if (ignoreSpinnerCallback) {
                     ignoreSpinnerCallback = false;
                     return;
@@ -116,18 +143,11 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                 }
 
                 if (act_venta == -1) {
-                    // "Todos": aplicamos el rango actual (si está vacío, lo recreamos)
-                    if (fechaInicio.isEmpty() || fechaFin.isEmpty()) {
-                        setFechasPorDefecto();
-                    }
-                    filtrarPorFechas(fechaInicio, fechaFin);
+                    // "Todos": cambiar a filtro por fechas
+                    cambiarAFiltroPorFechas();
                 } else {
-                    // Estado específico: limpiamos las fechas y filtramos por estado
-                    fechaInicio = "";
-                    fechaFin = "";
-                    if (etFechaIni != null) etFechaIni.setText("");
-                    if (etFechaFin != null) etFechaFin.setText("");
-                    filtrarPorEstado(act_venta);
+                    // Estado específico: cambiar a filtro por estado
+                    cambiarAFiltroPorEstado(act_venta);
                 }
             }
 
@@ -135,11 +155,11 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
             public void onNothingSelected(AdapterView<?> parent) { }
         });
 
+        // Configurar adapter del spinner
         String[] estados = getResources().getStringArray(R.array.listado_estado);
-
         ArrayAdapter<String> adapterSpinner = new ArrayAdapter<String>(
                 requireContext(),
-                R.layout.item_spinner_estado, // layout personalizado
+                R.layout.item_spinner_estado,
                 estados
         ) {
             @Override
@@ -189,46 +209,99 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
         spEstado.setAdapter(adapterSpinner);
         spEstado.setSelection(0);
-
-        // Inicializamos adapter vacío
-        adapter = new PedidosAdapter(getContext(), listaVenta);
-        recyclerViewPedidos.setAdapter(adapter);
-
-        // listener de los botones de cada ítem
-        adapter.setOnPedidoClickListener(new PedidosAdapter.OnPedidoClickListener() {
-            @Override
-            public void onCancelarClick(Venta venta) {
-                mostrarDialogCancelarPedido(venta);
-            }
-
-            @Override
-            public void onVerMasClick(Venta venta) {
-                mostrarDialogVerMas(venta);
-            }
-        });
-
-        etFechaIni = rootView.findViewById(R.id.etFechaIni);
-        etFechaFin = rootView.findViewById(R.id.etFechaFin);
-        etFechaIni.setOnClickListener(v -> mostrarDatePicker(true));
-        etFechaFin.setOnClickListener(v -> mostrarDatePicker(false));
-
-        btnNuevoPedido = (Button) rootView.findViewById(R.id.btnNuevoPedido);
-        btnNuevoPedido.setOnClickListener(this);
-
-        cargarPedidosCliente();
-        return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        Spinner spEstado = getView().findViewById(R.id.sp_estado);
-        if (spEstado != null) {
-        }
+        // Forzar selección de "Todos" en el spinner sin bloquear el siguiente cambio
+        ignoreSpinnerCallback = true;
+        spEstado.setSelection(0);
+        spEstado.post(() -> ignoreSpinnerCallback = false); // ← esto es clavea
+        // Mostrar campos de fecha
+        mostrarCamposFecha(true);
 
+        // Establecer fechas por defecto y aplicar filtro
         setFechasPorDefecto();
         filtrarPorFechas(fechaInicio, fechaFin);
+    }
+
+    private void resetearFiltros() {
+        filtrandoPorEstado = false;
+
+        // Resetear spinner sin disparar callback
+        ignoreSpinnerCallback = true;
+        spEstado.setSelection(0);
+
+        // Mostrar campos de fecha
+        mostrarCamposFecha(true);
+
+        // Fechas por defecto
+        setFechasPorDefecto();
+
+        // Aplicar filtro por fechas
+        filtrarPorFechas(fechaInicio, fechaFin);
+
+        // Forzar aplicación del filtro por estado si es necesario
+        spEstado.post(() -> {
+            ignoreSpinnerCallback = false;
+            int position = spEstado.getSelectedItemPosition();
+            int actVenta = positionToEstado(position);
+            if(actVenta != -1){
+                cambiarAFiltroPorEstado(actVenta);
+            }
+        });
+    }
+
+    private int positionToEstado(int position) {
+        switch (position) {
+            case 1: return 0; // Cancelado
+            case 2: return 2; // Pendiente
+            case 3: return 3; // Despachado
+            case 4: return 4; // Entregado
+            case 5: return 5; // Pagado
+            default: return -1; // Todos u otros
+        }
+    }
+
+    private void cambiarAFiltroPorFechas() {
+        filtrandoPorEstado = false;
+
+        // Mostrar campos de fecha
+        mostrarCamposFecha(true);
+
+        // Si no hay fechas establecidas, usar las por defecto
+        if (fechaInicio.isEmpty() || fechaFin.isEmpty()) {
+            setFechasPorDefecto();
+        }
+
+        // Aplicar filtro por fechas
+        filtrarPorFechas(fechaInicio, fechaFin);
+    }
+
+    private void cambiarAFiltroPorEstado(int act_venta) {
+        filtrandoPorEstado = true;
+
+        // Ocultar campos de fecha y limpiarlos
+        mostrarCamposFecha(false);
+        limpiarCamposFecha();
+
+        // Aplicar filtro por estado
+        filtrarPorEstado(act_venta);
+    }
+
+    private void mostrarCamposFecha(boolean mostrar) {
+        int visibility = mostrar ? View.VISIBLE : View.GONE;
+        if (etFechaIni != null) etFechaIni.setVisibility(visibility);
+        if (etFechaFin != null) etFechaFin.setVisibility(visibility);
+    }
+
+    private void limpiarCamposFecha() {
+        fechaInicio = "";
+        fechaFin = "";
+        if (etFechaIni != null) etFechaIni.setText("");
+        if (etFechaFin != null) etFechaFin.setText("");
     }
 
     private void setFechasPorDefecto() {
@@ -240,7 +313,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         if (etFechaFin != null) etFechaFin.setText(fechaFin);
 
         // Fecha inicio = mismo día pero del mes anterior
-        calendar.add(Calendar.MONTH, -1);  // Restar 1 mes
+        calendar.add(Calendar.MONTH, -1);
         fechaInicio = sdf.format(calendar.getTime());
         if (etFechaIni != null) etFechaIni.setText(fechaInicio);
     }
@@ -248,13 +321,16 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        fechaInicio = "";
-        fechaFin = "";
-        if (etFechaIni != null) etFechaIni.setText("");
-        if (etFechaFin != null) etFechaFin.setText("");
+        limpiarCamposFecha();
     }
 
     private void mostrarDatePicker(boolean esInicio) {
+        // Solo permitir cambio de fechas si no estamos filtrando por estado
+        if (filtrandoPorEstado) {
+            Toast.makeText(getContext(), "Para usar fechas, seleccione 'Todos' en el filtro de estado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         final Calendar calendario = Calendar.getInstance();
         int anio = calendario.get(Calendar.YEAR);
         int mes = calendario.get(Calendar.MONTH);
@@ -270,38 +346,41 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                 getContext(),
                 R.style.MiDatePickerTheme,
                 (view, year, month, dayOfMonth) -> {
-            String fecha = year + "-" + String.format("%02d", (month + 1)) + "-" + String.format("%02d", dayOfMonth);
+                    String fecha = year + "-" + String.format("%02d", (month + 1)) + "-" + String.format("%02d", dayOfMonth);
 
-            if (esInicio) {
-                // Validar que no sea mayor que la fecha fin
-                if (!fechaFin.isEmpty() && fecha.compareTo(fechaFin) > 0) {
-                    Toast.makeText(getContext(), "La fecha de inicio no puede ser mayor que la fecha fin", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                fechaInicio = fecha;
-                etFechaIni.setText(fecha);
-            } else {
-                // Validar que no sea menor que la fecha inicio
-                if (!fechaInicio.isEmpty() && fecha.compareTo(fechaInicio) < 0) {
-                    Toast.makeText(getContext(), "La fecha fin no puede ser menor que la fecha inicio", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                fechaFin = fecha;
-                etFechaFin.setText(fecha);
-            }
-            if (!fechaInicio.isEmpty() && !fechaFin.isEmpty()) {
-                filtrarPorFechas(fechaInicio, fechaFin);
-            }        }, anio, mes, dia);
+                    if (esInicio) {
+                        // Validar que no sea mayor que la fecha fin
+                        if (!fechaFin.isEmpty() && fecha.compareTo(fechaFin) > 0) {
+                            Toast.makeText(getContext(), "La fecha de inicio no puede ser mayor que la fecha fin", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        fechaInicio = fecha;
+                        etFechaIni.setText(fecha);
+                    } else {
+                        // Validar que no sea menor que la fecha inicio
+                        if (!fechaInicio.isEmpty() && fecha.compareTo(fechaInicio) < 0) {
+                            Toast.makeText(getContext(), "La fecha fin no puede ser menor que la fecha inicio", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        fechaFin = fecha;
+                        etFechaFin.setText(fecha);
+                    }
+
+                    // Aplicar filtro solo si ambas fechas están completas
+                    if (!fechaInicio.isEmpty() && !fechaFin.isEmpty()) {
+                        // Asegurar que el spinner esté en "Todos"
+                        if (spEstado.getSelectedItemPosition() != 0) {
+                            ignoreSpinnerCallback = true;
+                            spEstado.setSelection(0);
+                            spEstado.post(() -> ignoreSpinnerCallback = false);
+                        }
+                        filtrarPorFechas(fechaInicio, fechaFin);
+                    }
+                }, anio, mes, dia);
         datePicker.show();
     }
 
     private void filtrarPorFechas(String fecha_ini, String fecha_fin) {
-        // Limpiar spinner
-        Spinner spEstado = getView().findViewById(R.id.sp_estado);
-        if (spEstado != null) {
-            spEstado.setSelection(0, false); // false para que no dispare onItemSelected
-        }
-
         int idCliente = session.getIdCliente();
 
         String url = ServidorConfig.URL_SERVIDOR +
@@ -316,7 +395,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     String respuesta = new String(responseBody, "UTF-8");
                     JSONArray jsonArray = new JSONArray(respuesta);
 
-                    listaVenta.clear(); // limpiar lista antes de agregar resultados
+                    listaVenta.clear();
 
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
@@ -343,7 +422,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 } finally {
-                    swipeRefreshLayout.setRefreshing(false); // 👈 cerrar swipe aquí también
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
 
@@ -397,10 +476,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
                 } finally {
-                    // 👇 detener el swipe aunque haya 0 resultados
-                    if (swipeRefreshLayout != null) {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
 
@@ -408,14 +484,10 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
                 error.printStackTrace();
-                // 👇 detener el swipe en caso de error
-                if (swipeRefreshLayout != null) {
-                    swipeRefreshLayout.setRefreshing(false);
-                }
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
-
 
     private void cargarPedidosCliente() {
         int idCliente = session.getIdCliente();
@@ -494,7 +566,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
         // Botón "Sí"
         btnSi.setOnClickListener(v -> {
-            // Aquí llamas la función para cancelar el pedido
             CancelarPedido(venta.getId_venta());
             dialog.dismiss();
         });
@@ -547,13 +618,8 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                 try {
                     String respuesta = new String(responseBody, "UTF-8");
 
-                    // Obtener el objeto principal
                     JSONObject jsonObject = new JSONObject(respuesta);
-
-                    // Total ya calculado en PHP
                     double total = jsonObject.getDouble("tot_venta");
-
-                    // Lista de detalles
                     JSONArray jsonArray = jsonObject.getJSONArray("detalles");
 
                     listaArticulos.clear();
@@ -568,7 +634,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                         String codPresentacion = obj.optString("cod_presentacion");
                         double precioOferta = obj.optDouble("prec_promo_articulo");
 
-                        // Ya no calculamos el total aquí (subTotal lo puedes usar solo para mostrar)
                         double precioAplicado = (esPromo == 1 && precioOferta > 0) ? precioOferta : precio;
                         double subTotal = precioAplicado * cantidad;
 
@@ -579,8 +644,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
                     adapterArticulos.notifyDataSetChanged();
                     tvEmpty.setVisibility(listaArticulos.isEmpty() ? View.VISIBLE : View.GONE);
-
-                    // 👇 Mostrar el total que viene del servidor
                     tvMensajeTotal.setText("Total: S/ " + String.format("%.2f", total));
 
                     // Estado de la venta
@@ -607,7 +670,6 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                 }
             }
 
-
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
@@ -631,7 +693,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
 
                     if (status.equals("ok")) {
-                        cargarPedidosCliente();
+                        resetearFiltros();
                     }
 
                 } catch (Exception e) {
