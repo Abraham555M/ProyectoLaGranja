@@ -42,6 +42,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -60,6 +61,8 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     private LinearLayout emptyStateLayout;
     private TextView tvEmptyMessage;
     private ImageView ivEmptyIcon;
+    // nuevo campo
+    private boolean ignoreSpinnerCallback = false;
     private SwipeRefreshLayout swipeRefreshLayout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -76,19 +79,18 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
         // Configurar el SwipeRefreshLayout
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            // Limpiar filtros de fechas
-            fechaInicio = "";
-            fechaFin = "";
-            if (etFechaIni != null) etFechaIni.setText("");
-            if (etFechaFin != null) etFechaFin.setText("");
-
-            // Reiniciar spinner de estado a "Todos"
             Spinner spEstado = getView().findViewById(R.id.sp_estado);
             if (spEstado != null) {
-                spEstado.setSelection(0, false); // false para que NO dispare onItemSelected
+                // evitamos que onItemSelected se ejecute por este setSelection
+                ignoreSpinnerCallback = true;
+                spEstado.setSelection(0); // no necesitamos el false porque controlamos el callback con el flag
             }
 
-            cargarPedidosCliente(); // recargar pedidos
+            // Restaurar fechas por defecto y filtrar
+            setFechasPorDefecto();
+            filtrarPorFechas(fechaInicio, fechaFin);
+
+            // <-- ya no llamamos setRefreshing(false) aquí: lo haremos cuando termine la petición en filtrarPorFechas()
         });
 
         Spinner spEstado = rootView.findViewById(R.id.sp_estado);
@@ -96,42 +98,36 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         spEstado.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                int act_venta;
-
-                switch (position) {
-                    case 0: // Todos
-                        act_venta = -1; // usamos -1 como bandera
-                        break;
-                    case 1: // Anulado
-                        act_venta = 0;
-                        break;
-                    case 2: // Pendiente
-                        act_venta = 2;
-                        break;
-                    case 3: // Despachado
-                        act_venta = 3;
-                        break;
-                    case 4: // Entregado
-                        act_venta = 4;
-                        break;
-                    case 5: // Pagado
-                        act_venta = 5;
-                        break;
-                    default:
-                        act_venta = -1;
-                        break;
+                // si estamos ignorando callbacks (cambio programático), salimos y reseteamos el flag
+                if (ignoreSpinnerCallback) {
+                    ignoreSpinnerCallback = false;
+                    return;
                 }
 
-                // --- Limpiar fechas cada vez que se selecciona un estado ---
-                fechaInicio = "";
-                fechaFin = "";
-                if (etFechaIni != null) etFechaIni.setText("");
-                if (etFechaFin != null) etFechaFin.setText("");
+                int act_venta;
+                switch (position) {
+                    case 0: act_venta = -1; break; // Todos
+                    case 1: act_venta = 0; break;  // Anulado
+                    case 2: act_venta = 2; break;  // Pendiente
+                    case 3: act_venta = 3; break;  // Despachado
+                    case 4: act_venta = 4; break;  // Entregado
+                    case 5: act_venta = 5; break;  // Pagado
+                    default: act_venta = -1; break;
+                }
 
                 if (act_venta == -1) {
-                    cargarPedidosCliente(); // todos los pedidos
+                    // "Todos": aplicamos el rango actual (si está vacío, lo recreamos)
+                    if (fechaInicio.isEmpty() || fechaFin.isEmpty()) {
+                        setFechasPorDefecto();
+                    }
+                    filtrarPorFechas(fechaInicio, fechaFin);
                 } else {
-                    filtrarPorEstado(act_venta); // pedidos filtrados
+                    // Estado específico: limpiamos las fechas y filtramos por estado
+                    fechaInicio = "";
+                    fechaFin = "";
+                    if (etFechaIni != null) etFechaIni.setText("");
+                    if (etFechaFin != null) etFechaFin.setText("");
+                    filtrarPorEstado(act_venta);
                 }
             }
 
@@ -226,11 +222,27 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
+
         Spinner spEstado = getView().findViewById(R.id.sp_estado);
         if (spEstado != null) {
-            spEstado.setSelection(0, false); // false para NO disparar onItemSelected
         }
-        cargarPedidosCliente(); // opcional si quieres recargar todos los pedidos
+
+        setFechasPorDefecto();
+        filtrarPorFechas(fechaInicio, fechaFin);
+    }
+
+    private void setFechasPorDefecto() {
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        // Fecha fin = hoy
+        fechaFin = sdf.format(calendar.getTime());
+        if (etFechaFin != null) etFechaFin.setText(fechaFin);
+
+        // Fecha inicio = mismo día pero del mes anterior
+        calendar.add(Calendar.MONTH, -1);  // Restar 1 mes
+        fechaInicio = sdf.format(calendar.getTime());
+        if (etFechaIni != null) etFechaIni.setText(fechaInicio);
     }
 
     @Override
@@ -322,12 +334,16 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     adapter.notifyDataSetChanged();
 
                     if (listaVenta.isEmpty()) {
-                        Toast.makeText(getContext(), "Usted, no cuenta con pedidos en ese rango de fechas.", Toast.LENGTH_LONG).show();
+                        mostrarEmptyState("Usted no cuenta con pedidos en ese rango de fechas.", R.drawable.ic_carrito_compras);
+                    } else {
+                        ocultarEmptyState();
                     }
 
                 } catch (Exception e) {
                     Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
                     e.printStackTrace();
+                } finally {
+                    swipeRefreshLayout.setRefreshing(false); // 👈 cerrar swipe aquí también
                 }
             }
 
@@ -335,30 +351,28 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
                 error.printStackTrace();
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
 
     private void filtrarPorEstado(int act_venta) {
         int idCliente = session.getIdCliente();
+        String url = ServidorConfig.URL_SERVIDOR +
+                "pedido/pedido_filtro_estado.php?id_cliente=" + idCliente +
+                "&act_venta=" + act_venta;
 
         AsyncHttpClient client = new AsyncHttpClient();
-        String url = ServidorConfig.URL_SERVIDOR +
-                "pedido/pedido_filtro_estado.php?act_venta=" +
-                act_venta + "&id_cliente=" + idCliente;
-
         client.get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
-                    String response = new String(responseBody, "UTF-8");
-                    JSONArray jsonArray = new JSONArray(response);
+                    String respuesta = new String(responseBody, "UTF-8");
+                    JSONArray jsonArray = new JSONArray(respuesta);
 
                     listaVenta.clear();
-
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
-
                         int id_venta = obj.getInt("id_venta");
                         String num_venta = obj.getString("num_venta");
                         String fec_venta = obj.getString("fec_venta");
@@ -367,27 +381,41 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                         double tot_venta = obj.getDouble("tot_venta");
                         double efec_venta = obj.getDouble("efec_venta");
 
-                        listaVenta.add(new Venta(id_venta, num_venta, fec_venta, id_pago_medio, act_venta, tot_venta, efec_venta));
+                        listaVenta.add(new Venta(
+                                id_venta, num_venta, fec_venta, id_pago_medio, estado, tot_venta, efec_venta
+                        ));
                     }
 
                     adapter.notifyDataSetChanged();
 
                     if (listaVenta.isEmpty()) {
-                        mostrarEmptyState("Usted aún no tienes pedidos en este estado", R.drawable.ic_carrito_compras);
+                        mostrarEmptyState("No hay pedidos con este estado.", R.drawable.ic_carrito_compras);
                     } else {
                         ocultarEmptyState();
                     }
                 } catch (Exception e) {
-                    Toast.makeText(getContext(), "Error al procesar los datos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error al procesar la respuesta", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                } finally {
+                    // 👇 detener el swipe aunque haya 0 resultados
+                    if (swipeRefreshLayout != null) {
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
+                error.printStackTrace();
+                // 👇 detener el swipe en caso de error
+                if (swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
     }
+
 
     private void cargarPedidosCliente() {
         int idCliente = session.getIdCliente();
