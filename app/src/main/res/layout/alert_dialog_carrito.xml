@@ -58,22 +58,15 @@
         </LinearLayout>
 
         <!-- Lista de productos -->
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:overScrollMode="ifContentScrolls"
-                android:padding="4dp"
-                android:clipToPadding="false"
-                android:scrollbars="vertical"
-                tools:listitem="@layout/item_articulo_carrito" />
-        </LinearLayout>
+            android:layout_height="250dp"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="ifContentScrolls"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_articulo_carrito" />
 
         <!-- Mensaje vacío -->
         <TextView
@@ -133,17 +126,18 @@
                     app:boxStrokeColor="@color/darker_gray"
                     app:hintTextColor="@color/darker_gray"
                     android:background="@android:color/transparent"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="12dp"
+                    app:placeholderText="MZ A LT A URB. FLORES PISO 1">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etDireccion"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:maxLength="100"
                         android:inputType="text"
                         android:textColor="@color/black"
                         android:textCursorDrawable="@drawable/cursor_color" />
                 </com.google.android.material.textfield.TextInputLayout>
-
 
                 <!-- Medio de pago -->
                 <androidx.cardview.widget.CardView

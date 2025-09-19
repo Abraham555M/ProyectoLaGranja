@@ -486,7 +486,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
     private void verificarCodigoFirebase(String codigoIngresado) {
         if (verificationId == null) {
-            Toast.makeText(requireContext(), "No se ha enviado el código", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Código ingresado inválido", Toast.LENGTH_SHORT).show(); // No se ha enviado el código
             return;
         }
 

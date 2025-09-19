@@ -1,6 +1,7 @@
 package com.example.proyectolagranja.ui.Pedidos;
 
 import android.app.DatePickerDialog;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
@@ -44,6 +45,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -245,6 +247,12 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         int anio = calendario.get(Calendar.YEAR);
         int mes = calendario.get(Calendar.MONTH);
         int dia = calendario.get(Calendar.DAY_OF_MONTH);
+
+        Locale locale = new Locale("es", "ES");
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.setLocale(locale);
+        getContext().getResources().updateConfiguration(config, getContext().getResources().getDisplayMetrics());
 
         DatePickerDialog datePicker = new DatePickerDialog(
                 getContext(),
