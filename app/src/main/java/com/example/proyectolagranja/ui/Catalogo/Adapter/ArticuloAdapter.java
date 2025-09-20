@@ -37,6 +37,7 @@ public class ArticuloAdapter extends RecyclerView.Adapter<ArticuloAdapter.Articu
         void onAgregarClick(Articulo articulo);
     }
 
+
     @NonNull
     @Override
     public ArticuloAdapter.ArticuloViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
