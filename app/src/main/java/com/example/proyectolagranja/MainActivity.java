@@ -495,6 +495,7 @@ public class MainActivity extends AppCompatActivity {
         TextView tvTotal = dialogView.findViewById(R.id.tvTotal);
         CardView layoutDetallesCarrito = dialogView.findViewById(R.id.layoutDetallesCarrito);
         MaterialButton btnAgregarCarrito = dialogView.findViewById(R.id.btnAgregarCarrito);
+        TextView tvMinimoCompra = dialogView.findViewById(R.id.tvMinimoCompra);
 
         TextInputLayout tilReferenciaPago = dialogView.findViewById(R.id.tilReferenciaPago);
         tilReferenciaPago.setVisibility(View.GONE);
@@ -546,6 +547,13 @@ public class MainActivity extends AppCompatActivity {
                             tvEmptyMessage.setVisibility(View.GONE);
                             recyclerView.setVisibility(View.VISIBLE);
                             btnEnviarPedido.setVisibility(View.VISIBLE); // volver a mostrar si tiene algo
+
+                            if (total < 15.0) {
+                                tvMinimoCompra.setVisibility(View.VISIBLE);
+                            } else {
+                                tvMinimoCompra.setVisibility(View.INVISIBLE);
+                            }
+
                         }
                     }
             ));

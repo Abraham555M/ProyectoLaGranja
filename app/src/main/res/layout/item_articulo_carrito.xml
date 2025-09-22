@@ -7,7 +7,7 @@
     android:layout_margin="8dp"
     android:background="@android:color/darker_gray">
 
-    <!-- Contenedor que permite superponer elementos -->
+    <!-- Contenedor principal -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,75 +25,84 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:weightSum="100"
                 android:gravity="center_vertical">
 
-                <!-- Imagen del artículo -->
-                <FrameLayout
-                    android:layout_width="90dp"
-                    android:layout_height="90dp"
-                    android:layout_marginEnd="12dp">
-
-                    <ImageView
-                        android:id="@+id/imgArticulo"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:contentDescription="Imagen del artículo"
-                        android:src="@drawable/logo_la_granja"
-                        android:clipToOutline="true"
-                        android:scaleType="centerCrop" />
-                </FrameLayout>
-
-                <!-- Nombre y precio del artículo -->
+                <!-- Imagen + textos -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:orientation="vertical">
+                    android:layout_weight="80"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/nombreArticulo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Nombre del Artículo"
-                        android:textColor="@android:color/black"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                    <!-- Imagen del artículo -->
+                    <FrameLayout
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
+                        android:layout_marginEnd="12dp">
 
-                    <TextView
-                        android:id="@+id/precioArticulo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="Precio"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        <ImageView
+                            android:id="@+id/imgArticulo"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="Imagen del artículo"
+                            android:src="@drawable/logo_la_granja"
+                            android:clipToOutline="true"
+                            android:scaleType="centerCrop" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:id="@+id/cantidadArticulo"
-                        android:layout_width="wrap_content"
+                    <!-- Nombre y precio del artículo -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="Cantidad"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/subTotalArticulo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:text="SubTotal"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
+                        <TextView
+                            android:id="@+id/nombreArticulo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Nombre del Artículo"
+                            android:textColor="@android:color/black"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/precioArticulo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Precio"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/cantidadArticulo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Cantidad"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/subTotalArticulo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="SubTotal"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
                 <!-- Botón eliminar -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:layout_marginStart="16dp"
-                    android:gravity="center">
+                    android:layout_weight="20"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnEliminarArticulo"
@@ -141,7 +150,6 @@
                     android:id="@+id/etDetalleArticulo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:hintTextColor="@color/darker_gray"
                     android:hint="Ingrese su detalle"
                     android:textSize="14sp"
                     android:inputType="text"
