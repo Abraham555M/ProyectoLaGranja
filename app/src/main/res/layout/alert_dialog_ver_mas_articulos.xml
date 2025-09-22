@@ -74,7 +74,8 @@
                     android:overScrollMode="ifContentScrolls"
                     android:padding="8dp"
                     android:scrollbars="vertical"
-                    tools:listitem="@layout/item_articulo_vendido" />
+                    tools:listitem="@layout/item_articulo_vendido"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/tvEmptyMessage"
@@ -89,6 +90,17 @@
                     android:drawableTop="@drawable/ic_carrito_compras"
                     android:drawablePadding="8dp"
                     android:visibility="gone" />
+
+                <!-- Loader -->
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/darker_gray"/>
+
             </FrameLayout>
         </androidx.cardview.widget.CardView>
 

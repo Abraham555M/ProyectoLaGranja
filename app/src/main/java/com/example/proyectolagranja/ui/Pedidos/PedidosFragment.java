@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -587,6 +588,7 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
         MaterialButton btnCerrar = dialogView.findViewById(R.id.btnCerrar);
         TextView tvMensajeTotal = dialogView.findViewById(R.id.tvMensajeTotal);
         TextView tvMensajeEstado = dialogView.findViewById(R.id.tvMensajeEstado);
+        ProgressBar progressBar = dialogView.findViewById(R.id.progressBar);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         List<ArticuloDetalle> listaArticulos = new ArrayList<>();
@@ -602,15 +604,36 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
 
         dialog.show();
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        cargarDetallesVenta(venta.getId_venta(), listaArticulos, adapterArticulos, tvEmpty, tvMensajeTotal, tvMensajeEstado, venta.getAct_venta());
+        cargarDetallesVenta(
+                venta.getId_venta(),
+                listaArticulos,
+                adapterArticulos,
+                tvEmpty,
+                tvMensajeTotal,
+                tvMensajeEstado,
+                venta.getAct_venta(),
+                recyclerView,
+                progressBar
+        );
     }
 
-    private void cargarDetallesVenta(int idVenta, List<ArticuloDetalle> listaArticulos,
-                                     ArticuloDetalleAdapter adapterArticulos, TextView tvEmpty, TextView tvMensajeTotal,
-                                     TextView tvMensajeEstado, int actVenta) {
+    private void cargarDetallesVenta(int idVenta,
+                                     List<ArticuloDetalle> listaArticulos,
+                                     ArticuloDetalleAdapter adapterArticulos,
+                                     TextView tvEmpty,
+                                     TextView tvMensajeTotal,
+                                     TextView tvMensajeEstado,
+                                     int actVenta,
+                                     RecyclerView recyclerView,
+                                     ProgressBar progressBar) {
 
         String url = ServidorConfig.URL_SERVIDOR + "pedido/pedido_obtener_detalle.php?id_venta=" + idVenta;
         AsyncHttpClient client = new AsyncHttpClient();
+
+        // 🔹 Mostrar loader antes de la petición
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+        tvEmpty.setVisibility(View.GONE);
 
         client.get(url, new AsyncHttpResponseHandler() {
             @Override
@@ -643,7 +666,15 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     }
 
                     adapterArticulos.notifyDataSetChanged();
-                    tvEmpty.setVisibility(listaArticulos.isEmpty() ? View.VISIBLE : View.GONE);
+
+                    // 🔹 Ocultar loader y mostrar resultados
+                    progressBar.setVisibility(View.GONE);
+                    if (listaArticulos.isEmpty()) {
+                        tvEmpty.setVisibility(View.VISIBLE);
+                    } else {
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+
                     tvMensajeTotal.setText("Total: S/ " + String.format("%.2f", total));
 
                     // Estado de la venta
@@ -666,12 +697,14 @@ public class PedidosFragment extends Fragment implements View.OnClickListener {
                     tvMensajeEstado.setPadding(padding, padding/2, padding, padding/2);
 
                 } catch (Exception e) {
+                    progressBar.setVisibility(View.GONE);
                     Toast.makeText(getContext(), "Error al procesar los artículos", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(getContext(), "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
             }
         });

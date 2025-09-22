@@ -58,7 +58,7 @@ public class ArticuloDetalleAdapter extends RecyclerView.Adapter<ArticuloDetalle
 
         double precioFinal;
 
-// Si está en promo y el precio de oferta es válido, usar ese
+        // Si está en promo y el precio de oferta es válido, usar ese
         if (esPromo == 1 && precioOferta > 0) {
             precioFinal = precioOferta;
         } else {

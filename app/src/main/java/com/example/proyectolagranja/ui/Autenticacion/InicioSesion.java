@@ -398,6 +398,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         }
 
         Log.d("PhoneAuth", "Reenviando SMS a: " + numeroTelefonoActual);
+        mostrarLoadingConMensaje("Reenviando código...");
 
         PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
                 .setPhoneNumber(numeroTelefonoActual)
@@ -407,11 +408,13 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                 .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     @Override
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
+                        ocultarLoading();
                         signInWithPhoneAuthCredential(credential);
                     }
 
                     @Override
                     public void onVerificationFailed(@NonNull FirebaseException e) {
+                        ocultarLoading();
                         if (e instanceof FirebaseAuthInvalidCredentialsException) {
                             Toast.makeText(requireContext(), "Número de teléfono inválido", Toast.LENGTH_LONG).show();
                         } else if (e instanceof FirebaseTooManyRequestsException) {
@@ -425,6 +428,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     public void onCodeSent(@NonNull String verifId,
                                            @NonNull PhoneAuthProvider.ForceResendingToken token) {
                         super.onCodeSent(verifId, token);
+                        ocultarLoading();
+
                         verificationId = verifId;
                         resendToken = token;
                         Log.d("PhoneAuth", "Código reenviado. ID: " + verifId);
