@@ -97,11 +97,12 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         mAuth = FirebaseAuth.getInstance();
 
         // Inicializar App Check - Envio de sms
+        /*
         FirebaseApp.initializeApp(requireContext());
         FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.getInstance();
         firebaseAppCheck.installAppCheckProviderFactory(
                 PlayIntegrityAppCheckProviderFactory.getInstance());
-
+           */
         return rootView;
     }
 
