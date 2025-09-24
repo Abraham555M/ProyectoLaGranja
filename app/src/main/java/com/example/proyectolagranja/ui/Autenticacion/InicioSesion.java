@@ -322,42 +322,56 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
         mostrarLoading();
 
-        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
-                .setPhoneNumber(telefono)
-                .setTimeout(60L, TimeUnit.SECONDS)
-                .setActivity(requireActivity())
-                .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                    @Override
-                    public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
-                        ocultarLoading();
-                        signInWithPhoneAuthCredential(credential);
-                    }
+        // Obtener el token de App Check y esperar a que esté listo
+        FirebaseAppCheck.getInstance().getAppCheckToken(false).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // El token de App Check está listo
+                Log.d("AppCheck", "Token de App Check obtenido. Iniciando verificación de teléfono.");
 
-                    @Override
-                    public void onVerificationFailed(@NonNull FirebaseException e) {
-                        ocultarLoading();
-                        if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                            Toast.makeText(requireContext(), "Número de teléfono inválido", Toast.LENGTH_LONG).show();
-                        } else if (e instanceof FirebaseTooManyRequestsException) {
-                            Toast.makeText(requireContext(), "Demasiados intentos. Intenta más tarde", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
+                // Ahora llama a la verificación del número de teléfono
+                PhoneAuthOptions options = PhoneAuthOptions.newBuilder(mAuth)
+                        .setPhoneNumber(telefono)
+                        .setTimeout(60L, TimeUnit.SECONDS)
+                        .setActivity(requireActivity())
+                        .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                            @Override
+                            public void onVerificationCompleted(@NonNull PhoneAuthCredential credential) {
+                                ocultarLoading();
+                                signInWithPhoneAuthCredential(credential);
+                            }
 
-                    @Override
-                    public void onCodeSent(@NonNull String verifId,
-                                           @NonNull PhoneAuthProvider.ForceResendingToken token) {
-                        super.onCodeSent(verifId, token);
-                        ocultarLoading();
-                        verificationId = verifId;
-                        resendToken = token;
-                        Log.d("PhoneAuth", "Código enviado. ID: " + verifId);
-                        Toast.makeText(requireContext(), "Código enviado", Toast.LENGTH_SHORT).show();
-                    }
-                }).build();
+                            @Override
+                            public void onVerificationFailed(@NonNull FirebaseException e) {
+                                ocultarLoading();
+                                if (e instanceof FirebaseAuthInvalidCredentialsException) {
+                                    Toast.makeText(requireContext(), "Número de teléfono inválido", Toast.LENGTH_LONG).show();
+                                } else if (e instanceof FirebaseTooManyRequestsException) {
+                                    Toast.makeText(requireContext(), "Demasiados intentos. Intenta más tarde", Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            }
 
-        PhoneAuthProvider.verifyPhoneNumber(options);
+                            @Override
+                            public void onCodeSent(@NonNull String verifId, @NonNull PhoneAuthProvider.ForceResendingToken token) {
+                                super.onCodeSent(verifId, token);
+                                ocultarLoading();
+                                verificationId = verifId;
+                                resendToken = token;
+                                Log.d("PhoneAuth", "Código enviado. ID: " + verifId);
+                                Toast.makeText(requireContext(), "Código enviado", Toast.LENGTH_SHORT).show();
+                            }
+                        }).build();
+
+                PhoneAuthProvider.verifyPhoneNumber(options);
+
+            } else {
+                // Fallo al obtener el token de App Check
+                ocultarLoading();
+                Log.e("AppCheck", "Fallo al obtener el token de App Check: " + task.getException().getMessage());
+                Toast.makeText(requireContext(), "Error de seguridad. Intenta de nuevo.", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void incrementarIntentosReenvio(String telefono) {
