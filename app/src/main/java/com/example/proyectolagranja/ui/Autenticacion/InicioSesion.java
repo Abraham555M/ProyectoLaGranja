@@ -63,14 +63,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private String numeroTelefonoActual;
 
     // Control de intentos fallidos
-    private SharedPreferences sharedPreferences;
-    private static final String PREFS_NAME = "BloqueoTelefonos";
-    private static final String KEY_INTENTOS = "_intentos";
-    private static final String KEY_TIEMPO_BLOQUEO = "_tiempo_bloqueo";
+// Control de intentos fallidos
     private static final int MAX_INTENTOS = 3;
-    private static final long TIEMPO_BLOQUEO_HORAS = 24;
-    private static final String KEY_INTENTOS_CODIGO = "_intentos_codigo";
-    private static final String KEY_INTENTOS_REENVIO = "_intentos_reenvio";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,9 +85,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
         configurarAutoFocusCodigo(rootView);
 
-        // SharedPreferences para el control de bloqueos
-        sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-
         mAuth = FirebaseAuth.getInstance();
 
         // Inicializar App Check - Envio de sms
@@ -106,62 +97,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
-    private boolean esTelefonoBloqueado(String telefono) {
-        String telefonoFormateado = formatearNumero(telefono);
-        long tiempoBloqueo = sharedPreferences.getLong(telefonoFormateado + KEY_TIEMPO_BLOQUEO, 0);
 
-        if (tiempoBloqueo == 0) {
-            return false; // No hay bloqueo registrado
-        }
-
-        long tiempoActual = System.currentTimeMillis();
-        long tiempoTranscurrido = tiempoActual - tiempoBloqueo;
-        long tiempoBloqueoMs = TIEMPO_BLOQUEO_HORAS * 60 * 60 * 1000; // 24 horas en millisegundos
-
-        if (tiempoTranscurrido >= tiempoBloqueoMs) {
-            // El bloqueo ya expiró, limpiamos los datos
-            limpiarDatosBloqueo(telefonoFormateado);
-            return false;
-        }
-
-        return true; // Aún está bloqueado
-    }
-
-    private void incrementarIntentosFallidos(String telefono) {
-        String telefonoFormateado = formatearNumero(telefono);
-        int intentosActuales = sharedPreferences.getInt(telefonoFormateado + KEY_INTENTOS_CODIGO, 0);
-        intentosActuales++;
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(telefonoFormateado + KEY_INTENTOS_CODIGO, intentosActuales);
-
-        if (intentosActuales >= MAX_INTENTOS) {
-            long tiempoBloqueo = System.currentTimeMillis();
-            editor.putLong(telefonoFormateado + KEY_TIEMPO_BLOQUEO, tiempoBloqueo);
-            editor.apply();
-
-            Toast.makeText(requireContext(),
-                    "Número bloqueado por 24 horas debido a múltiples códigos incorrectos",
-                    Toast.LENGTH_LONG).show();
-
-            volverAlInicio();
-        } else {
-            editor.apply();
-            int intentosRestantes = MAX_INTENTOS - intentosActuales;
-            Toast.makeText(requireContext(),
-                    "Código incorrecto. Te quedan " + intentosRestantes + " intentos",
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void limpiarDatosBloqueo(String telefono) {
-        String telefonoFormateado = formatearNumero(telefono);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(telefonoFormateado + KEY_INTENTOS);
-        editor.remove(telefonoFormateado + KEY_INTENTOS_REENVIO);
-        editor.remove(telefonoFormateado + KEY_TIEMPO_BLOQUEO);
-        editor.apply();
-    }
 
     private void volverAlInicio() {
         layoutCodigo.setVisibility(View.GONE);
@@ -170,14 +106,126 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         limpiarEspacios();
     }
 
-    private long getTiempoRestanteBloqueo(String telefono) {
+    private void verificarEstadoBloqueo(String telefono) { // esTelefonoBloqueado
         String telefonoFormateado = formatearNumero(telefono);
-        long tiempoBloqueo = sharedPreferences.getLong(telefonoFormateado + KEY_TIEMPO_BLOQUEO, 0);
-        long tiempoActual = System.currentTimeMillis();
-        long tiempoBloqueoMs = TIEMPO_BLOQUEO_HORAS * 60 * 60 * 1000;
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/estado_bloqueo.php?tel_cliente=" + telefonoFormateado;
 
-        return (tiempoBloqueo + tiempoBloqueoMs - tiempoActual) / (60 * 60 * 1000); // Retorna horas restantes
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    boolean bloqueado = json.getBoolean("bloqueado");
+                    // horasRestantes será 0 si no está bloqueado, o el valor de la BD
+                    int horasRestantes = json.getInt("horas_restantes");
+
+                    if (bloqueado) {
+                        // El servidor nos confirma que el cliente sigue bloqueado
+                        Toast.makeText(requireContext(),
+                                "Este número está bloqueado. Tiempo restante: " + horasRestantes + " horas",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        // El servidor nos dice que está desbloqueado (o nunca lo estuvo)
+                        mostrarDialogoConfirmarNumero();
+                    }
+                } catch (Exception e) {
+                    Log.e("BLOQUEO_CHECK", "Error al procesar estado: " + e.getMessage());
+                    Toast.makeText(requireContext(), "Error de sistema al verificar bloqueo.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.e("HTTP_ERROR", "Fallo al verificar bloqueo: " + statusCode, error);
+                Toast.makeText(requireContext(), "Error de conexión con el servidor.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+    //-------------------------
+    // Nueva función para registrar un intento fallido en el servidor
+    private void registrarFallo(String telefono, String tipoBloqueo) {
+        String telefonoFormateado = formatearNumero(telefono);
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/registrar_fallo.php";
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        cz.msebera.android.httpclient.entity.StringEntity entity = null;
+        try {
+            JSONObject jsonParams = new JSONObject();
+            jsonParams.put("tel_cliente", telefonoFormateado);
+            jsonParams.put("tipo_bloqueo", tipoBloqueo);
+            entity = new cz.msebera.android.httpclient.entity.StringEntity(jsonParams.toString());
+            entity.setContentType("application/json");
+        } catch (Exception e) {
+            Log.e("REGISTRO_FALLO", "Error creando JSON: " + e.getMessage());
+            return;
+        }
+
+        client.post(requireContext(), url, entity, "application/json", new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    String estado = json.getString("estado"); // Puede ser "BLOQUEADO" o "NORMAL"
+                    int intentosActuales = json.getInt("intentos_actuales");
+
+                    // 🚨 AÑADE ESTOS LOGS CRUCIALES 🚨
+                    Log.d("FALLO_DEBUG", "JSON recibido: " + new String(responseBody));
+                    Log.d("FALLO_DEBUG", "Intentos actuales (Server): " + intentosActuales);
+                    // ------------------------------------
+
+                    if ("BLOQUEADO".equals(estado)) {
+                        // El servidor nos indica que el cliente ha sido bloqueado
+                        Toast.makeText(requireContext(),
+                                "Número bloqueado por 24 horas debido a múltiples fallos.",
+                                Toast.LENGTH_LONG).show();
+                        volverAlInicio();
+                    } else {
+                        // El servidor nos indica que es solo un intento fallido, no el límite
+                        int intentosRestantes = MAX_INTENTOS - intentosActuales;
+                        String mensaje = "Código incorrecto. Te quedan " + intentosRestantes + " intentos";
+                        if (tipoBloqueo.equals("REENVIO_EXCESIVO")) {
+                            mensaje = "Te quedan " + intentosRestantes + " reenvíos disponibles";
+                        }
+
+                        Toast.makeText(requireContext(), mensaje, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Log.e("BLOQUEO_FALLO", "Error al procesar registro: " + e.getMessage());
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.e("HTTP_ERROR", "Fallo al registrar intento: " + statusCode, error);
+                Toast.makeText(requireContext(), "Error de conexión al registrar el fallo.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Nuevo método para limpiar intentos en el servidor tras éxito
+    private void limpiarIntentosEnServidor(String telefono) {
+        String telefonoFormateado = formatearNumero(telefono);
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/limpiar_intentos.php?tel_cliente=" + telefonoFormateado;
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                Log.d("BLOQUEO_CONTROL", "Intentos de cliente limpiados en el servidor con éxito.");
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                // Esto no es crítico, solo se logea el error
+                Log.e("HTTP_ERROR", "Fallo al limpiar intentos: " + statusCode, error);
+            }
+        });
+    }
+
+    //-------------------------
+
 
     private void mostrarDialogoConfirmarNumero() {
         View dialogView = LayoutInflater.from(requireContext())
@@ -239,9 +287,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
                         String nombre = json.getString("nom_cliente");
                         String telCliente = json.getString("tel_cliente");
-
-                        // Limpiar datos de bloqueo al hacer login exitoso
-                        limpiarDatosBloqueo(telefono);
 
                         SessionManager session = new SessionManager(requireContext());
                         session.createLoginSession(idCliente, nombre, telCliente, false);
@@ -360,43 +405,14 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
 
-    private void incrementarIntentosReenvio(String telefono) {
-        String telefonoFormateado = formatearNumero(telefono);
-        int intentosReenvio = sharedPreferences.getInt(telefonoFormateado + KEY_INTENTOS_REENVIO, 0);
-        intentosReenvio++;
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(telefonoFormateado + KEY_INTENTOS_REENVIO, intentosReenvio);
-
-        if (intentosReenvio >= MAX_INTENTOS) {
-            // Bloquear el teléfono por 24 horas
-            long tiempoBloqueo = System.currentTimeMillis();
-            editor.putLong(telefonoFormateado + KEY_TIEMPO_BLOQUEO, tiempoBloqueo);
-            editor.apply();
-
-            Toast.makeText(requireContext(),
-                    "Número bloqueado por 24 horas debido a múltiples reenvíos",
-                    Toast.LENGTH_LONG).show();
-
-            volverAlInicio();
-        } else {
-            editor.apply();
-            int reenviosRestantes = MAX_INTENTOS - intentosReenvio;
-            Toast.makeText(requireContext(),
-                    "Te quedan " + reenviosRestantes + " reenvíos disponibles",
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
 
     private void reenviarCodigoFirebase() {
         if (numeroTelefonoActual == null || resendToken == null) {
             Toast.makeText(requireContext(), "No se puede reenviar el código", Toast.LENGTH_SHORT).show();
             return;
         }
-        incrementarIntentosReenvio(numeroTelefonoActual);
-        if (esTelefonoBloqueado(numeroTelefonoActual)) {
-            return; // Ya se bloqueó y mostró el toast correspondiente
-        }
+        registrarFallo(numeroTelefonoActual, "REENVIO_EXCESIVO");
 
         Log.d("PhoneAuth", "Reenviando SMS a: " + numeroTelefonoActual);
         mostrarLoadingConMensaje("Reenviando código...");
@@ -512,27 +528,18 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                     if (task.isSuccessful()) {
                         Log.d("PhoneAuth", "Autenticación exitosa");
                         String telefono = etTelefono.getText().toString().trim();
-                        resetearIntentosFallidos(telefono);
+                        limpiarIntentosEnServidor(telefono);
 
                         validarTelefono(telefono);
                     } else {
                         Log.e("PhoneAuth", "Autenticación fallida", task.getException());
                         String telefono = etTelefono.getText().toString().trim();
-                        incrementarIntentosFallidos(telefono);
+                        registrarFallo(telefono, "CODIGO_ERRONEO");
                     }
                 });
     }
 
-    private void resetearIntentosFallidos(String telefono) {
-        String telefonoFormateado = formatearNumero(telefono);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        // Solo resetear los intentos de código, mantener los de reenvío
-        editor.remove(telefonoFormateado + KEY_INTENTOS_CODIGO);
-        editor.apply();
-
-        Log.d("BloqueoControl", "Intentos de código reseteados para: " + telefonoFormateado);
-    }
 
     public void limpiarEspacios() {
         etTelefono.setText("");
@@ -560,16 +567,9 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                 return;
             }
 
-            // Verificar si el teléfono está bloqueado
-            if (esTelefonoBloqueado(telefono)) {
-                long horasRestantes = getTiempoRestanteBloqueo(telefono);
-                Toast.makeText(requireContext(),
-                        "Este número está bloqueado. Tiempo restante: " + horasRestantes + " horas",
-                        Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            mostrarDialogoConfirmarNumero();
+            // CORRECTO: Solo se llama a la verificación asíncrona.
+            // El resultado de la verificación llamará a mostrarDialogoConfirmarNumero() si no hay bloqueo.
+            verificarEstadoBloqueo(telefono);
         }
 
         if (v == btnValidarCodigo) {
