@@ -62,6 +62,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private PhoneAuthProvider.ForceResendingToken resendToken;
     private String numeroTelefonoActual;
 
+    private boolean numeroBloqueado = false; // Flag global
+
     // Control de intentos fallidos
 // Control de intentos fallidos
     private static final int MAX_INTENTOS = 3;
@@ -97,8 +99,6 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
         return rootView;
     }
 
-
-
     private void volverAlInicio() {
         layoutCodigo.setVisibility(View.GONE);
         layoutBienvenida.setVisibility(View.VISIBLE);
@@ -107,21 +107,29 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     }
 
     private void verificarEstadoBloqueo(String telefono) { // esTelefonoBloqueado
-        String telefonoFormateado = formatearNumero(telefono);
-        String url = ServidorConfig.URL_SERVIDOR + "cliente/estado_bloqueo.php?tel_cliente=" + telefonoFormateado;
+        String telefonoLimpio = telefono; // el que viene del EditText, 9 dígitos
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/estado_bloqueo.php?tel_cliente=" + telefonoLimpio;
+
+        Log.d("DEBUG_BLOQUEO", "Llamando a: " + url);
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
-                    JSONObject json = new JSONObject(new String(responseBody));
-                    boolean bloqueado = json.getBoolean("bloqueado");
-                    // horasRestantes será 0 si no está bloqueado, o el valor de la BD
-                    int horasRestantes = json.getInt("horas_restantes");
+                    String resp = new String(responseBody);
+                    Log.d("DEBUG_BLOQUEO", "Respuesta JSON: " + resp);
 
-                    if (bloqueado) {
+                    JSONObject json = new JSONObject(resp);
+                    boolean bloqueado = json.getBoolean("bloqueado");
+                    numeroBloqueado = bloqueado;
+                    int horasRestantes = json.getInt("horas_restantes");
+                    Log.d("DEBUG_BLOQUEO", "¿Bloqueado? " + bloqueado + " | Horas restantes: " + horasRestantes);
+
+                    if (numeroBloqueado) {
                         // El servidor nos confirma que el cliente sigue bloqueado
+                        volverAlInicio();  // más limpio que repetir setVisibility
+
                         Toast.makeText(requireContext(),
                                 "Este número está bloqueado. Tiempo restante: " + horasRestantes + " horas",
                                 Toast.LENGTH_LONG).show();
@@ -240,12 +248,19 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                 .create();
 
         btnSi.setOnClickListener(v -> {
-            layoutBienvenida.setVisibility(View.GONE);
-            layoutCodigo.setVisibility(View.VISIBLE);
-            tvBienvenida.setVisibility(View.GONE);
-            String telefonoFormateado = formatearNumero(etTelefono.getText().toString().trim());
-            enviarCodigoFirebase(telefonoFormateado);
+            Log.d("DEBUG_DIALOGO", "Click en SI | numeroBloqueado=" + numeroBloqueado);
 
+            if (numeroBloqueado) {
+                // 🚫 Evitar que pase a layoutCodigo
+                Toast.makeText(requireContext(), "Tu número está bloqueado", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+                return;
+            }
+
+            String telefonoFormateado = formatearNumero(etTelefono.getText().toString().trim());
+            Log.d("DEBUG_DIALOGO", "Llamando a enviarCodigoFirebase con: " + telefonoFormateado);
+
+            enviarCodigoFirebase(telefonoFormateado); // 🚀 Solo dispara Firebase
             dialog.dismiss();
         });
 
@@ -263,7 +278,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     }
 
     private void validarTelefono(String telefono) {
-        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_comprobar_telefono.php?tel_cliente=" + telefono;
+        String telefonoLimpio = telefono.replace("+51", ""); // por si acaso
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_comprobar_telefono.php?tel_cliente=" + telefonoLimpio;
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new AsyncHttpResponseHandler() {
@@ -397,8 +413,12 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
                         ocultarLoading();
                         verificationId = verifId;
                         resendToken = token;
-                        Log.d("PhoneAuth", "Código enviado. ID: " + verifId);
+                        Log.d("DEBUG_FIREBASE", "Código enviado OK. ID: " + verifId);
                         Toast.makeText(requireContext(), "Código enviado", Toast.LENGTH_SHORT).show();
+
+                        layoutBienvenida.setVisibility(View.GONE);
+                        layoutCodigo.setVisibility(View.VISIBLE);
+                        tvBienvenida.setVisibility(View.GONE);
                     }
                 }).build();
 
