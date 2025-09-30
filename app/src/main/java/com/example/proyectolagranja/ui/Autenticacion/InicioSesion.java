@@ -61,11 +61,8 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     private FirebaseAuth mAuth;
     private PhoneAuthProvider.ForceResendingToken resendToken;
     private String numeroTelefonoActual;
-
     private boolean numeroBloqueado = false; // Flag global
 
-    // Control de intentos fallidos
-// Control de intentos fallidos
     private static final int MAX_INTENTOS = 3;
 
     @Override
@@ -214,23 +211,46 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
     // Nuevo método para limpiar intentos en el servidor tras éxito
     private void limpiarIntentosEnServidor(String telefono) {
-        String telefonoFormateado = formatearNumero(telefono);
-        String url = ServidorConfig.URL_SERVIDOR + "cliente/limpiar_intentos.php?tel_cliente=" + telefonoFormateado;
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/limpiar_intentos.php?tel_cliente=" + telefono;
+        Log.d("DEBUG_LIMPIAR", "URL enviada: " + url);
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                Log.d("BLOQUEO_CONTROL", "Intentos de cliente limpiados en el servidor con éxito.");
+                try {
+                    String response = new String(responseBody, "UTF-8");
+                    JSONObject json = new JSONObject(response);
+
+                    boolean exito = json.optBoolean("exito", false);
+                    int eliminados = json.optInt("intentos_eliminados", 0);
+
+                    if (exito) {
+                        Log.d("BLOQUEO_CONTROL", "Intentos limpiados. Registros eliminados: " + eliminados);
+                    } else {
+                        Log.w("BLOQUEO_CONTROL", "No se limpiaron intentos. Respuesta: " + response);
+                    }
+
+                } catch (Exception e) {
+                    Log.e("JSON_ERROR", "Error parseando respuesta limpiar_intentos", e);
+                }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                // Esto no es crítico, solo se logea el error
-                Log.e("HTTP_ERROR", "Fallo al limpiar intentos: " + statusCode, error);
+                Log.e("BLOQUEO_CONTROL", "Error en la petición: " + statusCode, error);
+                if (responseBody != null) {
+                    try {
+                        String response = new String(responseBody, "UTF-8");
+                        Log.e("BLOQUEO_CONTROL", "Respuesta error: " + response);
+                    } catch (Exception e) {
+                        Log.e("BLOQUEO_CONTROL", "Error parseando respuesta de error", e);
+                    }
+                }
             }
         });
     }
+
 
     //-------------------------
 
