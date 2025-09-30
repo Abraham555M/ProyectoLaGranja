@@ -195,6 +195,8 @@ public class MainActivity extends AppCompatActivity {
                 );
             }
         }
+
+        verificarEstadoApp();
     }
 
     private void mostrarModalBienvenida(String nombre) {
@@ -317,6 +319,7 @@ public class MainActivity extends AppCompatActivity {
             inicializarFirebaseFCM();
         }
     }
+
     private void inicializarFirebaseFCM() {
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -342,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -477,6 +481,62 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void verificarEstadoApp() {
+        String url = ServidorConfig.URL_SERVIDOR + "app_status/obtener_app_status.php";
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.get(url, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                try {
+                    JSONObject json = new JSONObject(new String(responseBody));
+                    if (json.getBoolean("exito")) {
+                        String tipo = json.getString("tipo_status");
+                        String mensaje = json.getString("mensaje");
+                        String urlActualizar = json.optString("url_actualizacion", null);
+
+                        if ("MANTENIMIENTO".equalsIgnoreCase(tipo)) {
+                            mostrarDialogoEstadoApp(mensaje, false, null);
+                        } else if ("ACTUALIZACION".equalsIgnoreCase(tipo)) {
+                            mostrarDialogoEstadoApp(mensaje, true, urlActualizar);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                Log.e("MainActivity", "Error al consultar estado de la app");
+            }
+        });
+    }
+
+    private void mostrarDialogoEstadoApp(String mensaje, boolean esActualizacion, String urlActualizar) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(mensaje)
+                .setCancelable(false);
+
+        if (esActualizacion && urlActualizar != null && !urlActualizar.isEmpty()) {
+            builder.setPositiveButton("Actualizar ahora", (dialog, which) -> {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlActualizar));
+                startActivity(intent);
+                finish(); // cerrar la app para forzar actualización
+            });
+        } else {
+            builder.setPositiveButton("Aceptar", (dialog, which) -> {
+                dialog.dismiss();
+                // opcional: podrías incluso bloquear navegación si es mantenimiento
+            });
+        }
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
 
     private void mostrarCarrito() {
         // Inflar el layout de tu alert_dialog_carrito
