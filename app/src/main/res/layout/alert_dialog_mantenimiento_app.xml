@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="24dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    android:background="@drawable/bg_dialog_rounded"
+    android:backgroundTint="@android:color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <!-- Título o Mensaje -->
+        <TextView
+            android:id="@+id/tvMensajeDialogo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Actualmente estamos en mantenimiento, pronto volveremos. Gracias por tu comprensión."
+            android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+            android:textColor="?android:textColorPrimary"
+            android:textAlignment="center"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toTopOf="@id/btnAceptar" />
+
+        <!-- Botón Aceptar -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAceptar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aceptar"
+            app:cornerRadius="16dp"
+            app:backgroundTint="@color/color_verde"
+            app:layout_constraintTop_toBottomOf="@id/tvMensajeDialogo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

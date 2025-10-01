@@ -483,7 +483,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void verificarEstadoApp() {
-        String url = ServidorConfig.URL_SERVIDOR + "app_status/obtener_app_status.php";
+        String url = ServidorConfig.URL_SERVIDOR + "app_status/app_status_obtener.php";
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(url, new AsyncHttpResponseHandler() {
@@ -516,30 +516,43 @@ public class MainActivity extends AppCompatActivity {
 
     private void mostrarDialogoEstadoApp(String mensaje, boolean esActualizacion, String urlActualizar) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(mensaje)
-                .setCancelable(false);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.alert_dialog_mantenimiento_app, null);
+        builder.setView(dialogView);
 
+        AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        TextView tvMensaje = dialogView.findViewById(R.id.tvMensajeDialogo);
+        MaterialButton btnAceptar = dialogView.findViewById(R.id.btnAceptar);
+
+        tvMensaje.setText(mensaje);
+
+        // Configurar acción según el tipo
         if (esActualizacion && urlActualizar != null && !urlActualizar.isEmpty()) {
-            builder.setPositiveButton("Actualizar ahora", (dialog, which) -> {
+            btnAceptar.setText("Actualizar ahora");
+            btnAceptar.setOnClickListener(v -> {
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlActualizar));
                 startActivity(intent);
-                finish(); // cerrar la app para forzar actualización
+                dialog.dismiss();
+                finish(); // fuerza que el usuario no use versión vieja
             });
         } else {
-            builder.setPositiveButton("Aceptar", (dialog, which) -> {
+            btnAceptar.setText("Aceptar");
+            btnAceptar.setOnClickListener(v -> {
                 dialog.dismiss();
-                // opcional: podrías incluso bloquear navegación si es mantenimiento
+                finishAffinity(); //  cerrar toda la app
             });
         }
 
-        AlertDialog dialog = builder.create();
         dialog.show();
     }
 
 
-
     private void mostrarCarrito() {
-        // Inflar el layout de tu alert_dialog_carrito
         View dialogView = getLayoutInflater().inflate(R.layout.alert_dialog_carrito, null);
         spMedioPago = dialogView.findViewById(R.id.spMedioPago);
         btnCerrar = dialogView.findViewById(R.id.btnCerrar);

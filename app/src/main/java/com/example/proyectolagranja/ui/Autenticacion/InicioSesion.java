@@ -105,7 +105,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
     private void verificarEstadoBloqueo(String telefono) { // esTelefonoBloqueado
         String telefonoLimpio = telefono; // el que viene del EditText, 9 dígitos
-        String url = ServidorConfig.URL_SERVIDOR + "cliente/estado_bloqueo.php?tel_cliente=" + telefonoLimpio;
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_estado_bloqueo.php?tel_cliente=" + telefonoLimpio;
 
         Log.d("DEBUG_BLOQUEO", "Llamando a: " + url);
 
@@ -152,7 +152,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
     // Nueva función para registrar un intento fallido en el servidor
     private void registrarFallo(String telefono, String tipoBloqueo) {
         String telefonoFormateado = formatearNumero(telefono);
-        String url = ServidorConfig.URL_SERVIDOR + "cliente/registrar_fallo.php";
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_registrar_fallo.php";
 
         AsyncHttpClient client = new AsyncHttpClient();
         cz.msebera.android.httpclient.entity.StringEntity entity = null;
@@ -211,7 +211,7 @@ public class InicioSesion extends Fragment implements View.OnClickListener {
 
     // Nuevo método para limpiar intentos en el servidor tras éxito
     private void limpiarIntentosEnServidor(String telefono) {
-        String url = ServidorConfig.URL_SERVIDOR + "cliente/limpiar_intentos.php?tel_cliente=" + telefono;
+        String url = ServidorConfig.URL_SERVIDOR + "cliente/cliente_limpiar_intentos.php?tel_cliente=" + telefono;
         Log.d("DEBUG_LIMPIAR", "URL enviada: " + url);
 
         AsyncHttpClient client = new AsyncHttpClient();
